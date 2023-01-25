@@ -1,5 +1,5 @@
 # Election Results
-The Boulder County Elections [publishes](https://bouldercounty.gov/elections/by-year/) "statements of votes" for primary, general (even years), and coordinated (odd years) elections in going back to 2004. 
+The Boulder County Elections [publishes](https://bouldercounty.gov/elections/by-year/) "statements of votes" for primary and general elections in even years and coordinated (odd years) elections. The Colorado Secretary of State [publishes](https://www.coloradosos.gov/pubs/elections/Results/Archives.html) for primary and general elections in even years and state-wide ballot measures in odd years.
 
 ## Data summary
 Are the results of individual contests available at the level of precincts?
