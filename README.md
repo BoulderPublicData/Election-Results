@@ -5,7 +5,7 @@ The Boulder County Elections [publishes](https://bouldercounty.gov/elections/by-
 Are the results of individual contests available at the level of precincts?
 
 | Year | Excel | PDF |
-| --- | --- | --- | --- |
+| --- | --- | --- |
 | [2022](https://bouldercounty.gov/elections/by-year/2022-election/) | :white_check_mark: | :white_check_mark: |
 | [2021](https://bouldercounty.gov/elections/by-year/2021-election/) | :white_check_mark: | :white_check_mark: |
 | [2020](https://bouldercounty.gov/elections/by-year/2020-election/) | :white_check_mark: | :white_check_mark: |
