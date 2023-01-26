@@ -2,29 +2,29 @@
 The Boulder County Elections [publishes](https://bouldercounty.gov/elections/by-year/) "statements of votes" for primary and general elections in even years and coordinated (odd years) elections. The Colorado Secretary of State [publishes](https://www.coloradosos.gov/pubs/elections/Results/Archives.html) for primary and general elections in even years and state-wide ballot measures in odd years.
 
 ## Data summary
-Are the results of individual contests available at the level of precincts?
+Are the results of individual contests available at the level of precincts in an accessible format (XLS, CSV)?
 
-| Year | Excel | PDF |
+| Year | Boulder | State |
 | --- | --- | --- |
-| [2022](https://bouldercounty.gov/elections/by-year/2022-election/) | :white_check_mark: | :white_check_mark: |
-| [2021](https://bouldercounty.gov/elections/by-year/2021-election/) | :white_check_mark: | :white_check_mark: |
-| [2020](https://bouldercounty.gov/elections/by-year/2020-election/) | :white_check_mark: | :white_check_mark: |
-| [2019](https://bouldercounty.gov/elections/by-year/2019-election/) | :white_check_mark: | :white_check_mark: |
-| [2018](https://bouldercounty.gov/elections/by-year/2018-election/) | :white_check_mark: | :white_check_mark: |
-| [2017](https://bouldercounty.gov/elections/by-year/2017-election/) | :white_check_mark: | :white_check_mark: |
-| [2016](https://bouldercounty.gov/elections/by-year/2016-election/) | :white_check_mark: | :white_check_mark: |
-| [2015](https://bouldercounty.gov/elections/by-year/2015-election/) | :white_check_mark: | :white_check_mark: |
-| [2014](https://bouldercounty.gov/elections/by-year/2014-election/) | :white_check_mark: | :white_check_mark: |
-| [2013](https://bouldercounty.gov/elections/by-year/2013-election/) | :white_check_mark: | :white_check_mark: |
-| [2012](https://bouldercounty.gov/elections/by-year/2012-election/) | :white_check_mark: | :white_check_mark: |
-| [2011](https://bouldercounty.gov/elections/by-year/2011-election/) | :x: | :white_check_mark: |
-| [2010](https://bouldercounty.gov/elections/by-year/2010-election/) | :white_check_mark: | :white_check_mark: |
-| [2009](https://bouldercounty.gov/elections/by-year/2009-election/) | :x: | :x: |
-| [2008](https://bouldercounty.gov/elections/by-year/2008-election/) | :white_check_mark: | :white_check_mark: |
-| [2007](https://bouldercounty.gov/elections/by-year/2007-election/) | :x: | :x: | 
-| [2006](https://bouldercounty.gov/elections/by-year/2006-election/) | :x: | :x: | 
-| [2005](https://bouldercounty.gov/elections/by-year/2005-election/) | :x: | :x: | 
-| [2004](https://bouldercounty.gov/elections/by-year/2004-election/) | :x: | :x: | 
+| 2022 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2022/12/2022G-Boulder-County-Official-Statement-of-Votes.xlsx) | :grey_question: |
+| 2021 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2021/11/2021-Boulder-County-Coordinated-Election-Official-Statement-of-Votes-1.xlsx) | :x: |
+| 2020 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2020/11/2020-Boulder-County-General-Election-Official-Statement-of-Votes.xlsx) | [:white_check_mark:](https://www.coloradosos.gov/pubs/elections/Results/2020/2020GEPrecinctLevelResultsPosted.xlsx) |
+| 2019 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2019/11/2019C-Official-Statement-Of-Votes-SOV.xls) | :x: |
+| 2018 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2018/11/2018-General-Election-Official-Statement-Of-Votes.xlsx) | [:white_check_mark:](https://www.coloradosos.gov/pubs/elections/Results/2018/2018GEPrecinctLevelResults.xlsx) |
+| 2017 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2017/11/Results_SOV_Final.xlsx) | :x: |
+| 2016 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2016-general-election-results-final-sov.xls) | [:white_check_mark:](https://www.coloradosos.gov/pubs/elections/Results/2016/General/2016GeneralTurnoutPrecinctLevel.xlsx) |
+| 2015 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2015-election-sov.xls) | :x: |
+| 2014 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2014-general-election-sov.xls) | [:white_check_mark:](https://www.coloradosos.gov/pubs/elections/Results/2014/2014GeneralPrecinctTurnout.xlsx) |
+| 2013 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2013-election-sov.xls) | :x: |
+| 2012 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2012-general-election-sov.xls) | [:white_check_mark:](https://www.coloradosos.gov/pubs/elections/Results/2012/2012GeneralPrecinctLevelTurnout.xlsx) |
+| 2011 | [:interrobang:](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2011-election-sov.pdf) | :x: |
+| 2010 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2017/09/2010-general-sov.xls) | [:white_check_mark:](https://www.coloradosos.gov/pubs/elections/Results/2010/general/2010GeneralPrecinctTurnout.xlsx) |
+| 2009 | :x: | :x: |
+| 2008 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2017/12/2008-general-election-sov.xls) | [:white_check_mark:](https://www.coloradosos.gov/pubs/elections/Results/2008/2008GeneralPrecinctTurnout.xlsx) |
+| 2007 | :x: | :x: |
+| 2006 | :x: | [:white_check_mark:](https://www.coloradosos.gov/pubs/elections/Results/2006/2006GeneralPrecinctBallotsCast.xlsx) | 
+| 2005 | :x: | :x: |
+| 2004 | :x: | [:white_check_mark:](https://www.coloradosos.gov/pubs/elections/Results/2004/2004GeneralPrecinctBallotsCast.xlsx) |
 
 ### Data notes
 * Check consistency of precinct names across time
