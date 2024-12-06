@@ -6,6 +6,8 @@ Are the results of individual contests available at the level of precincts in an
 
 | Year | Boulder | State |
 | --- | --- | --- |
+| 2024 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx)]
+| 2023 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx) | :x: |
 | 2022 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2022/12/2022G-Boulder-County-Official-Statement-of-Votes.xlsx) | :x: |
 | 2021 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2021/11/2021-Boulder-County-Coordinated-Election-Official-Statement-of-Votes-1.xlsx) | :x: |
 | 2020 | [:white_check_mark:](https://assets.bouldercounty.gov/wp-content/uploads/2020/11/2020-Boulder-County-General-Election-Official-Statement-of-Votes.xlsx) | [:white_check_mark:](https://www.coloradosos.gov/pubs/elections/Results/2020/2020GEPrecinctLevelResultsPosted.xlsx) |
