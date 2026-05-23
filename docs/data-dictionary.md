@@ -236,7 +236,7 @@ Quick reference (post-pipeline run, 2026-05-23):
 | 2022 | Boulder | general | 22,144 | 76 | 201 | `machine_readable` (composite precincts) |
 | 2023 | Boulder | coordinated | 5,691 | 38 | 197 | `machine_readable` (Plurality + RCV sheets) |
 | 2024 | Boulder | general | 66 | 2 | 13 | `machine_readable` ⚠ check upstream |
-| 2024 | SOS | general | 0 | 0 | 0 | upstream file is turnout-only — no candidate/contest detail; harmonized rows skipped, raw file kept in `original-data/` |
+| 2024 | SOS | general | 0 | 0 | 0 | upstream file is turnout-only — no candidate/contest detail; harmonized rows skipped, raw file kept in `data/original/` |
 | 2025 | Boulder | coordinated | 4,340 | 32 | 195 | `machine_readable` (Propositions LL/MM, Boulder County ballot issues) |
 
 **Notes on row counts:**

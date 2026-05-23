@@ -170,7 +170,7 @@ def parse(path: Path, meta: SourceMeta, target_county: str = "Boulder") -> pd.Da
             extraction_notes=(
                 f"{path.name} is a turnout-only file (no candidate or contest "
                 "columns); harmonized schema requires candidate-level detail. "
-                "Use the raw file in original-data/ if you need turnout figures."
+                "Use the raw file in data/original/ if you need turnout figures."
             ),
         )
 
