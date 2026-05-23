@@ -1,0 +1,103 @@
+{
+  "$schema_version": "1.0.0",
+  "$description": "Pattern matchers for top-line contests across years. Each entry maps a canonical contest name to a list of case-insensitive substring patterns that identify that contest in the published Boulder County or SOS files. Used by scripts/reconcile.py to roll up multi-year cross-checks.",
+  "$generated_by": "hand-maintained; regeneration not automated",
+  "contests": [
+    {
+      "canonical": "Presidential Electors",
+      "tier": "federal",
+      "patterns": ["Presidential Electors", "President.*Vice President", "Presidential"]
+    },
+    {
+      "canonical": "United States Senator",
+      "tier": "federal",
+      "patterns": ["United States Senator", "U[.]?S[.]? Senate", "US Senator"]
+    },
+    {
+      "canonical": "United States Representative",
+      "tier": "federal",
+      "patterns": ["Representative to the .*Congress", "United States Representative", "U[.]?S[.]? House"]
+    },
+    {
+      "canonical": "Governor",
+      "tier": "state",
+      "patterns": ["Governor", "Governor/Lieutenant Governor"]
+    },
+    {
+      "canonical": "Attorney General",
+      "tier": "state",
+      "patterns": ["Attorney General"]
+    },
+    {
+      "canonical": "Secretary of State",
+      "tier": "state",
+      "patterns": ["Secretary of State"]
+    },
+    {
+      "canonical": "State Treasurer",
+      "tier": "state",
+      "patterns": ["State Treasurer", "Treasurer of the State"]
+    },
+    {
+      "canonical": "State Senate",
+      "tier": "state",
+      "patterns": ["State Senate"]
+    },
+    {
+      "canonical": "State Representative",
+      "tier": "state",
+      "patterns": ["State Representative"]
+    },
+    {
+      "canonical": "Regent University of Colorado",
+      "tier": "state",
+      "patterns": ["Regent.*University of Colorado"]
+    },
+    {
+      "canonical": "County Commissioner",
+      "tier": "county",
+      "patterns": ["County Commissioner"]
+    },
+    {
+      "canonical": "District Attorney",
+      "tier": "county",
+      "patterns": ["District Attorney"]
+    },
+    {
+      "canonical": "City of Boulder Council",
+      "tier": "city",
+      "patterns": ["City of Boulder Council"]
+    },
+    {
+      "canonical": "City of Boulder Mayor",
+      "tier": "city",
+      "patterns": ["City of Boulder Mayor"]
+    },
+    {
+      "canonical": "City of Longmont Council",
+      "tier": "city",
+      "patterns": ["City of Longmont Council"]
+    },
+    {
+      "canonical": "City of Longmont Mayor",
+      "tier": "city",
+      "patterns": ["City of Longmont Mayor"]
+    },
+    {
+      "canonical": "City of Louisville Council",
+      "tier": "city",
+      "patterns": ["City of Louisville.*Council"]
+    },
+    {
+      "canonical": "City of Lafayette Council",
+      "tier": "city",
+      "patterns": ["City of Lafayette Council"]
+    }
+  ],
+  "tiers": {
+    "federal": "Federal offices (President, US Senator, US Representative).",
+    "state":   "Statewide and state-legislative offices.",
+    "county":  "Boulder County offices.",
+    "city":    "Boulder-County city government offices."
+  }
+}

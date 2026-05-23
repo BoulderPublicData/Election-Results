@@ -1,0 +1,50 @@
+{
+  "$schema_version": "1.0.0",
+  "$description": "Yes/No variant normalization. Published files use many spellings (`Yes/For`, `No/Against`, `Yes/S\u00ed`, ...). `mapping` is source \u2192 canonical. All canonical values are either `Yes` or `No`.",
+  "$generated_by": "scripts/export_lookups.py from scripts/parsers/common.py:CHOICE_MAP",
+  "$generated_at": "2026-05-23T14:58:41+00:00",
+  "mapping": {
+    "Against": "No",
+    "For": "Yes",
+    "N": "No",
+    "NO": "No",
+    "NO/AGAINST": "No",
+    "No": "No",
+    "No/Against": "No",
+    "Y": "Yes",
+    "YES": "Yes",
+    "YES/FOR": "Yes",
+    "Yes": "Yes",
+    "Yes/For": "Yes",
+    "Yes/S\u00ed": "Yes",
+    "no": "No",
+    "no/against": "No",
+    "yes": "Yes",
+    "yes/for": "Yes",
+    "yes/s\u00ed": "Yes"
+  },
+  "by_canonical": {
+    "No": [
+      "Against",
+      "N",
+      "NO",
+      "NO/AGAINST",
+      "No",
+      "No/Against",
+      "no",
+      "no/against"
+    ],
+    "Yes": [
+      "For",
+      "Y",
+      "YES",
+      "YES/FOR",
+      "Yes",
+      "Yes/For",
+      "Yes/S\u00ed",
+      "yes",
+      "yes/for",
+      "yes/s\u00ed"
+    ]
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "$schema_version": "1.0.0",
+  "$description": "Party-name normalization. `mapping` is source-string \u2192 canonical 3-letter code. `by_canonical` groups every known source-string variant under its canonical code so you can render party labels consistently. Unknown source strings pass through verbatim \u2014 they are never silently dropped.",
+  "$generated_by": "scripts/export_lookups.py from scripts/parsers/common.py:PARTY_MAP",
+  "$generated_at": "2026-05-23T14:58:41+00:00",
+  "mapping": {
+    "ACN": "ACN",
+    "AIP": "AIP",
+    "AVP": "AVP",
+    "Alliance Party": "ALP",
+    "America's Independent": "AMI",
+    "America's Party": "AMP",
+    "American Constitution": "ACN",
+    "American Constitution Party": "ACN",
+    "American Delta Party": "ADP",
+    "American Independent": "AIP",
+    "American Independent Party": "AIP",
+    "American Solidarity Party": "ASP",
+    "American Third Position": "ATP",
+    "Approval Voting Party": "AVP",
+    "Boston Tea": "BTP",
+    "Boston Tea Party": "BTP",
+    "CON": "CON",
+    "Colorado Reform": "CRP",
+    "Concerns of People": "COP",
+    "Constitution": "CON",
+    "Constitution Party": "CON",
+    "DEM": "DEM",
+    "Dem": "DEM",
+    "Democrat": "DEM",
+    "Democratic": "DEM",
+    "Democratic Party": "DEM",
+    "GRN": "GRN",
+    "Green": "GRN",
+    "Green Party": "GRN",
+    "Heartquake '08": "HQE",
+    "Independent": "IND",
+    "Independent / Republican": "IND",
+    "LBR": "LBR",
+    "Lib": "LBR",
+    "Libertarian": "LBR",
+    "Libertarian Party": "LBR",
+    "Non Partisan": "NP",
+    "Non-Partisan": "NP",
+    "Nonpartisan": "NP",
+    "REP": "REP",
+    "Rep": "REP",
+    "Republican": "REP",
+    "Republican Party": "REP",
+    "UAF": "UAF",
+    "UTY": "UTY",
+    "Unaffiliated": "UAF",
+    "Unity": "UTY",
+    "WI": "WI",
+    "Write In": "WI",
+    "Write-In": "WI",
+    "Write-in": "WI"
+  },
+  "by_canonical": {
+    "ACN": [
+      "ACN",
+      "American Constitution",
+      "American Constitution Party"
+    ],
+    "ADP": [
+      "American Delta Party"
+    ],
+    "AIP": [
+      "AIP",
+      "American Independent",
+      "American Independent Party"
+    ],
+    "ALP": [
+      "Alliance Party"
+    ],
+    "AMI": [
+      "America's Independent"
+    ],
+    "AMP": [
+      "America's Party"
+    ],
+    "ASP": [
+      "American Solidarity Party"
+    ],
+    "ATP": [
+      "American Third Position"
+    ],
+    "AVP": [
+      "AVP",
+      "Approval Voting Party"
+    ],
+    "BTP": [
+      "Boston Tea",
+      "Boston Tea Party"
+    ],
+    "CON": [
+      "CON",
+      "Constitution",
+      "Constitution Party"
+    ],
+    "COP": [
+      "Concerns of People"
+    ],
+    "CRP": [
+      "Colorado Reform"
+    ],
+    "DEM": [
+      "DEM",
+      "Dem",
+      "Democrat",
+      "Democratic",
+      "Democratic Party"
+    ],
+    "GRN": [
+      "GRN",
+      "Green",
+      "Green Party"
+    ],
+    "HQE": [
+      "Heartquake '08"
+    ],
+    "IND": [
+      "Independent",
+      "Independent / Republican"
+    ],
+    "LBR": [
+      "LBR",
+      "Lib",
+      "Libertarian",
+      "Libertarian Party"
+    ],
+    "NP": [
+      "Non Partisan",
+      "Non-Partisan",
+      "Nonpartisan"
+    ],
+    "REP": [
+      "REP",
+      "Rep",
+      "Republican",
+      "Republican Party"
+    ],
+    "UAF": [
+      "UAF",
+      "Unaffiliated"
+    ],
+    "UTY": [
+      "UTY",
+      "Unity"
+    ],
+    "WI": [
+      "WI",
+      "Write In",
+      "Write-In",
+      "Write-in"
+    ]
+  }
+}
