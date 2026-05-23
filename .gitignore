@@ -128,3 +128,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .DS_Store
+
+# Combined tidy CSV is regenerable from per-year files and would exceed GitHub's
+# 100MB file limit; pipeline.py rebuilds it.
+data/processed/all-elections-tidy.csv
+
+# uv-managed virtual environment
+.venv/

@@ -1,0 +1,151 @@
+year,election_type,data_source,canonical,original_total,processed_total,delta,status
+2008,general,boulder_county,County Commissioner,,443548,,not_reconcilable
+2008,general,boulder_county,Presidential Electors,,1005,,not_reconcilable
+2008,general,boulder_county,United States Representative,,559,,not_reconcilable
+2008,general,boulder_county,United States Senator,,2229,,not_reconcilable
+2010,general,boulder_county,County Commissioner,,116922,,not_reconcilable
+2010,general,boulder_county,Governor,,154854,,not_reconcilable
+2010,general,boulder_county,Regent University of Colorado,,117523,,not_reconcilable
+2010,general,boulder_county,Secretary of State,,119678,,not_reconcilable
+2010,general,boulder_county,State Representative,,27389,,not_reconcilable
+2010,general,boulder_county,United States Representative,,1570,,not_reconcilable
+2010,general,boulder_county,United States Senator,,127423,,not_reconcilable
+2011,coordinated,boulder_county,City of Boulder Council,,95502,,not_reconcilable
+2011,coordinated,boulder_county,City of Lafayette Council,,19244,,not_reconcilable
+2011,coordinated,boulder_county,City of Longmont Council,,31653,,not_reconcilable
+2011,coordinated,boulder_county,City of Longmont Mayor,,21069,,not_reconcilable
+2011,coordinated,boulder_county,City of Louisville Council,,5232,,not_reconcilable
+2012,general,boulder_county,City of Louisville Council,,3097,,not_reconcilable
+2012,general,boulder_county,County Commissioner,,305929,,not_reconcilable
+2012,general,boulder_county,District Attorney,,124797,,not_reconcilable
+2012,general,boulder_county,Presidential Electors,,179499,,not_reconcilable
+2012,general,boulder_county,Regent University of Colorado,,159816,,not_reconcilable
+2012,general,boulder_county,State Representative,,163623,,not_reconcilable
+2012,general,boulder_county,State Senate,,158303,,not_reconcilable
+2012,general,boulder_county,United States Representative,,172626,,not_reconcilable
+2013,coordinated,boulder_county,City of Boulder Council,109635,109635,0,match
+2013,coordinated,boulder_county,City of Lafayette Council,21413,21413,0,match
+2013,coordinated,boulder_county,City of Longmont Council,48933,48933,0,match
+2013,coordinated,boulder_county,City of Longmont Mayor,24796,24796,0,match
+2013,coordinated,boulder_county,City of Louisville Council,6714,6714,0,match
+2014,general,boulder_county,Attorney General,133363,133363,0,match
+2014,general,boulder_county,City of Louisville Council,3464,3464,0,match
+2014,general,boulder_county,County Commissioner,123755,123755,0,match
+2014,general,boulder_county,Governor,141760,141760,0,match
+2014,general,boulder_county,Regent University of Colorado,95718,95718,0,match
+2014,general,boulder_county,Secretary of State,135438,135438,0,match
+2014,general,boulder_county,State Representative,114846,114846,0,match
+2014,general,boulder_county,State Senate,5528,5528,0,match
+2014,general,boulder_county,State Treasurer,134735,134735,0,match
+2014,general,boulder_county,United States Representative,139239,139239,0,match
+2014,general,boulder_county,United States Senator,142321,142321,0,match
+2015,coordinated,boulder_county,City of Boulder Council,114246,114246,0,match
+2015,coordinated,boulder_county,City of Lafayette Council,19710,19710,0,match
+2015,coordinated,boulder_county,City of Longmont Council,32954,32954,0,match
+2015,coordinated,boulder_county,City of Longmont Mayor,21096,21096,0,match
+2015,coordinated,boulder_county,City of Louisville Council,5198,5198,0,match
+2016,general,boulder_county,County Commissioner,339238,339238,0,match
+2016,general,boulder_county,District Attorney,299337,299337,0,match
+2016,general,boulder_county,Presidential Electors,188145,188145,0,match
+2016,general,boulder_county,Regent University of Colorado,216013,216013,0,match
+2016,general,boulder_county,State Representative,159617,159617,0,match
+2016,general,boulder_county,United States Representative,182571,182571,0,match
+2016,general,boulder_county,United States Senator,185820,185820,0,match
+2017,coordinated,boulder_county,City of Boulder Council,136282,136282,0,match
+2017,coordinated,boulder_county,City of Lafayette Council,27690,27690,0,match
+2017,coordinated,boulder_county,City of Longmont Council,47703,47703,0,match
+2017,coordinated,boulder_county,City of Longmont Mayor,24041,24041,0,match
+2017,coordinated,boulder_county,City of Louisville Council,5016,5016,0,match
+2018,general,boulder_county,Attorney General,173664,173664,0,match
+2018,general,boulder_county,County Commissioner,168404,168404,0,match
+2018,general,boulder_county,District Attorney,133806,133806,0,match
+2018,general,boulder_county,Governor,176262,176262,0,match
+2018,general,boulder_county,Regent University of Colorado,168559,168559,0,match
+2018,general,boulder_county,Secretary of State,174074,174074,0,match
+2018,general,boulder_county,State Representative,165975,165975,0,match
+2018,general,boulder_county,State Treasurer,171537,171537,0,match
+2018,general,boulder_county,United States Representative,174559,174559,0,match
+2019,coordinated,boulder_county,City of Boulder Council,168930,168930,0,match
+2019,coordinated,boulder_county,City of Lafayette Council,37036,37036,0,match
+2019,coordinated,boulder_county,City of Longmont Council,44748,44748,0,match
+2019,coordinated,boulder_county,City of Longmont Mayor,29134,29134,0,match
+2019,coordinated,boulder_county,City of Louisville Council,8045,8045,0,match
+2020,general,boulder_county,City of Louisville Council,2965,2965,0,match
+2020,general,boulder_county,County Commissioner,377430,377430,0,match
+2020,general,boulder_county,District Attorney,155225,155225,0,match
+2020,general,boulder_county,Presidential Electors,206111,206111,0,match
+2020,general,boulder_county,Regent University of Colorado,139909,139909,0,match
+2020,general,boulder_county,State Representative,195598,195598,0,match
+2020,general,boulder_county,United States Representative,200903,200903,0,match
+2020,general,boulder_county,United States Senator,205536,205536,0,match
+2021,coordinated,boulder_county,City of Boulder Council,135257,135257,0,match
+2021,coordinated,boulder_county,City of Louisville Council,6505,6505,0,match
+2022,general,boulder_county,Attorney General,162105,162105,0,match
+2022,general,boulder_county,County Commissioner,149471,149471,0,match
+2022,general,boulder_county,Governor,165077,165077,0,match
+2022,general,boulder_county,Secretary of State,163295,163295,0,match
+2022,general,boulder_county,State Representative,158784,158784,0,match
+2022,general,boulder_county,State Treasurer,161448,161448,0,match
+2022,general,boulder_county,United States Representative,163961,163961,0,match
+2022,general,boulder_county,United States Senator,165434,165434,0,match
+2023,coordinated,boulder_county,City of Boulder Council,113379,113379,0,match
+2023,coordinated,boulder_county,City of Boulder Mayor,32415,32415,0,match
+2023,coordinated,boulder_county,City of Louisville Council,7843,7843,0,match
+2004,general,secretary_of_state,District Attorney,113599,113599,0,match
+2004,general,secretary_of_state,Presidential Electors,308641,308641,0,match
+2004,general,secretary_of_state,United States Senator,157414,157414,0,match
+2006,general,secretary_of_state,Attorney General,113960,113960,0,match
+2006,general,secretary_of_state,Secretary of State,115548,115548,0,match
+2006,general,secretary_of_state,State Treasurer,114243,114243,0,match
+2008,general,secretary_of_state,District Attorney,114884,114884,0,match
+2008,general,secretary_of_state,Presidential Electors,171763,171763,0,match
+2008,general,secretary_of_state,Regent University of Colorado,109209,109209,0,match
+2008,general,secretary_of_state,State Representative,150932,150932,0,match
+2008,general,secretary_of_state,State Senate,142219,142219,0,match
+2008,general,secretary_of_state,United States Representative,162766,162766,0,match
+2008,general,secretary_of_state,United States Senator,166096,166096,0,match
+2010,general,secretary_of_state,Attorney General,119436,119436,0,match
+2010,general,secretary_of_state,Governor,125486,125486,0,match
+2010,general,secretary_of_state,Regent University of Colorado,148065,148065,0,match
+2010,general,secretary_of_state,Secretary of State,119678,119678,0,match
+2010,general,secretary_of_state,State Representative,111476,111476,0,match
+2010,general,secretary_of_state,State Senate,13823,13823,0,match
+2010,general,secretary_of_state,State Treasurer,119490,119490,0,match
+2010,general,secretary_of_state,United States Representative,124862,124862,0,match
+2010,general,secretary_of_state,United States Senator,125265,125265,0,match
+2012,general,secretary_of_state,District Attorney,124797,124797,0,match
+2012,general,secretary_of_state,Presidential Electors,179499,179499,0,match
+2012,general,secretary_of_state,Regent University of Colorado,159816,159816,0,match
+2012,general,secretary_of_state,State Representative,163623,163623,0,match
+2012,general,secretary_of_state,State Senate,158303,158303,0,match
+2012,general,secretary_of_state,United States Representative,172626,172626,0,match
+2014,general,secretary_of_state,Attorney General,133363,133363,0,match
+2014,general,secretary_of_state,Governor,141760,141760,0,match
+2014,general,secretary_of_state,Regent University of Colorado,95718,95718,0,match
+2014,general,secretary_of_state,Secretary of State,135438,135438,0,match
+2014,general,secretary_of_state,State Representative,114846,114846,0,match
+2014,general,secretary_of_state,State Senate,5528,5528,0,match
+2014,general,secretary_of_state,United States Representative,139239,139239,0,match
+2014,general,secretary_of_state,United States Senator,142321,142321,0,match
+2016,general,secretary_of_state,District Attorney,131787,131787,0,match
+2016,general,secretary_of_state,Presidential Electors,188145,188145,0,match
+2016,general,secretary_of_state,Regent University of Colorado,216013,216013,0,match
+2016,general,secretary_of_state,State Representative,159617,159617,0,match
+2016,general,secretary_of_state,State Senate,142818,142818,0,match
+2016,general,secretary_of_state,United States Representative,182571,182571,0,match
+2016,general,secretary_of_state,United States Senator,185820,185820,0,match
+2018,general,secretary_of_state,Attorney General,173664,173664,0,match
+2018,general,secretary_of_state,District Attorney,133806,133806,0,match
+2018,general,secretary_of_state,Governor,176262,176262,0,match
+2018,general,secretary_of_state,Regent University of Colorado,168559,168559,0,match
+2018,general,secretary_of_state,Secretary of State,174074,174074,0,match
+2018,general,secretary_of_state,State Representative,165975,165975,0,match
+2018,general,secretary_of_state,State Senate,7740,7740,0,match
+2018,general,secretary_of_state,United States Representative,174559,174559,0,match
+2020,general,secretary_of_state,District Attorney,155225,155225,0,match
+2020,general,secretary_of_state,Presidential Electors,206111,206111,0,match
+2020,general,secretary_of_state,Regent University of Colorado,139909,139909,0,match
+2020,general,secretary_of_state,State Representative,195598,195598,0,match
+2020,general,secretary_of_state,State Senate,186878,186878,0,match
+2020,general,secretary_of_state,United States Representative,200903,200903,0,match
+2020,general,secretary_of_state,United States Senator,205536,205536,0,match

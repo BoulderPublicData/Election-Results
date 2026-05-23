@@ -1,0 +1,130 @@
+name: Annual SOV refresh
+
+# Runs every January 6 at 14:00 UTC (07:00 MST). January 6 is the federal
+# Electoral College certification date — a fitting moment to pull last year's
+# SoV files. By then both Boulder County and the Colorado Secretary of State
+# have published certified results.
+on:
+  schedule:
+    - cron: "0 14 6 1 *"
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "Election year to fetch (default: previous calendar year)"
+        required: false
+        type: number
+      include_pdf:
+        description: "Also re-run PDF parsers for historical years"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python + uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          python-version: "3.12"
+
+      - name: Set up Java (for tabula-py)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Sync deps
+        run: uv sync
+
+      - name: Determine target year
+        id: year
+        run: |
+          if [ -n "${{ inputs.year }}" ]; then
+            echo "year=${{ inputs.year }}" >> $GITHUB_OUTPUT
+          else
+            echo "year=$(date -u -d 'yesterday' +'%Y' 2>/dev/null || date -v-1d +'%Y')" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fetch new SOV files
+        id: fetch
+        run: |
+          uv run python -m scripts.fetch --year ${{ steps.year.outputs.year }} 2>&1 | tee fetch.log
+          if grep -q "FAIL" fetch.log; then
+            echo "has_failures=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_failures=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Clean and audit
+        run: |
+          if [ "${{ inputs.include_pdf }}" = "true" ]; then
+            uv run python -m scripts.pipeline --skip-fetch --year ${{ steps.year.outputs.year }}
+          else
+            uv run python -m scripts.pipeline --skip-fetch --no-pdf --year ${{ steps.year.outputs.year }}
+          fi
+
+      - name: Capture changes
+        id: changes
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+          git diff --cached --stat | tee changes.txt
+
+      - name: Build PR body
+        if: steps.changes.outputs.has_changes == 'true'
+        id: body
+        run: |
+          {
+            echo "Automated annual refresh for **${{ steps.year.outputs.year }}**."
+            echo ""
+            echo "**Fetch log:**"
+            echo '```'
+            cat fetch.log
+            echo '```'
+            echo ""
+            echo "**Files changed (git diff --stat):**"
+            echo '```'
+            cat changes.txt
+            echo '```'
+            echo ""
+            echo "**Latest audit:**"
+            echo '```'
+            head -120 data/audit/summary.md 2>/dev/null || echo "(no audit produced)"
+            echo '```'
+            echo ""
+            echo "Review the data dictionary in \`docs/data-dictionary.md\` for any new caveats."
+            if [ "${{ steps.fetch.outputs.has_failures }}" = "true" ]; then
+              echo ""
+              echo "⚠️ **Some upstream URLs failed.** This usually means the SoV file isn't published yet,"
+              echo "or the canonical URL changed. Update \`scripts/sources.py\` and re-run."
+            fi
+          } > pr-body.md
+
+      - name: Open PR
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: bot/annual-sov-refresh-${{ steps.year.outputs.year }}
+          title: "chore: refresh ${{ steps.year.outputs.year }} SOV data"
+          body-path: pr-body.md
+          commit-message: "chore: refresh ${{ steps.year.outputs.year }} SOV data"
+          labels: |
+            automated
+            data-refresh
+          delete-branch: true
+
+      - name: Report no-op
+        if: steps.changes.outputs.has_changes == 'false'
+        run: echo "No changes — already up to date for ${{ steps.year.outputs.year }}."

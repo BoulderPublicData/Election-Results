@@ -1,0 +1,90 @@
+{
+  "$schema_version": "1.0.0",
+  "$description": "Canonical schema of every CSV under data/processed/. `columns` lists the column order; `dtypes` gives the pandas dtype for each. `Int16`/`Int64` are nullable integer dtypes \u2014 they may contain NA.",
+  "$generated_by": "scripts/export_lookups.py from scripts/schema.py",
+  "$generated_at": "2026-05-23T14:58:41+00:00",
+  "columns": [
+    "election_year",
+    "election_date",
+    "election_type",
+    "data_source",
+    "jurisdiction_level",
+    "jurisdiction_name",
+    "precinct_id",
+    "precinct_name",
+    "contest",
+    "contest_type",
+    "candidate_or_option",
+    "party",
+    "votes",
+    "active_voters",
+    "ballots_cast",
+    "source_file",
+    "source_url",
+    "retrieved_at",
+    "extraction_quality",
+    "extraction_notes"
+  ],
+  "dtypes": {
+    "election_year": "Int16",
+    "election_date": "string",
+    "election_type": "string",
+    "data_source": "string",
+    "jurisdiction_level": "string",
+    "jurisdiction_name": "string",
+    "precinct_id": "string",
+    "precinct_name": "string",
+    "contest": "string",
+    "contest_type": "string",
+    "candidate_or_option": "string",
+    "party": "string",
+    "votes": "Int64",
+    "active_voters": "Int64",
+    "ballots_cast": "Int64",
+    "source_file": "string",
+    "source_url": "string",
+    "retrieved_at": "string",
+    "extraction_quality": "string",
+    "extraction_notes": "string"
+  },
+  "contest_types": [
+    {
+      "value": "candidate",
+      "description": "Partisan or non-partisan candidate race."
+    },
+    {
+      "value": "measure",
+      "description": "Yes/No ballot measure, referendum, or amendment."
+    },
+    {
+      "value": "retention",
+      "description": "Judicial retention (Yes/No to retain a judge)."
+    },
+    {
+      "value": "recall",
+      "description": "Recall question (Yes/No)."
+    },
+    {
+      "value": "ranked_choice",
+      "description": "RCV contest \u2014 candidate_or_option suffixed with `| Round N` or `| Final`."
+    }
+  ],
+  "extraction_quality_values": [
+    {
+      "value": "machine_readable",
+      "description": "Parsed from XLS/XLSX with structured columns."
+    },
+    {
+      "value": "pdf_text_layer",
+      "description": "Parsed from a PDF text layer via tabula-py; contest titles may be unresolved."
+    },
+    {
+      "value": "pdf_ocr",
+      "description": "Reserved \u2014 not currently produced."
+    },
+    {
+      "value": "manual",
+      "description": "Reserved \u2014 for hand-entered records."
+    }
+  ]
+}
