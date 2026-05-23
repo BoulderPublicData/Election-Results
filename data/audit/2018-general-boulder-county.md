@@ -2,7 +2,7 @@
 
 - **Source file:** `2018-general-sov.xlsx`
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2018/11/2018-General-Election-Official-Statement-Of-Votes.xlsx
-- **Retrieved at:** 2021-12-09T22:56:16+00:00
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
 - **Extraction quality:** machine_readable
 - **Extraction notes:** contains composite precinct IDs (multiple precincts joined, comma-separated); votes are reported for the combined unit
 

@@ -2,7 +2,7 @@
 
 - **Source file:** `2010-general-sov.xls`
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/09/2010-general-sov.xls
-- **Retrieved at:** 2023-01-25T03:30:58+00:00
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 

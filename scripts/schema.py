@@ -15,7 +15,7 @@ from typing import Literal
 
 import pandas as pd
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
 
 # Canonical column order. Parsers MUST return these columns in this order.
 COLUMNS: list[str] = [
@@ -65,6 +65,43 @@ DTYPES: dict[str, str] = {
     "extraction_quality": "string",
     "extraction_notes": "string",
 }
+
+# Provenance columns that are constant per (year × source × election_type) — i.e.
+# they repeat the same value on every row from one source file. We drop them
+# from the per-row CSVs to keep file sizes manageable and write a sidecar
+# `data/processed/provenance.csv` with one row per source file instead.
+# The columns still live in the in-memory schema; coerce() / validate() / the
+# audit module all use them upstream of CSV writes.
+PROVENANCE_COLUMNS: list[str] = [
+    "source_file",
+    "source_url",
+    "retrieved_at",
+    "extraction_quality",
+    "extraction_notes",
+]
+
+# Columns actually written to per-year CSV files (the slimmed view).
+CSV_COLUMNS: list[str] = [c for c in COLUMNS if c not in PROVENANCE_COLUMNS]
+
+
+def to_csv_frame(df: pd.DataFrame) -> pd.DataFrame:
+    """Return a copy of `df` with provenance columns removed, in CSV column order."""
+    keep = [c for c in CSV_COLUMNS if c in df.columns]
+    return df[keep].copy()
+
+
+def provenance_record(df: pd.DataFrame) -> dict[str, object]:
+    """Distil the constant provenance fields from a parser-output frame into a
+    single dict. All non-grouping columns are expected to hold one value across
+    every row from this source — the first non-null wins."""
+    out: dict[str, object] = {}
+    for col in ["election_year", "election_type", "data_source"] + PROVENANCE_COLUMNS:
+        if col not in df.columns:
+            out[col] = pd.NA
+            continue
+        s = df[col].dropna()
+        out[col] = s.iloc[0] if len(s) else pd.NA
+    return out
 
 ElectionType = Literal["general", "primary", "coordinated"]
 ContestType = Literal[

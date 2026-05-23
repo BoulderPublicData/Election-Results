@@ -2,7 +2,7 @@
 
 - **Source file:** `2014-general-precinct-results.xlsx`
 - **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2014/2014GeneralPrecinctTurnout.xlsx
-- **Retrieved at:** 2023-01-31T02:30:23+00:00
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 

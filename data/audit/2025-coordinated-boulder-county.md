@@ -2,7 +2,7 @@
 
 - **Source file:** `2025-coordinated-sov.xlsx`
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx
-- **Retrieved at:** 2026-05-23T17:37:17+00:00
+- **Retrieved at:** 2026-05-23T18:30:06+00:00
 - **Extraction quality:** machine_readable
 - **Extraction notes:** contains composite precinct IDs (multiple precincts joined, comma-separated); votes are reported for the combined unit
 

@@ -2,7 +2,7 @@
 
 - **Source file:** `2023-coordinated-sov.xlsx`
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx
-- **Retrieved at:** 2024-03-19T15:59:02+00:00
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
 - **Extraction quality:** machine_readable
 - **Extraction notes:** contains composite precinct IDs (multiple precincts joined, comma-separated); votes are reported for the combined unit; RCV: candidate_or_option suffixed with '| Round N' for each tabulation round and '| Final' for the Total Votes column
 

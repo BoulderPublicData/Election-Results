@@ -2,7 +2,7 @@
 
 - **Source file:** `2016-general-sov.xls`
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2016-general-election-results-final-sov.xls
-- **Retrieved at:** 2021-12-09T22:56:24+00:00
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
 - **Extraction quality:** machine_readable
 - **Extraction notes:** contains composite precinct IDs (multiple precincts joined, comma-separated); votes are reported for the combined unit
 

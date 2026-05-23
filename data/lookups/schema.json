@@ -1,8 +1,8 @@
 {
-  "$schema_version": "1.0.0",
-  "$description": "Canonical schema of every CSV under data/processed/. `columns` lists the column order; `dtypes` gives the pandas dtype for each. `Int16`/`Int64` are nullable integer dtypes \u2014 they may contain NA.",
+  "$schema_version": "1.1.0",
+  "$description": "Harmonized schema for data/processed/. `columns` is the full in-memory schema (20 cols). `csv_columns` is the slim view written to per-year CSV files (15 cols). `provenance_columns` are the 5 fields stored in data/processed/provenance.csv instead of duplicating them on every row.",
   "$generated_by": "scripts/export_lookups.py from scripts/schema.py",
-  "$generated_at": "2026-05-23T17:55:33+00:00",
+  "$generated_at": "2026-05-23T18:37:08+00:00",
   "columns": [
     "election_year",
     "election_date",
@@ -19,6 +19,30 @@
     "votes",
     "active_voters",
     "ballots_cast",
+    "source_file",
+    "source_url",
+    "retrieved_at",
+    "extraction_quality",
+    "extraction_notes"
+  ],
+  "csv_columns": [
+    "election_year",
+    "election_date",
+    "election_type",
+    "data_source",
+    "jurisdiction_level",
+    "jurisdiction_name",
+    "precinct_id",
+    "precinct_name",
+    "contest",
+    "contest_type",
+    "candidate_or_option",
+    "party",
+    "votes",
+    "active_voters",
+    "ballots_cast"
+  ],
+  "provenance_columns": [
     "source_file",
     "source_url",
     "retrieved_at",

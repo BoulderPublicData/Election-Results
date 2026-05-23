@@ -91,8 +91,15 @@ def _output_path(s: Source) -> Path:
 
 
 def write_csv(df: pd.DataFrame, dest: Path) -> None:
+    """Write the slim CSV view (provenance columns excluded).
+
+    See scripts.schema.to_csv_frame — the 5 provenance columns are constant
+    per source file and live in the sidecar `data/processed/provenance.csv`
+    instead, which the pipeline regenerates from the in-memory frames.
+    """
+    from .schema import to_csv_frame
     dest.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(dest, index=False)
+    to_csv_frame(df).to_csv(dest, index=False)
 
 
 def main() -> int:

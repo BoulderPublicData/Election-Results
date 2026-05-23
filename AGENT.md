@@ -59,6 +59,12 @@ All modules above sit under `scripts/` and are wired up so `uv run python -m scr
 
 **Don't change to wide form.** The reshape recipes already handle the common views; widening the storage would break the SOS schema (which lacks ballots_cast) and the RCV round-level rows.
 
+### 2.1a Provenance lives in a sidecar, not on every row
+
+**Why:** `source_file`, `source_url`, `retrieved_at`, `extraction_quality`, `extraction_notes` are constant per source file — repeating them on every row would inflate per-year CSVs by ~3×. They live in `data/processed/provenance.csv` (one row per source file) and the in-memory schema. `scripts.schema.to_csv_frame()` drops them before write; `pipeline.py` regenerates the sidecar from the in-memory frames so the two views stay synchronized.
+
+To recover row-level provenance, join on `(election_year, election_type, data_source)` — see `docs/filter-pivot-recipes.md` § "Joining the provenance sidecar". `scripts.audit.audit_file` and `scripts.audit.audit_frame` both reconstruct provenance: the file-based variant reads the sidecar, the frame-based variant reads the in-memory columns directly.
+
 ### 2.2 Separate per-year parsers (not one mega-parser)
 
 **Why:** Each year/source generation has its own quirks (column rename, header layout, party-name conventions, RCV-vs-plurality sheets, panel vs. tidy format). Forcing them through one branching function hid bugs in the original `Cleaning.ipynb`. Splitting into `parsers/boco_tidy.py`, `parsers/boco_panel.py`, etc. makes each generation testable in isolation and adds a clear extension point for new years.
@@ -208,7 +214,8 @@ In rough order of value:
 - **Adding a parser without updating `scripts/clean.py`'s router.** The orchestrator picks the parser by year; a new parser orphaned outside the router won't run.
 - **Hardcoding a path.** Everything should resolve from `REPO_ROOT = Path(__file__).resolve().parents[1]`.
 - **Inferring schema from `data/processed/` instead of `scripts/schema.py`.** The schema file is authoritative.
-- **Bypassing `add_provenance()`.** Every row needs `source_url` + `retrieved_at` + `extraction_quality`. The helper in `parsers/common.py` does this.
+- **Bypassing `add_provenance()`.** Parsers must still attach the provenance columns — they're in the in-memory schema even though the CSV writer strips them. The audit module and the `provenance.csv` sidecar both depend on them.
+- **Inferring schema from the CSV files.** Per-year CSVs use `CSV_COLUMNS` (15 cols, no provenance); the canonical `COLUMNS` constant in `schema.py` has all 20. Use `CSV_COLUMNS` when validating a CSV; use `COLUMNS` when validating a parser-output frame.
 - **Pretending PDF years are machine-readable.** Their `extraction_quality` is intentionally `pdf_text_layer` so downstream filters can skip them.
 - **"Fixing" composite precinct IDs by splitting on comma.** Their vote tallies are reported jointly — splitting would multiply totals.
 - **Removing the `data/cleaned/` legacy directory.** It's the audit trail for the prior notebook's output and lets future agents diff the harmonized data against the pre-rewrite baseline.
