@@ -25,18 +25,19 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      issues: write  # used by the fallback step if the org disables PR creation by Actions
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Set up Python + uv
-        uses: astral-sh/setup-uv@v3
+      - name: Set up uv (Python comes from pyproject.toml's requires-python)
+        uses: astral-sh/setup-uv@v8
         with:
-          python-version: "3.12"
+          enable-cache: true
 
       - name: Set up Java (for tabula-py)
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -112,9 +113,19 @@ jobs:
             fi
           } > pr-body.md
 
+      # Requires repo setting:
+      #   Settings → Actions → General → "Allow GitHub Actions to create and
+      #   approve pull requests" must be enabled.
+      # And, if the org enforces it, the same toggle at the org level:
+      #   https://github.com/organizations/<org>/settings/actions
+      # If the toggle is off the job fails with "GitHub Actions is not
+      # permitted to create or approve pull requests"; the "Open issue
+      # fallback" step below catches that case so the work isn't lost.
       - name: Open PR
+        id: openpr
         if: steps.changes.outputs.has_changes == 'true'
-        uses: peter-evans/create-pull-request@v7
+        continue-on-error: true
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: bot/annual-sov-refresh-${{ steps.year.outputs.year }}
           title: "chore: refresh ${{ steps.year.outputs.year }} SOV data"
@@ -124,6 +135,17 @@ jobs:
             automated
             data-refresh
           delete-branch: true
+
+      - name: Open issue fallback (when PR creation is disabled)
+        if: steps.changes.outputs.has_changes == 'true' && steps.openpr.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Manual review needed: refresh ${{ steps.year.outputs.year }} SOV data" \
+            --body-file pr-body.md \
+            --label automated \
+            --label data-refresh
 
       - name: Report no-op
         if: steps.changes.outputs.has_changes == 'false'
