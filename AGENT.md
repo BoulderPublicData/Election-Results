@@ -75,9 +75,9 @@ All modules above sit under `scripts/` and are wired up so `uv run python -m scr
 
 **Why three:** The audit catches null-rate regressions and shape changes. The reconciliation catches vote-count regressions (the thing that would actually mislead an analyst). The notebook is the human-readable doc that explains both.
 
-### 2.5 `original-data/` is immutable
+### 2.5 `data/original/` is immutable
 
-Raw downloads are committed alongside the manifest (sha256 + retrieved_at). Anything under `data/` is regenerable. **Never edit `original-data/` files in place** — if you find an issue, change the parser, not the raw file. The integrity check would otherwise be meaningless.
+Raw downloads are committed alongside the manifest (sha256 + retrieved_at). Anything else under `data/` is regenerable. **Never edit `data/original/` files in place** — if you find an issue, change the parser, not the raw file. The integrity check would otherwise be meaningless.
 
 ### 2.6 uv + pyproject.toml (not pip + requirements.txt)
 
@@ -204,14 +204,14 @@ In rough order of value:
 
 ## 9. Common agent failure modes (avoid these)
 
-- **Editing `original-data/` instead of the parser.** The raw files are reference. Fix the parser.
+- **Editing `data/original/` instead of the parser.** The raw files are reference. Fix the parser.
 - **Adding a parser without updating `scripts/clean.py`'s router.** The orchestrator picks the parser by year; a new parser orphaned outside the router won't run.
 - **Hardcoding a path.** Everything should resolve from `REPO_ROOT = Path(__file__).resolve().parents[1]`.
 - **Inferring schema from `data/processed/` instead of `scripts/schema.py`.** The schema file is authoritative.
 - **Bypassing `add_provenance()`.** Every row needs `source_url` + `retrieved_at` + `extraction_quality`. The helper in `parsers/common.py` does this.
 - **Pretending PDF years are machine-readable.** Their `extraction_quality` is intentionally `pdf_text_layer` so downstream filters can skip them.
 - **"Fixing" composite precinct IDs by splitting on comma.** Their vote tallies are reported jointly — splitting would multiply totals.
-- **Removing the `cleaned-data/` legacy directory.** It's the audit trail for the prior notebook's output and lets future agents diff the harmonized data against the pre-rewrite baseline.
+- **Removing the `data/cleaned/` legacy directory.** It's the audit trail for the prior notebook's output and lets future agents diff the harmonized data against the pre-rewrite baseline.
 
 ---
 

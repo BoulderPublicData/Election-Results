@@ -87,7 +87,7 @@ def export_sources() -> None:
         "$schema_version": SCHEMA_VERSION,
         "$description": (
             "Source URL registry. One entry per (year, data_source). "
-            "`local_filename` is the path under original-data/{data_source-kebab}/."
+            "`local_filename` is the path under data/original/{data_source-kebab}/."
         ),
         "$generated_by": "scripts/export_lookups.py from scripts/sources.py:ALL_SOURCES",
         "$generated_at": _now(),

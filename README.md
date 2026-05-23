@@ -46,11 +46,13 @@ Output lands in [`data/processed/`](data/processed/):
 
 ```
 .
-├── original-data/             # immutable raw downloads
-│   ├── boulder-county/
-│   ├── secretary-of-state/
-│   └── manifest.json          # sha256 + retrieved_at per file
-├── data/
+├── data/                      # everything reproducible from raw + scripts
+│   ├── original/              # immutable raw downloads (was: original-data/)
+│   │   ├── boulder-county/
+│   │   ├── secretary-of-state/
+│   │   └── manifest.json      # sha256 + retrieved_at per file
+│   ├── cleaned/               # legacy outputs from the original notebook
+│   │                          #   (was: cleaned-data/)
 │   ├── processed/             # tidy CSVs (pipeline output)
 │   ├── audit/                 # auto-generated audits + reconciliation report
 │   └── lookups/               # JSON lookups — party codes, election dates,
@@ -71,7 +73,6 @@ Output lands in [`data/processed/`](data/processed/):
 ├── docs/
 │   ├── data-dictionary.md     # what every column means + cross-walks
 │   └── filter-pivot-recipes.md  # pandas / tidyverse / Excel recipes
-├── cleaned-data/              # legacy outputs from the original notebook
 ├── Cleaning.ipynb             # rewritten notebook — methodology + worked examples
 ├── AGENT.md                   # architecture, gotchas, future-agent handbook
 ├── .github/workflows/
