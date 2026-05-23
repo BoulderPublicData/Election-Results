@@ -219,6 +219,8 @@ Quick reference (post-pipeline run, 2026-05-23):
 | 2022 | Boulder | general | 22,144 | 76 | 201 | `machine_readable` (composite precincts) |
 | 2023 | Boulder | coordinated | 5,691 | 38 | 197 | `machine_readable` (Plurality + RCV sheets) |
 | 2024 | Boulder | general | 66 | 2 | 13 | `machine_readable` ⚠ check upstream |
+| 2024 | SOS | general | 0 | 0 | 0 | upstream file is turnout-only — no candidate/contest detail; harmonized rows skipped, raw file kept in `original-data/` |
+| 2025 | Boulder | coordinated | 4,340 | 32 | 195 | `machine_readable` (Propositions LL/MM, Boulder County ballot issues) |
 
 **Notes on row counts:**
 
@@ -234,6 +236,28 @@ See [`docs/filter-pivot-recipes.md`](filter-pivot-recipes.md) for parallel examp
 
 ---
 
-## 7. Changelog
+## 7. Upstream discovery
+
+The pipeline pulls source URLs from two layers:
+
+1. **Static registry** in [`scripts/sources.py`](../scripts/sources.py) — the verified canonical URL for every year that's been hand-recorded.
+2. **Discovery** in [`scripts/discover.py`](../scripts/discover.py) — scrapes the upstream landing pages so newly-published files are picked up automatically, even before they're hand-added to the registry:
+   - Boulder County: [bouldercounty.gov/elections/results/](https://bouldercounty.gov/elections/results/)
+   - Colorado SOS: [coloradosos.gov/pubs/elections/Results/Archives.html](https://www.coloradosos.gov/pubs/elections/Results/Archives.html)
+
+Discovery prefers `.xlsx` over `.xls` over `.pdf` when the same year publishes multiple formats. The filename filter rejects sample ballots, TABOR notices, summary files, abstracts, and other non-SoV publications.
+
+```bash
+# See what discovery would find that's NOT already in sources.py
+uv run python -m scripts.discover
+
+# Run the full pipeline including discovery
+uv run python -m scripts.pipeline --discover
+```
+
+When a discovery finds something new, **add it to `sources.py`** in the same PR that introduces the year's data. Discovery's role is to keep the pipeline working between hand-curated updates; it's not a substitute for the registry.
+
+## 8. Changelog
 
 - **2026-05-23** — Schema 1.0.0 released alongside the new pipeline. Initial dictionary published.
+- **2026-05** — Added `discover.py` (BoCo + SOS upstream scraping), pytest suite under `tests/`, CI workflow at `.github/workflows/tests.yml`, plus 2025 Boulder coordinated + 2024 SOS general entries. `infer_contest_type` now handles `pd.NA` inputs.

@@ -2,7 +2,7 @@
   "$schema_version": "1.0.0",
   "$description": "Election day for each year in the registry. Format: ISO YYYY-MM-DD. Note that Boulder County typically certifies its Statement of Votes ~3 weeks after election day; the `retrieved_at` field on processed rows captures when the pipeline downloaded the certified file.",
   "$generated_by": "scripts/export_lookups.py from scripts/sources.py:ELECTION_DATES",
-  "$generated_at": "2026-05-23T17:30:28+00:00",
+  "$generated_at": "2026-05-23T17:55:33+00:00",
   "election_dates": {
     "2004": "2004-11-02",
     "2005": "2005-11-01",
@@ -24,6 +24,8 @@
     "2021": "2021-11-02",
     "2022": "2022-11-08",
     "2023": "2023-11-07",
-    "2024": "2024-11-05"
+    "2024": "2024-11-05",
+    "2025": "2025-11-04",
+    "2026": "2026-11-03"
   }
 }

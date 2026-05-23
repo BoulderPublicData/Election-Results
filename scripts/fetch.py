@@ -110,14 +110,32 @@ def main() -> int:
                     default="all")
     ap.add_argument("--force", action="store_true", help="Refetch even if manifest matches")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--discover", action="store_true",
+                    help="Also scrape upstream landing pages for sources not in "
+                         "the static registry (e.g. years more recent than the "
+                         "last hand-recorded entry)")
     args = ap.parse_args()
 
     if args.source == "boulder_county":
-        pool = BOULDER_COUNTY
+        pool = list(BOULDER_COUNTY)
     elif args.source == "secretary_of_state":
-        pool = SECRETARY_OF_STATE
+        pool = list(SECRETARY_OF_STATE)
     else:
-        pool = ALL_SOURCES
+        pool = list(ALL_SOURCES)
+
+    if args.discover:
+        try:
+            from .discover import discover, merge_with_registry
+            discovered = discover()
+            new = merge_with_registry(discovered, only_new=True)
+            if args.source != "all":
+                new = [s for s in new if s.data_source == args.source]
+            for s in new:
+                print(f"discover  +{s.year}-{s.election_type}-{s.data_source}  {s.url}",
+                      file=sys.stderr)
+            pool.extend(new)
+        except Exception as e:
+            print(f"WARN discovery failed: {e}", file=sys.stderr)
 
     if args.year:
         pool = [s for s in pool if s.year == args.year]

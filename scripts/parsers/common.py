@@ -97,9 +97,12 @@ _RETENTION_RE = re.compile(
 _RECALL_RE = re.compile(r"\brecall\b", re.IGNORECASE)
 
 
-def infer_contest_type(contest: str, choice: object) -> str:
-    is_yesno = str(choice).strip() in {"Yes", "No"}
-    text = contest or ""
+def infer_contest_type(contest: object, choice: object) -> str:
+    # Guard against pd.NA / NaN / None — empty contests still return a default
+    # so downstream coerce() doesn't break on a missing value.
+    text = "" if pd.isna(contest) else str(contest)
+    choice_text = "" if pd.isna(choice) else str(choice)
+    is_yesno = choice_text.strip() in {"Yes", "No"}
     if _RECALL_RE.search(text):
         return "recall"
     if is_yesno and _RETENTION_RE.search(text):

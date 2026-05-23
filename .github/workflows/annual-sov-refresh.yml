@@ -49,10 +49,13 @@ jobs:
             echo "year=$(date -u -d 'yesterday' +'%Y' 2>/dev/null || date -v-1d +'%Y')" >> $GITHUB_OUTPUT
           fi
 
-      - name: Fetch new SOV files
+      - name: Fetch new SOV files (with upstream discovery)
         id: fetch
+        # --discover scrapes the Boulder and SOS landing pages so years more
+        # recent than the static registry in scripts/sources.py still get
+        # picked up automatically.
         run: |
-          uv run python -m scripts.fetch --year ${{ steps.year.outputs.year }} 2>&1 | tee fetch.log
+          uv run python -m scripts.fetch --discover --year ${{ steps.year.outputs.year }} 2>&1 | tee fetch.log
           if grep -q "FAIL" fetch.log; then
             echo "has_failures=true" >> $GITHUB_OUTPUT
           else
@@ -62,9 +65,9 @@ jobs:
       - name: Clean and audit
         run: |
           if [ "${{ inputs.include_pdf }}" = "true" ]; then
-            uv run python -m scripts.pipeline --skip-fetch --year ${{ steps.year.outputs.year }}
+            uv run python -m scripts.pipeline --skip-fetch --discover --year ${{ steps.year.outputs.year }}
           else
-            uv run python -m scripts.pipeline --skip-fetch --no-pdf --year ${{ steps.year.outputs.year }}
+            uv run python -m scripts.pipeline --skip-fetch --discover --no-pdf --year ${{ steps.year.outputs.year }}
           fi
 
       - name: Capture changes

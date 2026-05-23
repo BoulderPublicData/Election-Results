@@ -2,7 +2,7 @@
   "$schema_version": "1.0.0",
   "$description": "Canonical schema of every CSV under data/processed/. `columns` lists the column order; `dtypes` gives the pandas dtype for each. `Int16`/`Int64` are nullable integer dtypes \u2014 they may contain NA.",
   "$generated_by": "scripts/export_lookups.py from scripts/schema.py",
-  "$generated_at": "2026-05-23T17:30:28+00:00",
+  "$generated_at": "2026-05-23T17:55:33+00:00",
   "columns": [
     "election_year",
     "election_date",

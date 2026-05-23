@@ -85,6 +85,9 @@ BOULDER_COUNTY: list[Source] = [
     Source(2024, "general", "boulder_county",
            "https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx",
            "2024-general-sov.xlsx"),
+    Source(2025, "coordinated", "boulder_county",
+           "https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx",
+           "2025-coordinated-sov.xlsx"),
 ]
 
 # Colorado Secretary of State precinct-level results.
@@ -117,6 +120,9 @@ SECRETARY_OF_STATE: list[Source] = [
     Source(2020, "general", "secretary_of_state",
            "https://www.coloradosos.gov/pubs/elections/Results/2020/2020GEPrecinctLevelResultsPosted.xlsx",
            "2020-general-precinct-results.xlsx"),
+    Source(2024, "general", "secretary_of_state",
+           "https://www.coloradosos.gov/pubs/elections/Results/2024/2024GeneralPrecinctVoterTurnout.xlsx",
+           "2024-general-precinct-results.xlsx"),
 ]
 
 ALL_SOURCES: list[Source] = BOULDER_COUNTY + SECRETARY_OF_STATE
@@ -133,6 +139,7 @@ ELECTION_DATES: dict[int, str] = {
     2016: "2016-11-08", 2017: "2017-11-07", 2018: "2018-11-06",
     2019: "2019-11-05", 2020: "2020-11-03", 2021: "2021-11-02",
     2022: "2022-11-08", 2023: "2023-11-07", 2024: "2024-11-05",
+    2025: "2025-11-04", 2026: "2026-11-03",
 }
 
 
