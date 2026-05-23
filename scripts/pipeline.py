@@ -34,6 +34,9 @@ def main() -> int:
     ap.add_argument("--no-pdf", action="store_true")
     ap.add_argument("--skip-fetch", action="store_true",
                     help="Don't try to download; assume files already present.")
+    ap.add_argument("--discover", action="store_true",
+                    help="Also scrape upstream landing pages for sources not in "
+                         "the static registry (e.g. a newly published year)")
     ap.add_argument("--combined-out", type=Path,
                     default=PROCESSED_DATA / "all-elections-tidy.csv")
     args = ap.parse_args()
@@ -44,6 +47,20 @@ def main() -> int:
         pool = list(SECRETARY_OF_STATE)
     else:
         pool = list(ALL_SOURCES)
+
+    if args.discover:
+        try:
+            from .discover import discover, merge_with_registry
+            discovered = discover()
+            new = merge_with_registry(discovered, only_new=True)
+            if args.source != "all":
+                new = [s for s in new if s.data_source == args.source]
+            for s in new:
+                print(f"discover  +{s.year}-{s.election_type}-{s.data_source}  {s.url}",
+                      file=sys.stderr)
+            pool.extend(new)
+        except Exception as e:
+            print(f"WARN discovery failed: {e}", file=sys.stderr)
 
     if args.year:
         pool = [s for s in pool if s.year == args.year]

@@ -2,7 +2,7 @@
   "$schema_version": "1.0.0",
   "$description": "Source URL registry. One entry per (year, data_source). `local_filename` is the path under original-data/{data_source-kebab}/.",
   "$generated_by": "scripts/export_lookups.py from scripts/sources.py:ALL_SOURCES",
-  "$generated_at": "2026-05-23T17:30:28+00:00",
+  "$generated_at": "2026-05-23T17:55:33+00:00",
   "sources": [
     {
       "year": 2004,
@@ -199,6 +199,20 @@
       "data_source": "boulder_county",
       "url": "https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx",
       "local_filename": "2024-general-sov.xlsx"
+    },
+    {
+      "year": 2024,
+      "election_type": "general",
+      "data_source": "secretary_of_state",
+      "url": "https://www.coloradosos.gov/pubs/elections/Results/2024/2024GeneralPrecinctVoterTurnout.xlsx",
+      "local_filename": "2024-general-precinct-results.xlsx"
+    },
+    {
+      "year": 2025,
+      "election_type": "coordinated",
+      "data_source": "boulder_county",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx",
+      "local_filename": "2025-coordinated-sov.xlsx"
     }
   ]
 }

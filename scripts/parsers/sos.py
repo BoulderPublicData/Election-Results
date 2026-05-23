@@ -156,6 +156,24 @@ def parse(path: Path, meta: SourceMeta, target_county: str = "Boulder") -> pd.Da
     df = clean_cols(df)
     cols = {c.lower().strip() for c in df.columns}
 
+    # Turnout-only files (e.g. 2024 SOS PrecinctVoterTurnout.xlsx) report
+    # ballots-cast and active-voter totals without any candidate or contest
+    # detail. They don't fit the harmonized schema, so we emit an empty frame
+    # with a provenance note so downstream tools know we saw the file but
+    # couldn't extract candidate rows.
+    candidate_cols = {"candidate", "candidate/yes or no", "office/issue/judgeship",
+                      "office/ballot issue", "office/question"}
+    if not (cols & candidate_cols):
+        empty = pd.DataFrame()
+        return add_provenance(
+            empty, meta,
+            extraction_notes=(
+                f"{path.name} is a turnout-only file (no candidate or contest "
+                "columns); harmonized schema requires candidate-level detail. "
+                "Use the raw file in original-data/ if you need turnout figures."
+            ),
+        )
+
     if "candidate votes" in cols:
         out = _parse_split(df, target_county)
     else:
