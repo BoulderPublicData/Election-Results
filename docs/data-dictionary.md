@@ -116,7 +116,7 @@ canonicalizes them after collapsing embedded whitespace/newlines.
 | `ballots_cast` | `Total Ballots` | `Total Ballots` | `Total Ballots` | `Total Ballots` | `Total Ballots` | `Total Ballots` | `Total Ballots` | `Total Ballots` | `Total Ballots` |
 | `votes` | `Total Votes` | `Total Votes` | `Total Votes` | `Total Votes` | `Total Votes` | `Total Votes` | `Total Votes` | `Total Votes` | `Total Votes` |
 
-Columns not used: `ContestSeqNbr`, `CandSeqNbr`, `PctSeqNbr`, `Sequence`, `ContestID`, `IsCurrent`, `Total Under Votes`, `Total Over Votes`, `Total Undervotes`, `Total Overvotes`. (Under/over votes are intentionally dropped; if you need them, reach into the original-data file.)
+Columns not used: `ContestSeqNbr`, `CandSeqNbr`, `PctSeqNbr`, `Sequence`, `ContestID`, `IsCurrent`, `Total Under Votes`, `Total Over Votes`, `Total Undervotes`, `Total Overvotes`. (Under/over votes are intentionally dropped; if you need them, reach into the `data/original/` file.)
 
 ### 4.2 Boulder County panel years (2008, 2010, 2011, 2012)
 

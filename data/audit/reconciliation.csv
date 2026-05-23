@@ -1,23 +1,8 @@
 year,election_type,data_source,canonical,original_total,processed_total,delta,status
-2005,coordinated,boulder_county,City of Boulder Council,,164660,,not_reconcilable
-2005,coordinated,boulder_county,City of Lafayette Council,,16923,,not_reconcilable
-2005,coordinated,boulder_county,City of Longmont Council,,68026,,not_reconcilable
-2005,coordinated,boulder_county,City of Longmont Mayor,,20461,,not_reconcilable
-2005,coordinated,boulder_county,City of Louisville Council,,6135,,not_reconcilable
-2007,coordinated,boulder_county,City of Boulder Council,,166056,,not_reconcilable
-2007,coordinated,boulder_county,City of Lafayette Council,,7428,,not_reconcilable
-2007,coordinated,boulder_county,City of Longmont Council,,11393,,not_reconcilable
-2007,coordinated,boulder_county,City of Longmont Mayor,,6819,,not_reconcilable
-2007,coordinated,boulder_county,City of Louisville Council,,3492,,not_reconcilable
 2008,general,boulder_county,County Commissioner,,443548,,not_reconcilable
 2008,general,boulder_county,Presidential Electors,,1005,,not_reconcilable
 2008,general,boulder_county,United States Representative,,559,,not_reconcilable
 2008,general,boulder_county,United States Senator,,2229,,not_reconcilable
-2009,coordinated,boulder_county,City of Boulder Council,,74394,,not_reconcilable
-2009,coordinated,boulder_county,City of Lafayette Council,,23806,,not_reconcilable
-2009,coordinated,boulder_county,City of Longmont Council,,37465,,not_reconcilable
-2009,coordinated,boulder_county,City of Longmont Mayor,,17895,,not_reconcilable
-2009,coordinated,boulder_county,City of Louisville Council,,4063,,not_reconcilable
 2010,general,boulder_county,County Commissioner,,116922,,not_reconcilable
 2010,general,boulder_county,Governor,,154854,,not_reconcilable
 2010,general,boulder_county,Regent University of Colorado,,117523,,not_reconcilable

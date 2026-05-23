@@ -34,7 +34,7 @@ from .parsers.common import clean_cols
 from .sources import ALL_SOURCES, BOULDER_COUNTY, SECRETARY_OF_STATE, Source
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-ORIGINAL_DATA = REPO_ROOT / "original-data"
+ORIGINAL_DATA = REPO_ROOT / "data" / "original"
 PROCESSED = REPO_ROOT / "data" / "processed"
 AUDIT = REPO_ROOT / "data" / "audit"
 LOOKUPS = REPO_ROOT / "data" / "lookups"

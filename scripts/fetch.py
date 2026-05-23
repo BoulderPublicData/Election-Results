@@ -1,8 +1,8 @@
 """
-Download raw SoV/precinct files into original-data/{data-source}/.
+Download raw SoV/precinct files into data/original/{data-source}/.
 
 Idempotent: skips files that exist and match the recorded SHA-256
-in original-data/manifest.json. Use --force to refetch.
+in data/original/manifest.json. Use --force to refetch.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ import requests
 from .sources import ALL_SOURCES, BOULDER_COUNTY, SECRETARY_OF_STATE, Source
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-ORIGINAL_DATA = REPO_ROOT / "original-data"
+ORIGINAL_DATA = REPO_ROOT / "data" / "original"
 MANIFEST_PATH = ORIGINAL_DATA / "manifest.json"
 
 USER_AGENT = (

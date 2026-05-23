@@ -26,7 +26,7 @@ from .sources import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-ORIGINAL_DATA = REPO_ROOT / "original-data"
+ORIGINAL_DATA = REPO_ROOT / "data" / "original"
 PROCESSED_DATA = REPO_ROOT / "data" / "processed"
 MANIFEST_PATH = ORIGINAL_DATA / "manifest.json"
 

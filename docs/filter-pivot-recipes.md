@@ -245,5 +245,5 @@ df |>
 - **Active voters and ballots cast are precinct-level, not per-row** — they repeat across every contest/candidate row for the same (year, precinct). Use `drop_duplicates(["year","precinct_id"])` before summing them. Excel: use `Max` (or `First`), not `Sum`.
 - **Negative votes only appear in RCV intermediate rounds** — they represent ballots transferring *away* from an eliminated candidate. Use the `Round` suffix to filter for `Final` rows when you want final totals.
 - **`data_source` matters** — Boulder SoV reports all Boulder precincts; SOS reports only precincts that recorded votes. Counts differ slightly. When in doubt, prefer Boulder SoV for Boulder-specific analysis and SOS for state-level comparisons.
-- **Pre-2013 panel-format quirks** — 2008 and 2010 are partial extractions; consult the original-data XLS before publishing precinct-level findings for these years.
+- **Pre-2013 panel-format quirks** — 2008 and 2010 are partial extractions; consult the `data/original/` XLS before publishing precinct-level findings for these years.
 - **Composite precincts** — in 2015 and 2022, some `precinct_id` values are comma-joined (e.g. `"2181007800, 2181207403"`). These represent ballots tallied jointly across two underlying precincts. If you're joining to precinct geography, split first.
