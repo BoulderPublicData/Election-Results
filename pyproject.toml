@@ -14,11 +14,11 @@ dependencies = [
     "requests>=2.32",
     "beautifulsoup4>=4.12",
     "lxml>=5.2",
-    "tabula-py>=2.9",
     "pypdf>=4.3",
     "jupyter>=1.0",
     "ipykernel>=6.29",
     "pyyaml>=6.0",
+    "pdfplumber>=0.11.9",
 ]
 
 [project.optional-dependencies]

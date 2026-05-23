@@ -35,7 +35,7 @@ candidate-or-option)** tally.
 | 16 | `source_file` | string | yes | The local filename of the raw download (e.g., `2020-general-sov.xlsx`). |
 | 17 | `source_url` | string | yes | The canonical upstream URL. |
 | 18 | `retrieved_at` | string (ISO UTC) | yes | Timestamp when the raw file was downloaded by `scripts/fetch.py` (or the file's mtime if downloaded by hand). |
-| 19 | `extraction_quality` | string | yes | `machine_readable` (XLS/XLSX), `pdf_text_layer` (tabula-extracted from text-layer PDF), `pdf_ocr` (reserved), `manual` (reserved). |
+| 19 | `extraction_quality` | string | yes | `machine_readable` (XLS/XLSX), `pdf_text_layer` (pdfplumber-extracted from text-layer PDF), `pdf_ocr` (reserved), `manual` (reserved). |
 | 20 | `extraction_notes` | string | no | Free-text caveats from the parser — composite-ID flags, RCV mechanics, skipped panels, etc. |
 
 ---
@@ -137,14 +137,14 @@ Vote tallies are for the **combined** unit. To match these against single-precin
 
 ### 4.4 PDF years (2005, 2007, 2009)
 
-These are 100+-page coordinated-election Canvass Reports published only as PDFs. They have a text layer (tabula-py can extract tables) but the layout is irregular page-to-page, and **contest titles do not extract cleanly** because they sit in narrative cells outside the table region.
+These are 100+-page coordinated-election Canvass Reports published only as PDFs. They have a text layer, so `scripts/parsers/boco_pdf.py` reads them with **pdfplumber** (pure Python, no JVM). Contest titles come straight from the page text; candidate names are reconstructed by clustering rotated `upright=False` words by x-coordinate and reversing their characters.
 
 Rows from PDF years carry:
 - `extraction_quality = "pdf_text_layer"`
-- `contest = "<PDF: contest title not extracted>"` — flagged for manual association
-- `extraction_notes` listing the page-parse outcome
+- `contest = "<actual title from page>"` (e.g., `City of Boulder Council Candidates`, `Referendum C`)
+- `extraction_notes` summarizing pages parsed/skipped and reminding analysts to spot-check against the source PDF.
 
-These years should be treated as **provisional**: useful for spot-checks against the PDF, but not for unattended analyses until contest titles are backfilled.
+These years remain **provisional**: while contest names, candidate names, and per-precinct vote counts now extract reliably, the PDF layout is irregular page-to-page, so verify any precinct-level claim against the source before publishing.
 
 ### 4.5 Colorado SOS files (2004-2020)
 

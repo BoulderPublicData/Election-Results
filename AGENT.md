@@ -115,7 +115,7 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at). Anyt
 ### Open uncertainties (do not "fix" without evidence)
 
 - **2008/2010 panel-header alignment.** The merged-cell layout means column N in the header doesn't reliably correspond to column N in the data row. A correct fix requires per-contest column-position mapping (the original `Cleaning.ipynb` did this manually via `iloc[:,[0,7,8,9]]`-style indexing). Until someone ports those mappings, the parser uses a generic walker that captures the major statewide contests but not all down-ballot detail.
-- **PDF contest titles.** The 2005/2007/2009 PDFs have contest titles in narrative text that tabula doesn't capture. A page-aware text extractor (camelot? pdfplumber?) could close this gap.
+- **PDF contest titles.** Now extracted via pdfplumber (the parser clusters rotated candidate words by x-coordinate and reads contest titles from the page text). Spot-check a sample of precincts in the source PDF before publishing — extraction is reliable but the source layout is irregular page-to-page.
 - **Party-name normalization is best-effort.** The `PARTY_MAP` in `parsers/common.py` is exhaustive for the parties I've seen, but new parties (especially small / single-cycle ones) pass through verbatim. Check `data/lookups/party-codes.json:by_canonical` to see the current coverage.
 - **`election_date` is election day, not certification day.** The SoV file is usually published 2-4 weeks later. We don't track certification date as a separate field.
 

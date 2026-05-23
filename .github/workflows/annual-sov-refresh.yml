@@ -37,12 +37,6 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Set up Java (for tabula-py)
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "17"
-
       - name: Sync deps
         run: uv sync
 
