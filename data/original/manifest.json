@@ -1,0 +1,25 @@
+{
+  "files": {
+    "boulder_county/2025-coordinated-sov.xlsx": {
+      "bytes": 208487,
+      "data_source": "boulder_county",
+      "election_type": "coordinated",
+      "filename": "2025-coordinated-sov.xlsx",
+      "retrieved_at": "2026-05-23T18:30:06+00:00",
+      "sha256": "770b9a4ee12a480b6926dd218eccedd4b86fa1670d4224bb00b8a429cfe82966",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx",
+      "year": 2025
+    },
+    "secretary_of_state/2024-general-precinct-results.xlsx": {
+      "bytes": 9504284,
+      "data_source": "secretary_of_state",
+      "election_type": "general",
+      "filename": "2024-general-precinct-results.xlsx",
+      "retrieved_at": "2026-05-23T18:30:07+00:00",
+      "sha256": "0fd289b80ea56d82881b975c090404d98d0d284e2a882e1041adeea37b8c3b9e",
+      "url": "https://www.coloradosos.gov/pubs/elections/Results/2024/2024GeneralPrecinctVoterTurnout.xlsx",
+      "year": 2024
+    }
+  },
+  "schema_version": 1
+}

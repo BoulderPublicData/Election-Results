@@ -239,6 +239,27 @@ df |>
 
 ---
 
+## Joining the provenance sidecar
+
+The per-year CSVs hold the slim schema (no `source_url`/`retrieved_at`/etc.). If you need provenance for a row, join against `data/processed/provenance.csv`:
+
+**pandas**
+```python
+df = pd.read_csv("data/processed/all-elections-tidy.csv",
+                 dtype={"precinct_id": "string"})
+prov = pd.read_csv("data/processed/provenance.csv", dtype=str)
+df = df.merge(prov, on=["election_year", "election_type", "data_source"], how="left")
+```
+
+**tidyverse**
+```r
+prov <- read_csv("data/processed/provenance.csv",
+                 col_types = cols(election_year = col_integer()))
+df <- df |> left_join(prov, by = c("election_year", "election_type", "data_source"))
+```
+
+**Excel** — open `provenance.csv` as a side sheet and use `XLOOKUP` against the three join columns.
+
 ## Common gotchas
 
 - **`precinct_id` is a string** — `"01000123"` is not `1000123`. Load as text in Excel (paste-special), or use `dtype={"precinct_id": "string"}` in pandas / `col_character()` in R.

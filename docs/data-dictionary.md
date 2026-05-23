@@ -5,15 +5,30 @@ It also documents the cross-walks between Boulder County SoV files, Colorado
 Secretary of State precinct-results files, and the harmonized long-form schema
 used throughout `data/processed/`.
 
-Schema version: **1.0.0** (see [`scripts/schema.py`](../scripts/schema.py))
+Schema version: **1.1.0** (see [`scripts/schema.py`](../scripts/schema.py))
 
 ---
 
 ## 1. Schema (canonical columns)
 
-Every CSV under `data/processed/` carries the same 20 columns in this order. One
-row represents one **(election_year × jurisdiction × precinct × contest ×
-candidate-or-option)** tally.
+The harmonized in-memory schema is **20 columns**. The **per-year CSV files** under
+`data/processed/` hold a slim 15-column view — the 5 provenance columns (#16-20
+in the table below) are redundant per-row (every row from a single source file
+has the same value) so they live in a sidecar:
+
+```
+data/processed/
+├── 2020-general-boulder-county.csv     ← 15-column slim view
+├── …                                    ← one slim CSV per source file
+├── all-elections-tidy.csv              ← combined slim CSV
+└── provenance.csv                      ← one row per source file; carries
+                                          the 5 provenance columns
+```
+
+One row in a per-year CSV represents one
+**(election_year × jurisdiction × precinct × contest × candidate-or-option)** tally.
+Join `provenance.csv` on `(election_year, election_type, data_source)` if you
+need the source URL or retrieved-at timestamp for a row.
 
 | # | Column | Type | Required | Description |
 |---|---|---|---|---|
@@ -32,11 +47,13 @@ candidate-or-option)** tally.
 | 13 | `votes` | int (Int64) | usually | Vote tally for this row. **May be negative for RCV intermediate rounds** (votes transferring away from an eliminated candidate). |
 | 14 | `active_voters` | int (Int64) | no | Active registered voters in the precinct at the time of the election. Boulder SoVs only. Null on SOS rows. |
 | 15 | `ballots_cast` | int (Int64) | no | Ballots cast in the precinct. Boulder SoVs only. Null on SOS rows (SOS files don't report ballot totals). |
-| 16 | `source_file` | string | yes | The local filename of the raw download (e.g., `2020-general-sov.xlsx`). |
-| 17 | `source_url` | string | yes | The canonical upstream URL. |
-| 18 | `retrieved_at` | string (ISO UTC) | yes | Timestamp when the raw file was downloaded by `scripts/fetch.py` (or the file's mtime if downloaded by hand). |
-| 19 | `extraction_quality` | string | yes | `machine_readable` (XLS/XLSX), `pdf_text_layer` (pdfplumber-extracted from text-layer PDF), `pdf_ocr` (reserved), `manual` (reserved). |
-| 20 | `extraction_notes` | string | no | Free-text caveats from the parser — composite-ID flags, RCV mechanics, skipped panels, etc. |
+| 16 | `source_file` | string | sidecar | **Provenance — sidecar only.** The local filename of the raw download (e.g., `2020-general-sov.xlsx`). |
+| 17 | `source_url` | string | sidecar | **Provenance — sidecar only.** The canonical upstream URL. |
+| 18 | `retrieved_at` | string (ISO UTC) | sidecar | **Provenance — sidecar only.** Timestamp when the raw file was downloaded by `scripts/fetch.py` (or the file's mtime if downloaded by hand). |
+| 19 | `extraction_quality` | string | sidecar | **Provenance — sidecar only.** `machine_readable` (XLS/XLSX), `pdf_text_layer` (pdfplumber-extracted from text-layer PDF), `pdf_ocr` (reserved), `manual` (reserved). |
+| 20 | `extraction_notes` | string | sidecar | **Provenance — sidecar only.** Free-text caveats from the parser — composite-ID flags, RCV mechanics, skipped panels, etc. |
+
+Columns marked **sidecar** live in `data/processed/provenance.csv` rather than in every row of every per-year CSV. They're constant per source file, so duplicating them on every row would inflate file sizes ~3× for no information gain. The pipeline writes both files together so they stay in sync.
 
 ---
 
@@ -261,3 +278,4 @@ When a discovery finds something new, **add it to `sources.py`** in the same PR 
 
 - **2026-05-23** — Schema 1.0.0 released alongside the new pipeline. Initial dictionary published.
 - **2026-05** — Added `discover.py` (BoCo + SOS upstream scraping), pytest suite under `tests/`, CI workflow at `.github/workflows/tests.yml`, plus 2025 Boulder coordinated + 2024 SOS general entries. `infer_contest_type` now handles `pd.NA` inputs.
+- **2026-05** — Schema bumped to **1.1.0**. Per-row CSVs now hold a slim 15-column view; the 5 provenance columns (`source_file`, `source_url`, `retrieved_at`, `extraction_quality`, `extraction_notes`) moved to `data/processed/provenance.csv`. Combined-CSV size dropped from 152 MB to 49 MB; per-year files shrank by ~60%.

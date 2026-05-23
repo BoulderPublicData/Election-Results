@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .parsers.common import CHOICE_MAP, PARTY_MAP
-from .schema import SCHEMA_VERSION, COLUMNS, DTYPES
+from .schema import COLUMNS, CSV_COLUMNS, DTYPES, PROVENANCE_COLUMNS, SCHEMA_VERSION
 from .sources import ALL_SOURCES, ELECTION_DATES
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -110,13 +110,17 @@ def export_schema() -> None:
     payload = {
         "$schema_version": SCHEMA_VERSION,
         "$description": (
-            "Canonical schema of every CSV under data/processed/. `columns` lists "
-            "the column order; `dtypes` gives the pandas dtype for each. "
-            "`Int16`/`Int64` are nullable integer dtypes — they may contain NA."
+            "Harmonized schema for data/processed/. `columns` is the full "
+            "in-memory schema (20 cols). `csv_columns` is the slim view written "
+            "to per-year CSV files (15 cols). `provenance_columns` are the "
+            "5 fields stored in data/processed/provenance.csv instead of "
+            "duplicating them on every row."
         ),
         "$generated_by": "scripts/export_lookups.py from scripts/schema.py",
         "$generated_at": _now(),
         "columns": COLUMNS,
+        "csv_columns": CSV_COLUMNS,
+        "provenance_columns": PROVENANCE_COLUMNS,
         "dtypes": DTYPES,
         "contest_types": [
             {"value": "candidate", "description": "Partisan or non-partisan candidate race."},

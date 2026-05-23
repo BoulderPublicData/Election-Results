@@ -2,7 +2,7 @@
 
 - **Source file:** `2024-general-sov.xlsx`
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx
-- **Retrieved at:** 2024-12-06T00:41:31+00:00
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 

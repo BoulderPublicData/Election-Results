@@ -39,8 +39,12 @@ uv run pytest
 ```
 
 Output lands in [`data/processed/`](data/processed/):
-- `{year}-{election_type}-{source}.csv` — per file/year
+- `{year}-{election_type}-{source}.csv` — per source file (slim 15-column schema)
 - `all-elections-tidy.csv` — everything concatenated
+- `provenance.csv` — one row per source file with `source_url`, `retrieved_at`,
+  `extraction_quality`, `extraction_notes`. Join on `(election_year,
+  election_type, data_source)` if you need row-level provenance — see
+  [`docs/filter-pivot-recipes.md`](docs/filter-pivot-recipes.md).
 
 ## Layout
 
@@ -53,7 +57,7 @@ Output lands in [`data/processed/`](data/processed/):
 │   │   └── manifest.json      # sha256 + retrieved_at per file
 │   ├── cleaned/               # legacy outputs from the original notebook
 │   │                          #   (was: cleaned-data/)
-│   ├── processed/             # tidy CSVs (pipeline output)
+│   ├── processed/             # tidy CSVs (pipeline output) + provenance.csv sidecar
 │   ├── audit/                 # auto-generated audits + reconciliation report
 │   └── lookups/               # JSON lookups — party codes, election dates,
 │                              #   source registry, schema, contest aliases,

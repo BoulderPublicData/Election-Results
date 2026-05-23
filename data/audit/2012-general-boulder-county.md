@@ -2,7 +2,7 @@
 
 - **Source file:** `2012-general-sov.xls`
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2012-general-election-sov.xls
-- **Retrieved at:** 2021-12-09T22:56:53+00:00
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 

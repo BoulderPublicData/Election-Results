@@ -2,7 +2,7 @@
 
 - **Source file:** `2014-general-sov.xls`
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2014-general-election-sov.xls
-- **Retrieved at:** 2021-12-09T22:56:40+00:00
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 
