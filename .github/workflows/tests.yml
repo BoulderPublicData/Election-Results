@@ -1,0 +1,34 @@
+name: tests
+
+# Runs the pytest suite on every push and pull request. Tests are designed
+# to be hermetic (HTML fixtures cached under tests/fixtures/, no network
+# access) so the workflow completes in seconds.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8.1.0
+        with:
+          enable-cache: true
+
+      - name: Sync deps (incl. dev)
+        run: uv sync --all-extras
+
+      - name: Run pytest
+        run: uv run pytest -v --tb=short

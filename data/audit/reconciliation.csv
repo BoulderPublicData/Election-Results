@@ -91,6 +91,9 @@ year,election_type,data_source,canonical,original_total,processed_total,delta,st
 2023,coordinated,boulder_county,City of Boulder Council,113379,113379,0,match
 2023,coordinated,boulder_county,City of Boulder Mayor,32415,32415,0,match
 2023,coordinated,boulder_county,City of Louisville Council,7843,7843,0,match
+2025,coordinated,boulder_county,City of Boulder Council,113888,113888,0,match
+2025,coordinated,boulder_county,City of Longmont Mayor,31844,31844,0,match
+2025,coordinated,boulder_county,City of Louisville Council,7383,7383,0,match
 2004,general,secretary_of_state,District Attorney,113599,113599,0,match
 2004,general,secretary_of_state,Presidential Electors,308641,308641,0,match
 2004,general,secretary_of_state,United States Senator,157414,157414,0,match

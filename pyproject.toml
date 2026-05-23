@@ -32,6 +32,9 @@ elections-fetch = "scripts.fetch:main"
 elections-clean = "scripts.clean:main"
 elections-audit = "scripts.audit:main"
 elections-pipeline = "scripts.pipeline:main"
+elections-discover = "scripts.discover:main"
+elections-reconcile = "scripts.reconcile:main"
+elections-export-lookups = "scripts.export_lookups:main"
 
 [tool.ruff]
 line-length = 100
@@ -45,5 +48,18 @@ ignore = ["E501"]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["scripts"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+filterwarnings = [
+    "ignore::DeprecationWarning:openpyxl",
+    "ignore::UserWarning:openpyxl",
+]

@@ -8,22 +8,23 @@ This file is also a useful overview for human collaborators.
 
 ## 0. One-paragraph summary
 
-This repo harmonizes precinct-level election results from Boulder County (2005-2024) and the Colorado Secretary of State (2004-2020) into a single long-form CSV under `data/processed/`. Raw files in `data/original/` are immutable; everything else under `data/` is regenerable from them via `scripts/pipeline.py`. The schema is defined once in [`scripts/schema.py`](scripts/schema.py); every parser produces the same 20 columns. A reconciliation audit ([`scripts/reconcile.py`](scripts/reconcile.py)) compares top-line contest totals between the originals and the processed CSVs and would catch a regression. A GitHub Action runs every January 6 to refresh the prior calendar year.
+This repo harmonizes precinct-level election results from Boulder County (2005-2025) and the Colorado Secretary of State (2004-2024) into a single long-form CSV under `data/processed/`. Raw files in `original-data/` are immutable; everything in `data/` is regenerable from them via `scripts/pipeline.py`. The schema is defined once in [`scripts/schema.py`](scripts/schema.py); every parser produces the same 20 columns. A reconciliation audit ([`scripts/reconcile.py`](scripts/reconcile.py)) compares top-line contest totals between the originals and the processed CSVs and would catch a regression. [`scripts/discover.py`](scripts/discover.py) scrapes the upstream Boulder County and SOS landing pages so the pipeline picks up newly-published years even before they're hand-added to the static registry. A GitHub Action runs every January 6 to refresh the prior calendar year; another runs pytest on every push and PR.
 
 ---
 
 ## 1. Architecture
 
 ```
-                    ┌──────────────────────┐
-                    │  scripts/sources.py  │  URL registry + election dates
-                    └──────────┬───────────┘
-                               │ Source records
-                               ▼
-                    ┌──────────────────────┐
-                    │   scripts/fetch.py   │  idempotent downloader
-                    └──────────┬───────────┘
-                               │ data/original/{source}/*.xls(x|pdf)
+       ┌─────────────────────────┐     ┌──────────────────────┐
+       │  scripts/discover.py    │ ──▶ │  scripts/sources.py  │
+       │  (BoCo + SOS scrapers)  │     │  URL registry + dates│
+       └─────────────────────────┘     └──────────┬───────────┘
+                                                  │ Source records
+                                                  ▼
+                                       ┌──────────────────────┐
+                                       │   scripts/fetch.py   │  idempotent downloader
+                                       └──────────┬───────────┘
+                               │ original-data/{source}/*.xls(x|pdf)
                                ▼
         ┌─────────────────────────────────────────────────┐
         │            scripts/clean.py (router)            │
@@ -85,6 +86,14 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at). Anyt
 ### 2.7 Kebab-case file/dir names; snake_case Python module names
 
 **Why:** The user asked for kebab-case (correcting an earlier choice of snake_case). It applies to directories, JSON files, and CSV filenames. Python modules continue to use snake_case because that's the language requirement.
+
+### 2.8 Discovery layered on top of a static registry
+
+**Why:** Pure scraping is fragile — Boulder's `elections/results/` page rotates content and SOS reorganizes URL paths. A hand-maintained registry in `sources.py` keeps the canonical URLs stable; discovery only fills in gaps for years more recent than the last hand-recorded entry. `merge_with_registry(only_new=True)` is the default contract: the static registry wins for any (year, data_source) it already covers. Update the registry whenever a newly-discovered year lands in a PR.
+
+### 2.9 Hermetic tests (offline by default)
+
+**Why:** The discovery tests use HTML fixtures captured under `tests/fixtures/` so CI doesn't break if a vendor's CDN flakes. Re-capture them when the upstream pages change shape (instructions in `tests/test_discover.py`'s module docstring). Tests against `data/processed/` skip gracefully when the CSVs aren't present on disk, so the suite passes on a fresh clone without running the full pipeline first.
 
 ---
 
@@ -167,6 +176,7 @@ In rough order of value:
 |---|---|
 | Schema definition | [`scripts/schema.py`](scripts/schema.py) |
 | URL registry | [`scripts/sources.py`](scripts/sources.py) |
+| Upstream discovery | [`scripts/discover.py`](scripts/discover.py) |
 | Downloader | [`scripts/fetch.py`](scripts/fetch.py) |
 | Cleaning orchestrator | [`scripts/clean.py`](scripts/clean.py) |
 | Parsers (per generation) | [`scripts/parsers/`](scripts/parsers/) |
@@ -174,6 +184,7 @@ In rough order of value:
 | Reconciliation module | [`scripts/reconcile.py`](scripts/reconcile.py) |
 | End-to-end driver | [`scripts/pipeline.py`](scripts/pipeline.py) |
 | JSON lookup exporter | [`scripts/export_lookups.py`](scripts/export_lookups.py) |
+| Test suite | [`tests/`](tests/) (pytest, ~70 tests, runs in 2s) |
 | Data dictionary | [`docs/data-dictionary.md`](docs/data-dictionary.md) |
 | Filter/pivot recipes | [`docs/filter-pivot-recipes.md`](docs/filter-pivot-recipes.md) |
 | Methodology notebook | [`Cleaning.ipynb`](Cleaning.ipynb) |
@@ -186,6 +197,8 @@ In rough order of value:
 | Top-line contest patterns | [`data/lookups/contest-aliases.json`](data/lookups/contest-aliases.json) |
 | Reconciliation report | [`data/audit/reconciliation.md`](data/audit/reconciliation.md) |
 | Per-file audits | [`data/audit/*.md`](data/audit/) |
+| Annual refresh workflow | [`.github/workflows/annual-sov-refresh.yml`](.github/workflows/annual-sov-refresh.yml) |
+| CI tests workflow | [`.github/workflows/tests.yml`](.github/workflows/tests.yml) |
 
 ---
 
@@ -204,9 +217,10 @@ In rough order of value:
 
 ## 10. Sanity-check before declaring done
 
-After any non-trivial change, run all four:
+After any non-trivial change, run all five:
 
 ```bash
+uv run pytest                                            # all unit tests (~2s)
 uv run python -m scripts.pipeline --skip-fetch --no-pdf  # rebuilds processed CSVs
 uv run python -m scripts.reconcile                       # checks top-line totals
 uv run python -m scripts.export_lookups                  # refreshes JSON lookups
@@ -214,4 +228,4 @@ uv run jupyter nbconvert --to notebook --execute \
     Cleaning.ipynb --output Cleaning.ipynb               # validates notebook
 ```
 
-If `reconcile` reports any new `mismatch` rows, **stop and investigate** before committing.
+If `pytest` fails or `reconcile` reports any new `mismatch` rows, **stop and investigate** before committing. CI runs pytest on every push and PR; the annual-refresh workflow also runs reconcile and surfaces the mismatch count in the PR body.

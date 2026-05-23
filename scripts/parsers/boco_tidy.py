@@ -38,7 +38,7 @@ _PRECINCT_SHORT_ALIASES = {
 _CONTEST_ALIASES = {"Contest Title", "Contest Name"}
 _CHOICE_ALIASES = {"Choice Name", "Candidate Name"}
 _PARTY_ALIASES = {"Party"}
-_ACTIVE_VOTERS_ALIASES = {"Active Voters"}
+_ACTIVE_VOTERS_ALIASES = {"Active Voters", "Active Voters*"}
 _TOTAL_BALLOTS_ALIASES = {"Total Ballots"}
 _TOTAL_VOTES_ALIASES = {"Total Votes"}
 
