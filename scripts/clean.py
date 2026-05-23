@@ -33,7 +33,7 @@ MANIFEST_PATH = ORIGINAL_DATA / "manifest.json"
 # Year-by-year routing for Boulder County.
 # Panel: 2008, 2010, 2011, 2012 — multi-block per-sheet format.
 # Tidy:  2013-2024 — long-form (with quirks handled by boco_tidy).
-# PDF:   2005, 2007, 2009 — best-effort tabula extraction.
+# PDF:   2005, 2007, 2009 — best-effort pdfplumber extraction (no JVM required).
 BOCO_PANEL_YEARS = {2008, 2010, 2011, 2012}
 BOCO_PDF_YEARS = {2005, 2007, 2009}
 

@@ -127,7 +127,7 @@ def export_schema() -> None:
         ],
         "extraction_quality_values": [
             {"value": "machine_readable", "description": "Parsed from XLS/XLSX with structured columns."},
-            {"value": "pdf_text_layer", "description": "Parsed from a PDF text layer via tabula-py; contest titles may be unresolved."},
+            {"value": "pdf_text_layer", "description": "Parsed from a PDF text layer via pdfplumber; contest titles + candidate names extracted, but spot-check against source PDF before publishing."},
             {"value": "pdf_ocr", "description": "Reserved — not currently produced."},
             {"value": "manual", "description": "Reserved — for hand-entered records."},
         ],

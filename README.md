@@ -94,11 +94,11 @@ Are the results of individual contests available at the level of precincts in an
 | 2012 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2012-general-election-sov.xls) | [✅](https://www.coloradosos.gov/pubs/elections/Results/2012/2012GeneralPrecinctLevelTurnout.xlsx) | Panel format |
 | 2011 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2011-election-sov.xls) | ❌ | Panel format |
 | 2010 | ⚠️ [partial](https://assets.bouldercounty.gov/wp-content/uploads/2017/09/2010-general-sov.xls) | [✅](https://www.coloradosos.gov/pubs/elections/Results/2010/general/2010GeneralPrecinctTurnout.xlsx) | Merged-cell panels limit extraction |
-| 2009 | ⚠️ [PDF](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2009-election-sov.pdf) | ❌ | tabula extract; contest titles not auto-resolved |
+| 2009 | ⚠️ [PDF](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2009-election-sov.pdf) | ❌ | pdfplumber extract |
 | 2008 | ⚠️ [partial](https://assets.bouldercounty.gov/wp-content/uploads/2017/12/2008-general-election-sov.xls) | [✅](https://www.coloradosos.gov/pubs/elections/Results/2008/2008GeneralPrecinctTurnout.xlsx) | Merged-cell panels limit extraction |
-| 2007 | ⚠️ [PDF](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2007-election-sov.pdf) | ❌ | tabula extract |
+| 2007 | ⚠️ [PDF](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2007-election-sov.pdf) | ❌ | pdfplumber extract |
 | 2006 | ❌ | [✅](https://www.coloradosos.gov/pubs/elections/Results/2006/2006GeneralPrecinctBallotsCast.xlsx) | |
-| 2005 | ⚠️ [PDF](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2005-election-sov.pdf) | ❌ | tabula extract |
+| 2005 | ⚠️ [PDF](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2005-election-sov.pdf) | ❌ | pdfplumber extract |
 | 2004 | ❌ | [✅](https://www.coloradosos.gov/pubs/elections/Results/2004/2004GeneralPrecinctBallotsCast.xlsx) | |
 
 ✅ machine-readable extraction · ⚠️ partial / PDF-extracted (verify before publishing) · ❌ not available upstream
