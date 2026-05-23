@@ -8,7 +8,7 @@ This file is also a useful overview for human collaborators.
 
 ## 0. One-paragraph summary
 
-This repo harmonizes precinct-level election results from Boulder County (2005-2025) and the Colorado Secretary of State (2004-2024) into a single long-form CSV under `data/processed/`. Raw files in `original-data/` are immutable; everything in `data/` is regenerable from them via `scripts/pipeline.py`. The schema is defined once in [`scripts/schema.py`](scripts/schema.py); every parser produces the same 20 columns. A reconciliation audit ([`scripts/reconcile.py`](scripts/reconcile.py)) compares top-line contest totals between the originals and the processed CSVs and would catch a regression. [`scripts/discover.py`](scripts/discover.py) scrapes the upstream Boulder County and SOS landing pages so the pipeline picks up newly-published years even before they're hand-added to the static registry. A GitHub Action runs every January 6 to refresh the prior calendar year; another runs pytest on every push and PR.
+This repo harmonizes precinct-level election results from Boulder County (2005-2025) and the Colorado Secretary of State (2004-2024) into a single long-form CSV under `data/processed/`. Raw files in `data/original/` are immutable; everything else under `data/` is regenerable from them via `scripts/pipeline.py`. The schema is defined once in [`scripts/schema.py`](scripts/schema.py); every parser produces the same 20 columns. A reconciliation audit ([`scripts/reconcile.py`](scripts/reconcile.py)) compares top-line contest totals between the originals and the processed CSVs and would catch a regression. [`scripts/discover.py`](scripts/discover.py) scrapes the upstream Boulder County and SOS landing pages so the pipeline picks up newly-published years even before they're hand-added to the static registry. A GitHub Action runs every January 6 to refresh the prior calendar year; another runs pytest on every push and PR.
 
 ---
 
@@ -24,7 +24,7 @@ This repo harmonizes precinct-level election results from Boulder County (2005-2
                                        ┌──────────────────────┐
                                        │   scripts/fetch.py   │  idempotent downloader
                                        └──────────┬───────────┘
-                               │ original-data/{source}/*.xls(x|pdf)
+                               │ data/original/{source}/*.xls(x|pdf)
                                ▼
         ┌─────────────────────────────────────────────────┐
         │            scripts/clean.py (router)            │
@@ -218,7 +218,7 @@ In rough order of value:
 - **Inferring schema from the CSV files.** Per-year CSVs use `CSV_COLUMNS` (15 cols, no provenance); the canonical `COLUMNS` constant in `schema.py` has all 20. Use `CSV_COLUMNS` when validating a CSV; use `COLUMNS` when validating a parser-output frame.
 - **Pretending PDF years are machine-readable.** Their `extraction_quality` is intentionally `pdf_text_layer` so downstream filters can skip them.
 - **"Fixing" composite precinct IDs by splitting on comma.** Their vote tallies are reported jointly — splitting would multiply totals.
-- **Removing the `data/cleaned/` legacy directory.** It's the audit trail for the prior notebook's output and lets future agents diff the harmonized data against the pre-rewrite baseline.
+- **Recreating a `data/cleaned/` or `data/original/output/` directory for "intermediate" outputs.** There are only two homes for data on disk: `data/original/` for immutable raw downloads and `data/processed/` for everything the pipeline produces. The `data/audit/` and `data/lookups/` siblings are read-only artifacts derived from `data/processed/`; do not invent new write targets.
 
 ---
 

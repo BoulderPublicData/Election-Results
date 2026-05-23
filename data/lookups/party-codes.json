@@ -2,7 +2,7 @@
   "$schema_version": "1.1.0",
   "$description": "Party-name normalization. `mapping` is source-string \u2192 canonical 3-letter code. `by_canonical` groups every known source-string variant under its canonical code so you can render party labels consistently. Unknown source strings pass through verbatim \u2014 they are never silently dropped.",
   "$generated_by": "scripts/export_lookups.py from scripts/parsers/common.py:PARTY_MAP",
-  "$generated_at": "2026-05-23T18:37:08+00:00",
+  "$generated_at": "2026-05-23T18:52:29+00:00",
   "mapping": {
     "ACN": "ACN",
     "AIP": "AIP",
