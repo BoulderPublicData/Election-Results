@@ -2,7 +2,7 @@
   "$schema_version": "1.1.0",
   "$description": "Source URL registry. One entry per (year, data_source). `local_filename` is the path under data/original/{data_source-kebab}/.",
   "$generated_by": "scripts/export_lookups.py from scripts/sources.py:ALL_SOURCES",
-  "$generated_at": "2026-05-23T18:52:29+00:00",
+  "$generated_at": "2026-05-27T01:36:21+00:00",
   "sources": [
     {
       "year": 2004,

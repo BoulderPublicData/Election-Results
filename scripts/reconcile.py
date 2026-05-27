@@ -30,14 +30,14 @@ from pathlib import Path
 
 import pandas as pd
 
+from .config import (
+    AUDIT, BOULDER_COUNTY, LOOKUPS, ORIGINAL as ORIGINAL_DATA,
+    PROCESSED, REPO_ROOT, SECRETARY_OF_STATE, SOURCES as ALL_SOURCES, Source,
+)
+from .logging_setup import get_logger
 from .parsers.common import clean_cols
-from .sources import ALL_SOURCES, BOULDER_COUNTY, SECRETARY_OF_STATE, Source
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-ORIGINAL_DATA = REPO_ROOT / "data" / "original"
-PROCESSED = REPO_ROOT / "data" / "processed"
-AUDIT = REPO_ROOT / "data" / "audit"
-LOOKUPS = REPO_ROOT / "data" / "lookups"
+log = get_logger(__name__)
 
 
 @dataclass(frozen=True)
@@ -225,12 +225,12 @@ def reconcile_source(source: Source, patterns: list[ContestPattern]) -> pd.DataF
                 "original_total", "processed_total", "delta", "status"]]
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--year", type=int)
     ap.add_argument("--source", choices=["boulder_county", "secretary_of_state", "all"],
                     default="all")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     if args.source == "boulder_county":
         pool = BOULDER_COUNTY

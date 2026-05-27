@@ -1,127 +1,3 @@
-### 2004 general — secretary_of_state
-
-- **Source file:** `2004-general-precinct-results.xlsx`
-- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2004/2004GeneralPrecinctBallotsCast.xlsx
-- **Retrieved at:** 2026-05-23T18:13:44+00:00
-- **Extraction quality:** machine_readable
-- **Extraction notes:** —
-
-- **Rows:** 13,586
-- **Distinct contests:** 33
-- **Distinct precincts:** 229
-- **Total votes summed:** 3,219,506
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {'measure': 5902, 'candidate': 5414, 'retention': 2270}
-- **Party breakdown (top 8):** {'(none)': 8172, 'DEM': 1569, 'REP': 1230, 'LBR': 1031, 'CRP': 406, 'UAF': 329, 'ACN': 316, 'IND': 173}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-| Presidential Electors | 159,259 |
-| US Senator | 157,414 |
-| Amend 35 Tobacco Tax Inc for Health-Rel. Purposes | 153,067 |
-| Amend 36 Selection of Presidential Electors | 149,382 |
-| Referendum 4A | 148,802 |
-| Amend 37 Renewable Energy Requirement | 147,909 |
-| Amend 34 Construction Liability | 146,211 |
-| Referendum 4B | 143,987 |
-| U of C Regent - At Large | 143,012 |
-| Referendum B Obsolete Constitutional Provisions | 131,795 |
-
-### 2005 coordinated — boulder_county
-
-- **Source file:** `2005-coordinated-sov.pdf`
-- **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2005-election-sov.pdf
-- **Retrieved at:** 2023-08-30T18:13:27+00:00
-- **Extraction quality:** pdf_text_layer
-- **Extraction notes:** pdfplumber: parsed 121 pages, skipped 0, 0 pages had no recognizable candidate header (skipped); Candidate names recovered from rotated PDF text via _unrotate(); spot-check a sample of precincts against the source PDF before publishing
-
-- **Rows:** 7,283
-- **Distinct contests:** 43
-- **Distinct precincts:** 227
-- **Total votes summed:** 1,165,590
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {'measure': 4092, 'candidate': 3191}
-- **Party breakdown (top 8):** {'(none)': 7283}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-| CITY OF BOULDER COUNCIL | 164,660 |
-| Referendum C | 86,208 |
-| Referendum D | 86,020 |
-| COUNTY ISSUE 1A: | 82,884 |
-| COUNTY QUESTION 1B: | 82,656 |
-| COUNTY QUESTION 1D: | 82,532 |
-| COUNTY QUESTION 1C: | 82,457 |
-| CITY OF LONGMONT COUNCIL MEMBER - AT LARGE | 61,684 |
-| BOULDER VALLEY SCHOOL DISTRICT RE-2 QUESTION 3A: | 51,199 |
-| BOULDER VALLEY SCHOOL DISTRICT RE-2 QUESTION 3B: | 50,340 |
-
-### 2006 general — secretary_of_state
-
-- **Source file:** `2006-general-precinct-results.xlsx`
-- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2006/2006GeneralPrecinctBallotsCast.xlsx
-- **Retrieved at:** 2026-05-23T18:13:44+00:00
-- **Extraction quality:** machine_readable
-- **Extraction notes:** —
-
-- **Rows:** 17,299
-- **Distinct contests:** 41
-- **Distinct precincts:** 237
-- **Total votes summed:** 3,356,492
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {'measure': 8930, 'candidate': 6019, 'retention': 2350}
-- **Party breakdown (top 8):** {'(none)': 11280, 'DEM': 1916, 'REP': 1813, 'LBR': 935, 'ACN': 498, 'UAF': 470, 'GRN': 175, 'NP': 149}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-| Gov./Lieutenant Gov. | 118,331 |
-| Amendment 43 | 117,068 |
-| Referendum I | 116,988 |
-| Amendment 44 | 116,703 |
-| Amendment 42 | 116,362 |
-| Secretary of State | 115,548 |
-| State Treasurer | 114,243 |
-| Attorney General | 113,960 |
-| Amendment 39 | 113,459 |
-| Amendment 40 | 112,804 |
-
-### 2007 coordinated — boulder_county
-
-- **Source file:** `2007-coordinated-sov.pdf`
-- **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2007-election-sov.pdf
-- **Retrieved at:** 2023-08-30T18:13:27+00:00
-- **Extraction quality:** pdf_text_layer
-- **Extraction notes:** pdfplumber: parsed 108 pages, skipped 0, 0 pages had no recognizable candidate header (skipped); Candidate names recovered from rotated PDF text via _unrotate(); spot-check a sample of precincts against the source PDF before publishing
-
-- **Rows:** 3,403
-- **Distinct contests:** 37
-- **Distinct precincts:** 234
-- **Total votes summed:** 543,123
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 2520, 'measure': 883}
-- **Party breakdown (top 8):** {'(none)': 3403}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-| City of Boulder Council Candidates | 166,056 |
-| County Issue 1B (Transportation Sales and Use Tax Extension and Revenue Change): | 57,153 |
-| County Issue 1A (Open Space Bond Authorization, Sales and Use Tax Extension, and Revenue Change): | 56,607 |
-| Boulder Valley School District Director District C (4 Years) | 22,507 |
-| City of Longmont Ballot Issue 2A | 16,402 |
-| City of Longmont Ballot Issue 2C | 16,369 |
-| City of Boulder Ballot Question 2B City Council Compensation | 16,273 |
-| City of Longmont Ballot Issue 2B | 16,248 |
-| City of Boulder Ballot Question 2C Clarifying Circumstances That Cause a City Council Vacancy | 15,906 |
-| City of Boulder Question 2D Filling City Council Vacancies | 15,720 |
-
 ### 2008 general — boulder_county
 
 - **Source file:** `2008-general-sov.xls`
@@ -148,68 +24,6 @@
 | UNITED STATES SENATOR | 2,229 |
 | PRESIDENTIAL ELECTORS | 1,005 |
 | REPRESENTATIVE TO THE 111TH UNITED STATES CONGRESS - DISTRICT 2 | 559 |
-
-### 2008 general — secretary_of_state
-
-- **Source file:** `2008-general-precinct-results.xlsx`
-- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2008/2008GeneralPrecinctTurnout.xlsx
-- **Retrieved at:** 2026-05-23T18:13:44+00:00
-- **Extraction quality:** machine_readable
-- **Extraction notes:** —
-
-- **Rows:** 24,856
-- **Distinct contests:** 43
-- **Distinct precincts:** 239
-- **Total votes summed:** 4,744,062
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 11472, 'measure': 7648, 'retention': 5736}
-- **Party breakdown (top 8):** {'(none)': 13623, 'DEM': 3346, 'REP': 2868, 'GRN': 956, 'UAF': 956, 'CON': 239, 'LBR': 239, "HeartQuake '08": 239}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-| PRESIDENTIAL ELECTORS/ PRESIDENTIAL ELECTORS (VICE) | 171,763 |
-| UNITED STATES SENATOR | 166,096 |
-| Amendment 48 | 164,829 |
-| Amendment 47 | 159,811 |
-| Amendment 51 | 158,937 |
-| Amendment 46 | 158,417 |
-| Amendment 50 | 157,999 |
-| Amendment 58 | 157,880 |
-| Amendment 49 | 155,675 |
-| Amendment 59 | 155,014 |
-
-### 2009 coordinated — boulder_county
-
-- **Source file:** `2009-coordinated-sov.pdf`
-- **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2009-election-sov.pdf
-- **Retrieved at:** 2023-08-30T18:13:27+00:00
-- **Extraction quality:** pdf_text_layer
-- **Extraction notes:** pdfplumber: parsed 105 pages, skipped 0, 0 pages had no recognizable candidate header (skipped); Candidate names recovered from rotated PDF text via _unrotate(); spot-check a sample of precincts against the source PDF before publishing
-
-- **Rows:** 6,557
-- **Distinct contests:** 40
-- **Distinct precincts:** 234
-- **Total votes summed:** 697,022
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 4009, 'measure': 2548}
-- **Party breakdown (top 8):** {'(none)': 6557}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-| City of Boulder Council Candidates | 74,394 |
-| County Ballot Issue 1A | 62,018 |
-| County Ballot Issue 1B | 61,623 |
-| County Ballot Issue 1C | 61,379 |
-| County Ballot Question 1D | 59,928 |
-| City of Longmont Council Member At-Large | 30,408 |
-| City of Lafayette Council Candidates | 23,806 |
-| Boulder Valley School District Director District B (4 Years) | 23,000 |
-| Boulder Valley School District Director District E (4 Years) | 22,366 |
-| Boulder Valley School District Director District F (4 Years) | 21,968 |
 
 ### 2010 general — boulder_county
 
@@ -239,37 +53,6 @@
 | STATE REPRESENTATIVE - DISTRICT 12 | 27,389 |
 | REPRESENTATIVE TO THE US CONGRESS - DISTRICT 2 | 1,148 |
 | REPRESENTATIVE TO THE US CONGRESS - DISTRICT 4 | 422 |
-
-### 2010 general — secretary_of_state
-
-- **Source file:** `2010-general-precinct-results.xlsx`
-- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2010/general/2010GeneralPrecinctTurnout.xlsx
-- **Retrieved at:** 2026-05-23T18:13:44+00:00
-- **Extraction quality:** machine_readable
-- **Extraction notes:** —
-
-- **Rows:** 18,196
-- **Distinct contests:** 37
-- **Distinct precincts:** 236
-- **Total votes summed:** 3,078,004
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 9304, 'measure': 5616, 'retention': 3276}
-- **Party breakdown (top 8):** {'(none)': 9047, 'REP': 2316, 'DEM': 2311, 'UNA': 1710, 'LIB': 928, 'ACN': 704, 'GRN': 472, 'NR': 236}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-| GOVERNOR/LIEUTENANT GOVERNOR | 125,486 |
-| UNITED STATES SENATOR | 125,265 |
-| Amendment 61 (CONSTITUTIONAL) | 121,416 |
-| Amendment 62 (CONSTITUTIONAL) | 121,217 |
-| Amendment 60 (CONSTITUTIONAL) | 120,100 |
-| Proposition 101 (STATUTORY) | 119,955 |
-| SECRETARY OF STATE | 119,678 |
-| STATE TREASURER | 119,490 |
-| ATTORNEY GENERAL | 119,436 |
-| Amendment 63 (CONSTITUTIONAL) | 118,692 |
 
 ### 2011 coordinated — boulder_county
 
@@ -333,37 +116,6 @@
 | JUSTICE OF THE COLORADO SUPREME COURT   - Nathan B. Coats | 127,463 |
 | COUNTY JUDGE - BOULDER   - John F. Stavely | 125,630 |
 
-### 2012 general — secretary_of_state
-
-- **Source file:** `2012-general-precinct-results.xlsx`
-- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2012/2012GeneralPrecinctLevelTurnout.xlsx
-- **Retrieved at:** 2026-05-23T18:13:44+00:00
-- **Extraction quality:** machine_readable
-- **Extraction notes:** —
-
-- **Rows:** 17,252
-- **Distinct contests:** 22
-- **Distinct precincts:** 234
-- **Total votes summed:** 2,153,645
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 10546, 'measure': 5770, 'retention': 936}
-- **Party breakdown (top 8):** {'(none)': 9398, 'DEM': 1569, 'REP': 1393, 'LBR': 1148, 'ACN': 526, 'GRN': 410, 'Socialist Party USA': 234, 'Justice Party': 234}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-| President/Vice President | 179,499 |
-| Amendment 64 (CONSTITUTIONAL) | 175,158 |
-| Amendment 65 (CONSTITUTIONAL) | 165,630 |
-| Regent Of The University Of Colorado - At Large | 159,816 |
-| Amendment S (CONSTITUTIONAL) | 154,756 |
-| United States Representative - District 2 | 128,237 |
-| Supreme Court | 127,463 |
-| County Court, Boulder | 125,630 |
-| Court of Appeals | 125,393 |
-| District Attorney - District 20 | 124,797 |
-
 ### 2013 coordinated — boulder_county
 
 - **Source file:** `2013-coordinated-sov.xls`
@@ -425,37 +177,6 @@
 | State Treasurer | 134,735 |
 | BOULDER COUNTY BALLOT ISSUE 1B | 133,622 |
 | Attorney General | 133,363 |
-
-### 2014 general — secretary_of_state
-
-- **Source file:** `2014-general-precinct-results.xlsx`
-- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2014/2014GeneralPrecinctTurnout.xlsx
-- **Retrieved at:** 2026-05-23T18:13:44+00:00
-- **Extraction quality:** machine_readable
-- **Extraction notes:** —
-
-- **Rows:** 18,404
-- **Distinct contests:** 23
-- **Distinct precincts:** 233
-- **Total votes summed:** 2,042,814
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 10724, 'measure': 6748, 'retention': 932}
-- **Party breakdown (top 8):** {'(none)': 11027, 'REP': 1936, 'DEM': 1817, 'LBR': 1469, 'UAF': 1223, 'GRN': 233, 'Unaffiliated / Republican': 233, 'ACN': 233}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-| United States Senator | 142,321 |
-| Governor/Lieutenant Governor | 141,760 |
-| Amendment 67 (CONSTITUTIONAL) | 139,834 |
-| Proposition 105 (STATUTORY) | 139,300 |
-| Amendment 68 (CONSTITUTIONAL) | 138,778 |
-| Secretary of State | 135,438 |
-| Treasurer | 134,735 |
-| Attorney General | 133,363 |
-| Proposition 104 (STATUTORY) | 133,120 |
-| United States Representative - District 2 | 103,022 |
 
 ### 2015 coordinated — boulder_county
 
@@ -519,37 +240,6 @@
 | Amendment 71 (CONSTITUTIONAL) | 175,638 |
 | COUNTY ISSUE 1A  (Road and Bridge Mill Levy Increase): | 175,549 |
 
-### 2016 general — secretary_of_state
-
-- **Source file:** `2016-general-precinct-results.xlsx`
-- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2016/General/2016GeneralTurnoutPrecinctLevel.xlsx
-- **Retrieved at:** 2026-05-23T18:13:44+00:00
-- **Extraction quality:** machine_readable
-- **Extraction notes:** —
-
-- **Rows:** 23,496
-- **Distinct contests:** 28
-- **Distinct precincts:** 233
-- **Total votes summed:** 3,413,849
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 13934, 'measure': 8630, 'retention': 932}
-- **Party breakdown (top 8):** {'(none)': 12813, 'UAF': 1864, 'DEM': 1678, 'REP': 1535, 'LBR': 713, 'GRN': 466, 'ACN': 233, 'AVP': 233}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-| President/Vice President | 188,145 |
-| United States Senator | 185,820 |
-| Amendment 70 (CONSTITUTIONAL) | 184,193 |
-| Amendment 72 (CONSTITUTIONAL) | 183,219 |
-| Proposition 106 (STATUTORY) | 181,711 |
-| Amendment 69 (CONSTITUTIONAL) | 178,821 |
-| Proposition 107 (STATUTORY) | 176,381 |
-| Amendment 71 (CONSTITUTIONAL) | 175,638 |
-| Amendment T (CONSTITUTIONAL) | 174,723 |
-| Proposition 108 (STATUTORY) | 173,189 |
-
 ### 2017 coordinated — boulder_county
 
 - **Source file:** `2017-coordinated-sov.xlsx`
@@ -612,37 +302,6 @@
 | Amendment A (Constitutional) | 168,899 |
 | Amendment 73 (Constitutional) | 168,856 |
 
-### 2018 general — secretary_of_state
-
-- **Source file:** `2018-general-precinct-results.xlsx`
-- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2018/2018GEPrecinctLevelResults.xlsx
-- **Retrieved at:** 2026-05-23T18:13:44+00:00
-- **Extraction quality:** machine_readable
-- **Extraction notes:** —
-
-- **Rows:** 21,422
-- **Distinct contests:** 34
-- **Distinct precincts:** 235
-- **Total votes summed:** 4,288,865
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {'measure': 11622, 'candidate': 8860, 'retention': 940}
-- **Party breakdown (top 8):** {'(none)': 14837, 'DEM': 2184, 'REP': 1835, 'LBR': 908, 'Unity Party of Colorado': 470, 'ACN': 470, 'GRN': 235, 'AVP': 235}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-| Governor | 176,262 |
-| Secretary of State | 174,074 |
-| Attorney General | 173,664 |
-| Proposition 112 (STATUTORY) | 172,772 |
-| Treasurer | 171,537 |
-| Amendment V (CONSTITUTIONAL) | 170,633 |
-| Amendment 74 (CONSTITUTIONAL) | 169,563 |
-| Amendment A (CONSTITUTIONAL) | 168,899 |
-| Amendment 73 (CONSTITUTIONAL) | 168,856 |
-| Regent Of The University Of Colorado - At Large | 168,559 |
-
 ### 2019 coordinated — boulder_county
 
 - **Source file:** `2019-coordinated-sov.xls`
@@ -704,37 +363,6 @@
 | Proposition 118 (Statutory) | 195,980 |
 | Proposition 114 (Statutory) | 195,562 |
 | Amendment 77 (Constitutional) | 191,125 |
-
-### 2020 general — secretary_of_state
-
-- **Source file:** `2020-general-precinct-results.xlsx`
-- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2020/2020GEPrecinctLevelResultsPosted.xlsx
-- **Retrieved at:** 2026-05-23T18:13:44+00:00
-- **Extraction quality:** machine_readable
-- **Extraction notes:** —
-
-- **Rows:** 23,320
-- **Distinct contests:** 28
-- **Distinct precincts:** 240
-- **Total votes summed:** 4,068,596
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 12904, 'measure': 9456, 'retention': 960}
-- **Party breakdown (top 8):** {'(none)': 12816, 'UAF': 2020, 'DEM': 1608, 'REP': 1368, 'LBR': 948, 'Unity Party of Colorado': 720, 'GRN': 480, 'AVP': 480}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-| President/Vice President | 206,111 |
-| United States Senator | 205,536 |
-| Amendment 76 (CONSTITUTIONAL) | 198,888 |
-| Proposition EE (STATUTORY) | 198,475 |
-| Proposition 115 (STATUTORY) | 198,177 |
-| Proposition 116 (STATUTORY) | 198,064 |
-| Proposition 113 (STATUTORY) | 197,920 |
-| Proposition 118 (STATUTORY) | 195,980 |
-| Proposition 114 (STATUTORY) | 195,562 |
-| Amendment 77 (CONSTITUTIONAL) | 191,125 |
 
 ### 2021 coordinated — boulder_county
 
@@ -852,27 +480,6 @@
 | Town of Superior - Trustee | 16,417 |
 | Town of Erie - Council Member District 1 | 11,467 |
 
-### ? ? — ?
-
-- **Source file:** `?`
-- **Source URL:** ?
-- **Retrieved at:** ?
-- **Extraction quality:** ?
-- **Extraction notes:** —
-
-- **Rows:** 0
-- **Distinct contests:** 0
-- **Distinct precincts:** 0
-- **Total votes summed:** 0
-- **Rows with null votes:** 0
-- **Contest type breakdown:** {}
-- **Party breakdown (top 8):** {}
-
-**Top 10 contests by vote total** (sanity check):
-
-| contest | total_votes |
-|---|---|
-
 ### 2025 coordinated — boulder_county
 
 - **Source file:** `2025-coordinated-sov.xlsx`
@@ -903,3 +510,282 @@
 | Boulder Valley School District RE-2 Director District B (4 Years) | 46,625 |
 | Boulder Valley School District RE-2 Director District F (4 Years) | 45,488 |
 | St. Vrain Valley School District RE-1J Board of Education Director in Director District B | 36,900 |
+
+### 2004 general — secretary_of_state
+
+- **Source file:** `2004-general-precinct-results.xlsx`
+- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2004/2004GeneralPrecinctBallotsCast.xlsx
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
+- **Extraction quality:** machine_readable
+- **Extraction notes:** —
+
+- **Rows:** 13,586
+- **Distinct contests:** 33
+- **Distinct precincts:** 229
+- **Total votes summed:** 3,219,506
+- **Rows with null votes:** 0
+- **Contest type breakdown:** {'measure': 5902, 'candidate': 5414, 'retention': 2270}
+- **Party breakdown (top 8):** {'(none)': 8172, 'DEM': 1569, 'REP': 1230, 'LBR': 1031, 'CRP': 406, 'UAF': 329, 'ACN': 316, 'IND': 173}
+
+**Top 10 contests by vote total** (sanity check):
+
+| contest | total_votes |
+|---|---|
+| Presidential Electors | 159,259 |
+| US Senator | 157,414 |
+| Amend 35 Tobacco Tax Inc for Health-Rel. Purposes | 153,067 |
+| Amend 36 Selection of Presidential Electors | 149,382 |
+| Referendum 4A | 148,802 |
+| Amend 37 Renewable Energy Requirement | 147,909 |
+| Amend 34 Construction Liability | 146,211 |
+| Referendum 4B | 143,987 |
+| U of C Regent - At Large | 143,012 |
+| Referendum B Obsolete Constitutional Provisions | 131,795 |
+
+### 2006 general — secretary_of_state
+
+- **Source file:** `2006-general-precinct-results.xlsx`
+- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2006/2006GeneralPrecinctBallotsCast.xlsx
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
+- **Extraction quality:** machine_readable
+- **Extraction notes:** —
+
+- **Rows:** 17,299
+- **Distinct contests:** 41
+- **Distinct precincts:** 237
+- **Total votes summed:** 3,356,492
+- **Rows with null votes:** 0
+- **Contest type breakdown:** {'measure': 8930, 'candidate': 6019, 'retention': 2350}
+- **Party breakdown (top 8):** {'(none)': 11280, 'DEM': 1916, 'REP': 1813, 'LBR': 935, 'ACN': 498, 'UAF': 470, 'GRN': 175, 'NP': 149}
+
+**Top 10 contests by vote total** (sanity check):
+
+| contest | total_votes |
+|---|---|
+| Gov./Lieutenant Gov. | 118,331 |
+| Amendment 43 | 117,068 |
+| Referendum I | 116,988 |
+| Amendment 44 | 116,703 |
+| Amendment 42 | 116,362 |
+| Secretary of State | 115,548 |
+| State Treasurer | 114,243 |
+| Attorney General | 113,960 |
+| Amendment 39 | 113,459 |
+| Amendment 40 | 112,804 |
+
+### 2008 general — secretary_of_state
+
+- **Source file:** `2008-general-precinct-results.xlsx`
+- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2008/2008GeneralPrecinctTurnout.xlsx
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
+- **Extraction quality:** machine_readable
+- **Extraction notes:** —
+
+- **Rows:** 24,856
+- **Distinct contests:** 43
+- **Distinct precincts:** 239
+- **Total votes summed:** 4,744,062
+- **Rows with null votes:** 0
+- **Contest type breakdown:** {'candidate': 11472, 'measure': 7648, 'retention': 5736}
+- **Party breakdown (top 8):** {'(none)': 13623, 'DEM': 3346, 'REP': 2868, 'GRN': 956, 'UAF': 956, 'CON': 239, 'LBR': 239, "HeartQuake '08": 239}
+
+**Top 10 contests by vote total** (sanity check):
+
+| contest | total_votes |
+|---|---|
+| PRESIDENTIAL ELECTORS/ PRESIDENTIAL ELECTORS (VICE) | 171,763 |
+| UNITED STATES SENATOR | 166,096 |
+| Amendment 48 | 164,829 |
+| Amendment 47 | 159,811 |
+| Amendment 51 | 158,937 |
+| Amendment 46 | 158,417 |
+| Amendment 50 | 157,999 |
+| Amendment 58 | 157,880 |
+| Amendment 49 | 155,675 |
+| Amendment 59 | 155,014 |
+
+### 2010 general — secretary_of_state
+
+- **Source file:** `2010-general-precinct-results.xlsx`
+- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2010/general/2010GeneralPrecinctTurnout.xlsx
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
+- **Extraction quality:** machine_readable
+- **Extraction notes:** —
+
+- **Rows:** 18,196
+- **Distinct contests:** 37
+- **Distinct precincts:** 236
+- **Total votes summed:** 3,078,004
+- **Rows with null votes:** 0
+- **Contest type breakdown:** {'candidate': 9304, 'measure': 5616, 'retention': 3276}
+- **Party breakdown (top 8):** {'(none)': 9047, 'REP': 2316, 'DEM': 2311, 'UNA': 1710, 'LIB': 928, 'ACN': 704, 'GRN': 472, 'NR': 236}
+
+**Top 10 contests by vote total** (sanity check):
+
+| contest | total_votes |
+|---|---|
+| GOVERNOR/LIEUTENANT GOVERNOR | 125,486 |
+| UNITED STATES SENATOR | 125,265 |
+| Amendment 61 (CONSTITUTIONAL) | 121,416 |
+| Amendment 62 (CONSTITUTIONAL) | 121,217 |
+| Amendment 60 (CONSTITUTIONAL) | 120,100 |
+| Proposition 101 (STATUTORY) | 119,955 |
+| SECRETARY OF STATE | 119,678 |
+| STATE TREASURER | 119,490 |
+| ATTORNEY GENERAL | 119,436 |
+| Amendment 63 (CONSTITUTIONAL) | 118,692 |
+
+### 2012 general — secretary_of_state
+
+- **Source file:** `2012-general-precinct-results.xlsx`
+- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2012/2012GeneralPrecinctLevelTurnout.xlsx
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
+- **Extraction quality:** machine_readable
+- **Extraction notes:** —
+
+- **Rows:** 17,252
+- **Distinct contests:** 22
+- **Distinct precincts:** 234
+- **Total votes summed:** 2,153,645
+- **Rows with null votes:** 0
+- **Contest type breakdown:** {'candidate': 10546, 'measure': 5770, 'retention': 936}
+- **Party breakdown (top 8):** {'(none)': 9398, 'DEM': 1569, 'REP': 1393, 'LBR': 1148, 'ACN': 526, 'GRN': 410, 'Socialist Party USA': 234, 'Justice Party': 234}
+
+**Top 10 contests by vote total** (sanity check):
+
+| contest | total_votes |
+|---|---|
+| President/Vice President | 179,499 |
+| Amendment 64 (CONSTITUTIONAL) | 175,158 |
+| Amendment 65 (CONSTITUTIONAL) | 165,630 |
+| Regent Of The University Of Colorado - At Large | 159,816 |
+| Amendment S (CONSTITUTIONAL) | 154,756 |
+| United States Representative - District 2 | 128,237 |
+| Supreme Court | 127,463 |
+| County Court, Boulder | 125,630 |
+| Court of Appeals | 125,393 |
+| District Attorney - District 20 | 124,797 |
+
+### 2014 general — secretary_of_state
+
+- **Source file:** `2014-general-precinct-results.xlsx`
+- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2014/2014GeneralPrecinctTurnout.xlsx
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
+- **Extraction quality:** machine_readable
+- **Extraction notes:** —
+
+- **Rows:** 18,404
+- **Distinct contests:** 23
+- **Distinct precincts:** 233
+- **Total votes summed:** 2,042,814
+- **Rows with null votes:** 0
+- **Contest type breakdown:** {'candidate': 10724, 'measure': 6748, 'retention': 932}
+- **Party breakdown (top 8):** {'(none)': 11027, 'REP': 1936, 'DEM': 1817, 'LBR': 1469, 'UAF': 1223, 'GRN': 233, 'Unaffiliated / Republican': 233, 'ACN': 233}
+
+**Top 10 contests by vote total** (sanity check):
+
+| contest | total_votes |
+|---|---|
+| United States Senator | 142,321 |
+| Governor/Lieutenant Governor | 141,760 |
+| Amendment 67 (CONSTITUTIONAL) | 139,834 |
+| Proposition 105 (STATUTORY) | 139,300 |
+| Amendment 68 (CONSTITUTIONAL) | 138,778 |
+| Secretary of State | 135,438 |
+| Treasurer | 134,735 |
+| Attorney General | 133,363 |
+| Proposition 104 (STATUTORY) | 133,120 |
+| United States Representative - District 2 | 103,022 |
+
+### 2016 general — secretary_of_state
+
+- **Source file:** `2016-general-precinct-results.xlsx`
+- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2016/General/2016GeneralTurnoutPrecinctLevel.xlsx
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
+- **Extraction quality:** machine_readable
+- **Extraction notes:** —
+
+- **Rows:** 23,496
+- **Distinct contests:** 28
+- **Distinct precincts:** 233
+- **Total votes summed:** 3,413,849
+- **Rows with null votes:** 0
+- **Contest type breakdown:** {'candidate': 13934, 'measure': 8630, 'retention': 932}
+- **Party breakdown (top 8):** {'(none)': 12813, 'UAF': 1864, 'DEM': 1678, 'REP': 1535, 'LBR': 713, 'GRN': 466, 'ACN': 233, 'AVP': 233}
+
+**Top 10 contests by vote total** (sanity check):
+
+| contest | total_votes |
+|---|---|
+| President/Vice President | 188,145 |
+| United States Senator | 185,820 |
+| Amendment 70 (CONSTITUTIONAL) | 184,193 |
+| Amendment 72 (CONSTITUTIONAL) | 183,219 |
+| Proposition 106 (STATUTORY) | 181,711 |
+| Amendment 69 (CONSTITUTIONAL) | 178,821 |
+| Proposition 107 (STATUTORY) | 176,381 |
+| Amendment 71 (CONSTITUTIONAL) | 175,638 |
+| Amendment T (CONSTITUTIONAL) | 174,723 |
+| Proposition 108 (STATUTORY) | 173,189 |
+
+### 2018 general — secretary_of_state
+
+- **Source file:** `2018-general-precinct-results.xlsx`
+- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2018/2018GEPrecinctLevelResults.xlsx
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
+- **Extraction quality:** machine_readable
+- **Extraction notes:** —
+
+- **Rows:** 21,422
+- **Distinct contests:** 34
+- **Distinct precincts:** 235
+- **Total votes summed:** 4,288,865
+- **Rows with null votes:** 0
+- **Contest type breakdown:** {'measure': 11622, 'candidate': 8860, 'retention': 940}
+- **Party breakdown (top 8):** {'(none)': 14837, 'DEM': 2184, 'REP': 1835, 'LBR': 908, 'Unity Party of Colorado': 470, 'ACN': 470, 'GRN': 235, 'AVP': 235}
+
+**Top 10 contests by vote total** (sanity check):
+
+| contest | total_votes |
+|---|---|
+| Governor | 176,262 |
+| Secretary of State | 174,074 |
+| Attorney General | 173,664 |
+| Proposition 112 (STATUTORY) | 172,772 |
+| Treasurer | 171,537 |
+| Amendment V (CONSTITUTIONAL) | 170,633 |
+| Amendment 74 (CONSTITUTIONAL) | 169,563 |
+| Amendment A (CONSTITUTIONAL) | 168,899 |
+| Amendment 73 (CONSTITUTIONAL) | 168,856 |
+| Regent Of The University Of Colorado - At Large | 168,559 |
+
+### 2020 general — secretary_of_state
+
+- **Source file:** `2020-general-precinct-results.xlsx`
+- **Source URL:** https://www.coloradosos.gov/pubs/elections/Results/2020/2020GEPrecinctLevelResultsPosted.xlsx
+- **Retrieved at:** 2026-05-23T18:13:44+00:00
+- **Extraction quality:** machine_readable
+- **Extraction notes:** —
+
+- **Rows:** 23,320
+- **Distinct contests:** 28
+- **Distinct precincts:** 240
+- **Total votes summed:** 4,068,596
+- **Rows with null votes:** 0
+- **Contest type breakdown:** {'candidate': 12904, 'measure': 9456, 'retention': 960}
+- **Party breakdown (top 8):** {'(none)': 12816, 'UAF': 2020, 'DEM': 1608, 'REP': 1368, 'LBR': 948, 'Unity Party of Colorado': 720, 'GRN': 480, 'AVP': 480}
+
+**Top 10 contests by vote total** (sanity check):
+
+| contest | total_votes |
+|---|---|
+| President/Vice President | 206,111 |
+| United States Senator | 205,536 |
+| Amendment 76 (CONSTITUTIONAL) | 198,888 |
+| Proposition EE (STATUTORY) | 198,475 |
+| Proposition 115 (STATUTORY) | 198,177 |
+| Proposition 116 (STATUTORY) | 198,064 |
+| Proposition 113 (STATUTORY) | 197,920 |
+| Proposition 118 (STATUTORY) | 195,980 |
+| Proposition 114 (STATUTORY) | 195,562 |
+| Amendment 77 (CONSTITUTIONAL) | 191,125 |

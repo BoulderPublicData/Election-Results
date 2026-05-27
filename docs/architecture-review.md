@@ -42,7 +42,7 @@ Tier 1 closes the easy gaps in a single afternoon. Tier 2 is a week's work and y
 | Cron-driven refresh PR | ✅ `.github/workflows/annual-sov-refresh.yml` (every Jan 6) |
 | Data dictionary + filter-pivot recipes | ✅ `docs/data-dictionary.md` + `docs/filter-pivot-recipes.md` |
 | Movement-context note | ✅ README mentions BoulderPublicData |
-| Two-home rule (only `data/original/` + `data/processed/` are written) | ✅ Codified in AGENT.md guardrails |
+| Two-home rule (only `data/original/` + `data/processed/` are written) | ✅ Codified in AGENTS.md guardrails |
 
 ---
 

@@ -1,0 +1,211 @@
+{
+  "$schema_version": "1.1.0",
+  "$description": "Source-neutral concept catalog. Each entry maps a snake_case canonical concept name to the literal contest-title patterns that identify it in each source's files, plus a `caveats` field spelling out what is and is NOT comparable across sources. Use scripts/concepts.py:concept_for(contest, source) for row-by-row lookup.",
+  "$generated_by": "scripts/export_lookups.py from scripts/concepts.py:CONCEPTS",
+  "$generated_at": "2026-05-27T01:36:21+00:00",
+  "concepts": [
+    {
+      "name": "presidential_electors",
+      "description": "Electors for President and Vice President of the United States.",
+      "boulder_county_patterns": [
+        "Presidential Electors",
+        "President.*Vice President"
+      ],
+      "secretary_of_state_patterns": [
+        "President.*United States.*Vice President",
+        "President of the United States"
+      ],
+      "caveats": "Boulder presents the elector slate as a single candidate (`Joseph R. Biden / Kamala D. Harris`); SOS lists the presidential candidate alone (`Joseph R. Biden`). Vote totals match exactly when aggregated to the candidate level, but the candidate strings cannot be joined directly \u2014 strip the running-mate suffix from Boulder rows before joining.",
+      "tier": "federal"
+    },
+    {
+      "name": "us_senator",
+      "description": "United States Senator for Colorado.",
+      "boulder_county_patterns": [
+        "United States Senator",
+        "U[.]?S[.]? Senator"
+      ],
+      "secretary_of_state_patterns": [
+        "United States Senator",
+        "U[.]?S[.]? Senator"
+      ],
+      "caveats": "Cleanly comparable across sources.",
+      "tier": "federal"
+    },
+    {
+      "name": "us_representative",
+      "description": "United States Representative \u2014 Boulder is mostly in CO-2, with a small piece historically in CO-4.",
+      "boulder_county_patterns": [
+        "Representative to the \\d+th Congress",
+        "United States Representative"
+      ],
+      "secretary_of_state_patterns": [
+        "Representative to the \\d+th Congress",
+        "United States Representative"
+      ],
+      "caveats": "District numbers (`113th Congress`, `114th Congress`, etc.) change by election; group on this concept to avoid having to enumerate every Congress. District boundaries also shift after each census (2010, 2020) so historical comparisons across boundary years are geographic-area comparisons, not constituency comparisons.",
+      "tier": "federal"
+    },
+    {
+      "name": "governor",
+      "description": "Governor / Lieutenant Governor of Colorado.",
+      "boulder_county_patterns": [
+        "Governor",
+        "Governor/Lieutenant Governor"
+      ],
+      "secretary_of_state_patterns": [
+        "Governor",
+        "Governor/Lieutenant Governor"
+      ],
+      "caveats": "Like president, Boulder presents the ticket as one candidate (`Polis/Primavera`); SOS varies. Aggregate to candidate level after splitting the slash.",
+      "tier": "state"
+    },
+    {
+      "name": "attorney_general",
+      "description": "Colorado Attorney General.",
+      "boulder_county_patterns": [
+        "Attorney General"
+      ],
+      "secretary_of_state_patterns": [
+        "Attorney General"
+      ],
+      "caveats": "Cleanly comparable.",
+      "tier": "state"
+    },
+    {
+      "name": "secretary_of_state",
+      "description": "Colorado Secretary of State.",
+      "boulder_county_patterns": [
+        "Secretary of State"
+      ],
+      "secretary_of_state_patterns": [
+        "Secretary of State"
+      ],
+      "caveats": "Cleanly comparable.",
+      "tier": "state"
+    },
+    {
+      "name": "state_treasurer",
+      "description": "Colorado State Treasurer.",
+      "boulder_county_patterns": [
+        "State Treasurer",
+        "Treasurer of the State"
+      ],
+      "secretary_of_state_patterns": [
+        "State Treasurer",
+        "Treasurer of the State"
+      ],
+      "caveats": "Cleanly comparable.",
+      "tier": "state"
+    },
+    {
+      "name": "state_senator",
+      "description": "Colorado State Senator.",
+      "boulder_county_patterns": [
+        "State Senate"
+      ],
+      "secretary_of_state_patterns": [
+        "State Senator",
+        "State Senate"
+      ],
+      "caveats": "District boundaries are redrawn after each census. Cross-decennial comparisons need a precinct-to-district crosswalk for each year.",
+      "tier": "state"
+    },
+    {
+      "name": "state_representative",
+      "description": "Colorado State Representative.",
+      "boulder_county_patterns": [
+        "State Representative"
+      ],
+      "secretary_of_state_patterns": [
+        "State Representative"
+      ],
+      "caveats": "Same caveat as state senator on redistricting.",
+      "tier": "state"
+    },
+    {
+      "name": "regent_university_of_colorado",
+      "description": "Regent of the University of Colorado.",
+      "boulder_county_patterns": [
+        "Regent.*University of Colorado"
+      ],
+      "secretary_of_state_patterns": [
+        "Regent.*University of Colorado"
+      ],
+      "caveats": "Cleanly comparable.",
+      "tier": "state"
+    },
+    {
+      "name": "district_attorney",
+      "description": "Boulder County District Attorney (20th Judicial District).",
+      "boulder_county_patterns": [
+        "District Attorney"
+      ],
+      "secretary_of_state_patterns": [
+        "District Attorney"
+      ],
+      "caveats": "Cleanly comparable.",
+      "tier": "county"
+    },
+    {
+      "name": "county_commissioner",
+      "description": "Boulder County Commissioner (district seats).",
+      "boulder_county_patterns": [
+        "County Commissioner"
+      ],
+      "secretary_of_state_patterns": [],
+      "caveats": "SOS does NOT publish precinct-level county-commissioner results \u2014 the Boulder County file is the only source. Reconciliation cross-checks therefore only work BoCo\u2192BoCo for this concept.",
+      "tier": "county"
+    },
+    {
+      "name": "city_of_boulder_council",
+      "description": "City of Boulder Council members (at-large).",
+      "boulder_county_patterns": [
+        "City of Boulder Council"
+      ],
+      "secretary_of_state_patterns": [],
+      "caveats": "City-level office; only published in Boulder County files. Starting in 2023, the Boulder Mayor race became RCV \u2014 see `city_of_boulder_mayor` for that. Council remains plurality.",
+      "tier": "city"
+    },
+    {
+      "name": "city_of_boulder_mayor",
+      "description": "City of Boulder Mayor (RCV since 2023).",
+      "boulder_county_patterns": [
+        "City of Boulder Mayor"
+      ],
+      "secretary_of_state_patterns": [],
+      "caveats": "First-ever RCV election in 2023. RCV rows in the harmonized schema use `contest_type = 'ranked_choice'` and suffix `candidate_or_option` with `| Round N` (intermediate rounds, may have NEGATIVE votes for ballots transferring away) or `| Final` (the candidate's final round total). Sum only `| Final` rows to get totals comparable to a plurality race.",
+      "tier": "city"
+    },
+    {
+      "name": "city_of_longmont_council",
+      "description": "City of Longmont Council.",
+      "boulder_county_patterns": [
+        "City of Longmont Council"
+      ],
+      "secretary_of_state_patterns": [],
+      "caveats": "City-level office; only Boulder County files.",
+      "tier": "city"
+    },
+    {
+      "name": "city_of_louisville_council",
+      "description": "City of Louisville City Council.",
+      "boulder_county_patterns": [
+        "City of Louisville.*Council"
+      ],
+      "secretary_of_state_patterns": [],
+      "caveats": "City-level office; only Boulder County files.",
+      "tier": "city"
+    },
+    {
+      "name": "city_of_lafayette_council",
+      "description": "City of Lafayette City Council.",
+      "boulder_county_patterns": [
+        "City of Lafayette Council"
+      ],
+      "secretary_of_state_patterns": [],
+      "caveats": "City-level office; only Boulder County files.",
+      "tier": "city"
+    }
+  ]
+}

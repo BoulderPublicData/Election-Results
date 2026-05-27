@@ -20,6 +20,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from ..reject import Rejector, register as register_rejector
 from ..schema import SourceMeta
 from .common import (
     add_provenance, clean_cols, infer_contest_type,
@@ -31,7 +32,7 @@ def _normalize_county(series: pd.Series) -> pd.Series:
     return series.astype("string").str.strip().str.upper()
 
 
-def _parse_unified(df: pd.DataFrame, target_county: str) -> pd.DataFrame:
+def _parse_unified(df: pd.DataFrame, target_county: str, rejector: Rejector | None = None) -> pd.DataFrame:
     """2004-2010 schema: one Votes column, candidates and Yes/No mixed."""
     # Standardize column names.
     rename = {}
@@ -69,7 +70,7 @@ def _parse_unified(df: pd.DataFrame, target_county: str) -> pd.DataFrame:
     return out
 
 
-def _parse_split(df: pd.DataFrame, target_county: str) -> pd.DataFrame:
+def _parse_split(df: pd.DataFrame, target_county: str, rejector: Rejector | None = None) -> pd.DataFrame:
     """2012-2020 schema: candidate votes vs. yes/no votes in separate columns."""
     rename = {}
     for c in df.columns:
@@ -97,9 +98,12 @@ def _parse_split(df: pd.DataFrame, target_county: str) -> pd.DataFrame:
 
     rows: list[pd.DataFrame] = []
 
-    # Candidate rows: where _cand_votes is non-null.
+    # Candidate rows: where _cand_votes AND _candidate are both non-null.
+    # (Some SOS files put a "0" in the candidate-votes column for measure rows,
+    # so masking on candidate-votes alone would emit candidate rows for
+    # ballot measures.)
     if "_cand_votes" in sub.columns:
-        cand_mask = sub["_cand_votes"].notna()
+        cand_mask = sub["_cand_votes"].notna() & sub.get("_candidate", pd.Series(dtype="object")).notna()
         cand = pd.DataFrame()
         cand["precinct_id"] = sub.loc[cand_mask, "_precinct"].map(precinct_id_str)
         cand["precinct_name"] = pd.NA
@@ -129,13 +133,20 @@ def _parse_split(df: pd.DataFrame, target_county: str) -> pd.DataFrame:
         for vote_col, choice_label in [("_yes_votes", "Yes"), ("_no_votes", "No")]:
             if vote_col not in measure_dedup.columns:
                 continue
+            # Only emit rows where THIS choice's vote count is non-null. The
+            # previous version emitted a placeholder NaN row whenever the
+            # OTHER choice had a value, generating ~55k artificial "rejections"
+            # downstream.
+            sub_dedup = measure_dedup[measure_dedup[vote_col].notna()]
+            if sub_dedup.empty:
+                continue
             block = pd.DataFrame()
-            block["precinct_id"] = measure_dedup["_precinct"].map(precinct_id_str)
+            block["precinct_id"] = sub_dedup["_precinct"].map(precinct_id_str)
             block["precinct_name"] = pd.NA
-            block["contest"] = measure_dedup["_contest"].astype("string").str.strip()
+            block["contest"] = sub_dedup["_contest"].astype("string").str.strip()
             block["candidate_or_option"] = choice_label
             block["party"] = pd.NA
-            block["votes"] = pd.to_numeric(measure_dedup[vote_col], errors="coerce")
+            block["votes"] = pd.to_numeric(sub_dedup[vote_col], errors="coerce")
             block["active_voters"] = pd.NA
             block["ballots_cast"] = pd.NA
             block["contest_type"] = [
@@ -147,11 +158,25 @@ def _parse_split(df: pd.DataFrame, target_county: str) -> pd.DataFrame:
         return pd.DataFrame()
 
     out = pd.concat(rows, ignore_index=True)
-    out = out.dropna(subset=["precinct_id", "contest", "candidate_or_option", "votes"])
+    if rejector is not None:
+        out = rejector.drop_na_with_reject(
+            out,
+            required=["precinct_id", "contest", "candidate_or_option", "votes"],
+            reason="missing_required_field",
+        )
+    else:
+        out = out.dropna(subset=["precinct_id", "contest", "candidate_or_option", "votes"])
     return out
 
 
 def parse(path: Path, meta: SourceMeta, target_county: str = "Boulder") -> pd.DataFrame:
+    rejector = Rejector(
+        source_file=path.name,
+        election_year=meta.election_year,
+        data_source=meta.data_source,
+    )
+    register_rejector(rejector)
+
     df = pd.read_excel(path, engine="openpyxl", sheet_name=0)
     df = clean_cols(df)
     cols = {c.lower().strip() for c in df.columns}
@@ -175,9 +200,9 @@ def parse(path: Path, meta: SourceMeta, target_county: str = "Boulder") -> pd.Da
         )
 
     if "candidate votes" in cols:
-        out = _parse_split(df, target_county)
+        out = _parse_split(df, target_county, rejector=rejector)
     else:
-        out = _parse_unified(df, target_county)
+        out = _parse_unified(df, target_county, rejector=rejector)
 
     if out.empty:
         raise ValueError(f"{path.name}: no rows matched county={target_county!r}")

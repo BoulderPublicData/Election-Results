@@ -29,6 +29,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from ..reject import Rejector, register as register_rejector
 from ..schema import SourceMeta
 from .common import (
     add_provenance, clean_col, infer_contest_type, normalize_choice,
@@ -150,6 +151,13 @@ def _meta_cols(block: pd.DataFrame) -> dict[str, str]:
 
 
 def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
+    rejector = Rejector(
+        source_file=path.name,
+        election_year=meta.election_year,
+        data_source=meta.data_source,
+    )
+    register_rejector(rejector)
+
     raw = _read_raw(path)
     starts = _find_panel_starts(raw)
     if not starts:
@@ -237,9 +245,21 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
         raise ValueError(f"{path.name}: no panels yielded data; skipped={skipped_panels}")
 
     final = pd.concat(rows, ignore_index=True)
-    final = final.dropna(subset=["precinct_id", "candidate_or_option", "votes"])
+    final = rejector.drop_na_with_reject(
+        final,
+        required=["precinct_id", "candidate_or_option", "votes"],
+        reason="missing_required_field",
+    )
     final = final[final["candidate_or_option"].astype("string").str.len() > 0]
 
+    # Skipped panels are a per-PANEL rejection (not per-row); record them too
+    # so a reviewer browsing rejected.csv sees the loss.
+    for panel_label in skipped_panels:
+        rejector.add(
+            row_index=panel_label,
+            reason="panel_skipped",
+            detail="boco_panel parser could not align headers with data block",
+        )
     if skipped_panels:
         notes.append(f"skipped {len(skipped_panels)} panel(s) during extraction")
     if "<unknown contest" in " ".join(final["contest"].unique().tolist()):

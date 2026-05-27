@@ -23,10 +23,7 @@ from pathlib import Path
 
 import pandas as pd
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-PROCESSED = REPO_ROOT / "data" / "processed"
-AUDIT_DIR = REPO_ROOT / "data" / "audit"
-PROVENANCE_CSV = PROCESSED / "provenance.csv"
+from .config import AUDIT as AUDIT_DIR, PROCESSED, PROVENANCE_CSV, REPO_ROOT  # noqa: F401
 
 
 def _md_table(rows: list[dict], cols: list[str]) -> str:
@@ -133,14 +130,14 @@ def audit_file(csv_path: Path, *, provenance_lookup: dict | None = None) -> str:
     return audit_frame(df, csv_path.stem, provenance=prov)
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", type=Path, default=AUDIT_DIR / "summary.md",
                     help="Concatenated audit output (default: data/audit/summary.md)")
     ap.add_argument("csv", nargs="*", type=Path,
                     help="Specific CSVs (default: every CSV in data/processed/ "
                          "except provenance.csv and all-elections-tidy.csv)")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     if args.csv:
         csvs = args.csv
