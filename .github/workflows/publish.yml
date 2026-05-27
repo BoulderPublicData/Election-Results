@@ -49,12 +49,31 @@ jobs:
         run: uv run python -m scripts.pipeline publish
 
       - name: Show sizes
+        run: ls -lh data/processed/elections.db data/processed/metadata.yaml
+
+      - name: Write release notes
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        # Heredoc into a file. Keeps Markdown (with its `**` and other YAML-
+        # hostile characters) entirely out of the workflow YAML, where it had
+        # broken the previous version of this workflow.
         run: |
-          ls -lh data/processed/elections.db data/processed/metadata.yaml
-          uv run python -c "import sqlite3; \
-            c = sqlite3.connect('data/processed/elections.db'); \
-            for t in ['elections','provenance','concepts']: \
-              print(f'  {t}: {c.execute(f\"SELECT COUNT(*) FROM {t}\").fetchone()[0]:,} rows')"
+          cat > release-notes.md <<'NOTES_EOF'
+          Auto-built harmonized dataset.
+
+          **Files**
+          - `elections.db` — single SQLite with `elections` + `provenance` + `concepts` tables, plus an `elections_with_provenance` join view.
+          - `metadata.yaml` — Datasette annotations: per-column docs, suggested facets, three canned queries.
+
+          **Open in Datasette Lite (no install):**
+          https://lite.datasette.io/?url=https://github.com/__REPO__/releases/download/latest/elections.db
+
+          Source commit: __SHA__
+          NOTES_EOF
+          sed -i "s|__SHA__|$COMMIT_SHA|g; s|__REPO__|$REPO|g" release-notes.md
+          echo '--- release notes ---'
+          cat release-notes.md
 
       - name: Upload to "latest" Release
         env:
@@ -65,14 +84,6 @@ jobs:
           gh release delete latest --yes --cleanup-tag 2>/dev/null || true
           gh release create latest \
             --title "Latest harmonized dataset" \
-            --notes "Auto-built from commit ${{ github.sha }} on $(date -u +'%Y-%m-%d %H:%M UTC').
-
-**Files:**
-- \`elections.db\` — single SQLite with elections + provenance + concepts.
-- \`metadata.yaml\` — Datasette annotations.
-
-**Use it now (no install):**
-[Open in Datasette Lite ↗](https://lite.datasette.io/?url=https://github.com/${{ github.repository }}/releases/download/latest/elections.db)
-" \
+            --notes-file release-notes.md \
             data/processed/elections.db \
             data/processed/metadata.yaml
