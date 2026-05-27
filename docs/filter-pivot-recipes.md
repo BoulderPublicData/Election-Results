@@ -3,10 +3,15 @@
 The harmonized data is in **long form** — one row per
 (year × precinct × contest × candidate-or-option). Long form is awkward to
 *look at* but trivial to filter, group, and reshape. This file shows side-by-side
-how to do the most common civic-data tasks in **pandas**, **tidyverse**, and
-**Excel pivot tables**.
+how to do the most common civic-data tasks in **pandas**, **tidyverse**,
+**Excel pivot tables**, and **DuckDB** (SQL straight against the CSV — no load
+step).
 
-Load the file first:
+> **Just want to explore in the browser?** Open the
+> [Datasette Lite link in the README](../README.md#-datasette-lite) — same data,
+> same SQL editor as the DuckDB column below, zero setup.
+
+Load the file first (DuckDB doesn't need a load — see its column):
 
 **pandas**
 ```python
@@ -19,6 +24,14 @@ df = pd.read_csv("data/processed/all-elections-tidy.csv", dtype={"precinct_id": 
 library(readr); library(dplyr); library(tidyr)
 df <- read_csv("data/processed/all-elections-tidy.csv",
                col_types = cols(precinct_id = col_character()))
+```
+
+**DuckDB** (Python, R, CLI, or paste into Datasette's SQL editor)
+```sql
+-- DuckDB reads CSV directly — no load step. From the CLI:
+duckdb -c "FROM 'data/processed/all-elections-tidy.csv' LIMIT 5"
+-- From Python: `import duckdb; con = duckdb.connect()` then `con.sql(...)`.
+-- From the Datasette web UI: paste any of the queries below into the SQL editor.
 ```
 
 **Excel**
@@ -54,6 +67,19 @@ pres20 <- df |>
               values_fn = sum, values_fill = 0)
 ```
 
+**DuckDB**
+```sql
+PIVOT (
+    FROM 'data/processed/all-elections-tidy.csv'
+    WHERE election_year = 2020
+      AND data_source = 'boulder_county'
+      AND contest = 'Presidential Electors'
+)
+ON candidate_or_option
+USING SUM(votes)
+GROUP BY precinct_id;
+```
+
 **Excel**
 - **Filters:** `election_year = 2020`, `data_source = boulder_county`, `contest = Presidential Electors`
 - **Rows:** `precinct_id`
@@ -84,6 +110,18 @@ turnout <- df |>
   distinct(election_year, precinct_id, .keep_all = TRUE) |>
   pivot_wider(id_cols = precinct_id, names_from = election_year,
               values_from = ballots_cast)
+```
+
+**DuckDB**
+```sql
+PIVOT (
+    SELECT DISTINCT precinct_id, election_year, ballots_cast
+    FROM 'data/processed/all-elections-tidy.csv'
+    WHERE data_source = 'boulder_county'
+)
+ON election_year
+USING ANY_VALUE(ballots_cast)  -- "first non-null" for the (precinct, year) cell
+GROUP BY precinct_id;
 ```
 
 **Excel**
@@ -126,6 +164,22 @@ df |>
   arrange(desc(votes))
 ```
 
+**DuckDB**
+```sql
+-- DuckDB reads the JSON lookup directly via read_json_auto.
+WITH cob AS (
+    SELECT UNNEST(*) AS precinct_id
+    FROM read_json_auto('data/lookups/city-of-boulder-precincts-2023.json')
+)
+SELECT contest, candidate_or_option, SUM(votes) AS votes
+FROM 'data/processed/all-elections-tidy.csv'
+WHERE precinct_id IN (SELECT precinct_id FROM cob)
+  AND election_year = 2023
+  AND contest LIKE '%Council%'
+GROUP BY contest, candidate_or_option
+ORDER BY votes DESC;
+```
+
 **Excel**
 - Open the City of Boulder precinct lookup. Paste as a list in a side sheet.
 - In the pivot, use a slicer on `precinct_id` matching that list (or pre-filter via VLOOKUP/XLOOKUP).
@@ -158,6 +212,25 @@ sen20 <- df |>
   summarise(votes = sum(votes, na.rm = TRUE), .groups = "drop") |>
   pivot_wider(names_from = data_source, values_from = votes) |>
   mutate(delta = boulder_county - secretary_of_state)
+```
+
+**DuckDB**
+```sql
+WITH base AS (
+    SELECT data_source, candidate_or_option, SUM(votes) AS votes
+    FROM 'data/processed/all-elections-tidy.csv'
+    WHERE election_year = 2020
+      AND LOWER(contest) LIKE '%united states senator%'
+    GROUP BY data_source, candidate_or_option
+)
+SELECT candidate_or_option,
+       SUM(CASE WHEN data_source = 'boulder_county' THEN votes END) AS boulder_county,
+       SUM(CASE WHEN data_source = 'secretary_of_state' THEN votes END) AS secretary_of_state,
+       SUM(CASE WHEN data_source = 'boulder_county' THEN votes END)
+         - SUM(CASE WHEN data_source = 'secretary_of_state' THEN votes END) AS delta
+FROM base
+GROUP BY candidate_or_option
+ORDER BY ABS(delta) DESC;
 ```
 
 **Excel**
@@ -196,6 +269,23 @@ df |>
   summarise(pass_rate = mean(passed))
 ```
 
+**DuckDB**
+```sql
+WITH measures AS (
+    SELECT election_year, contest,
+           SUM(CASE WHEN candidate_or_option = 'Yes' THEN votes END) AS yes,
+           SUM(CASE WHEN candidate_or_option = 'No' THEN votes END) AS no
+    FROM 'data/processed/all-elections-tidy.csv'
+    WHERE contest_type = 'measure' AND election_year >= 2014
+    GROUP BY election_year, contest
+)
+SELECT election_year,
+       AVG(CASE WHEN yes > no THEN 1.0 ELSE 0.0 END) AS pass_rate
+FROM measures
+GROUP BY election_year
+ORDER BY election_year;
+```
+
 **Excel** (two-step pivot):
 1. Pivot 1: Rows = `election_year`, `contest`; Columns = `candidate_or_option`; Values = Sum of `votes`. Filter `contest_type = measure`.
 2. In a side column compute `=IF(Yes>No, 1, 0)`.
@@ -232,6 +322,22 @@ df |>
   pivot_wider(names_from = round_label, values_from = votes, values_fill = 0)
 ```
 
+**DuckDB**
+```sql
+PIVOT (
+    SELECT TRIM(SPLIT_PART(candidate_or_option, '|', 1)) AS candidate,
+           TRIM(SPLIT_PART(candidate_or_option, '|', 2)) AS round_label,
+           votes
+    FROM 'data/processed/all-elections-tidy.csv'
+    WHERE election_year = 2023
+      AND contest_type = 'ranked_choice'
+      AND LOWER(contest) LIKE '%mayor%'
+)
+ON round_label
+USING SUM(votes)
+GROUP BY candidate;
+```
+
 **Excel**
 - Filter `election_year = 2023`, `contest_type = ranked_choice`, `contest` contains "Mayor".
 - Add a helper column splitting `candidate_or_option` on `|` (use `TEXTSPLIT` in modern Excel, or `LEFT`/`FIND`).
@@ -256,6 +362,16 @@ df = df.merge(prov, on=["election_year", "election_type", "data_source"], how="l
 prov <- read_csv("data/processed/provenance.csv",
                  col_types = cols(election_year = col_integer()))
 df <- df |> left_join(prov, by = c("election_year", "election_type", "data_source"))
+```
+
+**DuckDB**
+```sql
+SELECT e.*, p.source_url, p.retrieved_at, p.extraction_quality
+FROM 'data/processed/all-elections-tidy.csv' e
+LEFT JOIN 'data/processed/provenance.csv' p
+  ON  e.election_year = CAST(p.election_year AS INTEGER)
+  AND e.election_type = p.election_type
+  AND e.data_source   = p.data_source;
 ```
 
 **Excel** — open `provenance.csv` as a side sheet and use `XLOOKUP` against the three join columns.

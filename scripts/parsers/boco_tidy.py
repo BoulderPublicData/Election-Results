@@ -19,6 +19,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from ..reject import Rejector, register as register_rejector
 from ..schema import SourceMeta
 from .common import (
     add_provenance, clean_cols, infer_contest_type,
@@ -60,6 +61,12 @@ def _read_excel(path: Path, sheet: int | str = 0) -> pd.DataFrame:
 def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
     """Return harmonized long-form DataFrame for a Boulder tidy-format SoV."""
     notes: list[str] = []
+    rejector = Rejector(
+        source_file=path.name,
+        election_year=meta.election_year,
+        data_source=meta.data_source,
+    )
+    register_rejector(rejector)
 
     # Read all sheets, then concatenate (handles 2023's Plurality+RCV split).
     engine = "openpyxl" if path.suffix.lower() == ".xlsx" else "xlrd"
@@ -139,8 +146,19 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
                 infer_contest_type(c, ch) for c, ch in zip(out["contest"], out["candidate_or_option"])
             ]
 
-        # Drop rows where precinct_id is missing or where the row is a totals row.
-        out = out.dropna(subset=["precinct_id", "contest", "candidate_or_option"])
+        # Reject rows with missing required fields (was a silent dropna).
+        # `sheet:row` lets reviewers find the bad row in the source XLSX.
+        sheet_label = sheet
+        out = out.assign(_row_in_sheet=range(len(out)))
+        out["_row_index"] = out["_row_in_sheet"].map(lambda i: f"{sheet_label}:{i+2}")
+        out = rejector.drop_na_with_reject(
+            out,
+            required=["precinct_id", "contest", "candidate_or_option"],
+            reason="missing_required_field",
+            row_index_col="_row_index",
+        )
+        out = out.drop(columns=["_row_in_sheet", "_row_index"])
+        # Strip totals rows (these are display-only summaries, not data).
         out = out[~out["precinct_id"].astype("string").str.lower().isin(
             {"total", "totals", "grand total", "summary", "nan", ""}
         )]

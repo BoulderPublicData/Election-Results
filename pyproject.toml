@@ -19,6 +19,13 @@ dependencies = [
     "ipykernel>=6.29",
     "pyyaml>=6.0",
     "pdfplumber>=0.11.9",
+    "pandera>=0.20",
+    "requests-cache>=1.2",
+    "tenacity>=9.0",
+    "structlog>=24.4",
+    "sqlite-utils>=3.37",
+    "duckdb>=1.0",
+    "datasette>=0.65",
 ]
 
 [project.optional-dependencies]

@@ -18,17 +18,21 @@ from pathlib import Path
 
 import pandas as pd
 
+from .config import (
+    BOULDER_COUNTY, ELECTION_DATES, MANIFEST_PATH, ORIGINAL,
+    PROCESSED, REPO_ROOT, SECRETARY_OF_STATE, SOURCES, Source,
+)
+from .logging_setup import get_logger
 from .parsers import boco_panel, boco_pdf, boco_tidy, sos
 from .schema import SourceMeta, validate
-from .sources import (
-    ALL_SOURCES, BOULDER_COUNTY, ELECTION_DATES,
-    SECRETARY_OF_STATE, Source,
-)
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-ORIGINAL_DATA = REPO_ROOT / "data" / "original"
-PROCESSED_DATA = REPO_ROOT / "data" / "processed"
-MANIFEST_PATH = ORIGINAL_DATA / "manifest.json"
+log = get_logger(__name__)
+
+# Backwards-compatible aliases — keep these so any external code that imported
+# from scripts.clean keeps working through a deprecation cycle.
+ORIGINAL_DATA = ORIGINAL
+PROCESSED_DATA = PROCESSED
+ALL_SOURCES = SOURCES
 
 # Year-by-year routing for Boulder County.
 # Panel: 2008, 2010, 2011, 2012 — multi-block per-sheet format.
@@ -102,7 +106,7 @@ def write_csv(df: pd.DataFrame, dest: Path) -> None:
     to_csv_frame(df).to_csv(dest, index=False)
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--year", type=int, help="Only this year")
     ap.add_argument("--since", type=int, help="This year and later")
@@ -113,7 +117,7 @@ def main() -> int:
                     help="Skip PDF-sourced years (2005/2007/2009). PDF parse can take minutes.")
     ap.add_argument("--validate-only", action="store_true",
                     help="Parse + validate but don't write CSVs.")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     if args.source == "boulder_county":
         pool = BOULDER_COUNTY

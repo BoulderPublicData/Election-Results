@@ -1,0 +1,78 @@
+name: Publish Datasette artifacts
+
+# Build elections.db + metadata.yaml on every push to main and attach them to
+# a rolling GitHub Release ("latest"). Readers point Datasette Lite at the
+# Release artifact — see the link in README — to get a full SQL interface
+# in the browser with zero server infrastructure.
+#
+# Trigger:
+#   - push to main (after a refresh PR merges)
+#   - manual workflow_dispatch
+#
+# This intentionally does NOT deploy to Vercel / Fly / Cloud Run — those need
+# user-specific secrets. Add a follow-on job when you have a target picked.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/processed/*.csv"
+      - "data/processed/provenance.csv"
+      - "scripts/publish.py"
+      - "scripts/concepts.py"
+      - ".github/workflows/publish.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write  # to create / update the Release
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8.1.0
+        with:
+          enable-cache: true
+
+      - name: Sync deps
+        run: uv sync
+
+      - name: Rebuild combined tidy CSV
+        # The per-year CSVs are committed; the combined CSV is gitignored.
+        # publish.py reads it directly, so rebuild it now.
+        run: uv run python -m scripts.pipeline run --skip-fetch --no-pdf
+
+      - name: Build elections.db + metadata.yaml
+        run: uv run python -m scripts.pipeline publish
+
+      - name: Show sizes
+        run: |
+          ls -lh data/processed/elections.db data/processed/metadata.yaml
+          uv run python -c "import sqlite3; \
+            c = sqlite3.connect('data/processed/elections.db'); \
+            for t in ['elections','provenance','concepts']: \
+              print(f'  {t}: {c.execute(f\"SELECT COUNT(*) FROM {t}\").fetchone()[0]:,} rows')"
+
+      - name: Upload to "latest" Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Recreate the rolling "latest" release so its assets always reflect
+          # the current main.
+          gh release delete latest --yes --cleanup-tag 2>/dev/null || true
+          gh release create latest \
+            --title "Latest harmonized dataset" \
+            --notes "Auto-built from commit ${{ github.sha }} on $(date -u +'%Y-%m-%d %H:%M UTC').
+
+**Files:**
+- \`elections.db\` — single SQLite with elections + provenance + concepts.
+- \`metadata.yaml\` — Datasette annotations.
+
+**Use it now (no install):**
+[Open in Datasette Lite ↗](https://lite.datasette.io/?url=https://github.com/${{ github.repository }}/releases/download/latest/elections.db)
+" \
+            data/processed/elections.db \
+            data/processed/metadata.yaml

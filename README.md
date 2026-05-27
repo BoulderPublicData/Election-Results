@@ -1,7 +1,14 @@
 # Election Results
 
 Boulder County and Colorado Secretary of State precinct-level election results,
-harmonized into a single tidy long-form dataset spanning **2004-2024**.
+harmonized into a single tidy long-form dataset spanning **2004-2025**.
+
+> **🦆 Datasette Lite (one click, no install):**
+> [**Open the dataset in your browser →**](https://lite.datasette.io/?url=https://github.com/BoulderPublicData/Election-Results/releases/download/latest/elections.db#/elections)
+>
+> Full SQL editor, faceting, JSON API. The SQLite is rebuilt and re-released
+> on every push to `main` by [`.github/workflows/publish.yml`](.github/workflows/publish.yml).
+> Direct download: [`elections.db` from the latest release](https://github.com/BoulderPublicData/Election-Results/releases/download/latest/elections.db).
 
 Boulder County Elections [publishes](https://bouldercounty.gov/elections/by-year/)
 Statements of Votes (SoVs) for primary and general elections in even years and
@@ -14,9 +21,24 @@ This repo:
 - harmonizes them into one schema (one row per precinct × contest × candidate),
 - audits each year for shape and totals,
 - reconciles top-line vote totals against the originals,
-- documents every column, every cross-walk, and every known caveat.
+- documents every column, every cross-walk, and every known caveat,
+- publishes the result as a single queryable SQLite via Datasette Lite.
 
-> **Maintaining this repo?** Read [`AGENT.md`](AGENT.md) first — it's the architecture brief, gotcha list, and "how to add a new year" guide in one page.
+> **Maintaining this repo?** Read [`AGENTS.md`](AGENTS.md) first — it's the architecture brief, gotcha list, and "how to add a new year" guide in one page.
+
+## Lineage
+
+This project sits in the **data-liberation** tradition: civic-tech work that turns
+agency-published documents into queryable, reusable datasets. Direct antecedents:
+
+- the **[Sunlight Foundation](https://en.wikipedia.org/wiki/Sunlight_Foundation)** (2006-2020) — first to systematize "scrape, parse, document, republish" for government data;
+- **[MuckRock](https://www.muckrock.com/)** + **[DocumentCloud](https://www.documentcloud.org/)** — FOIA-as-pipeline + the OCR/annotation/embed surface for source documents;
+- the **[PDF Liberation Project](https://github.com/pdf-liberation/pdf-liberation-hackathon)** (2013-2014) — methodology for liberating tables from PDFs that government agencies refuse to publish as data;
+- **[PUDL](https://github.com/catalyst-cooperative/pudl)** (Catalyst Cooperative) — the modern reference for a long-running, harmonized, audited civic-data pipeline (energy); much of this repo's structure (`scripts/{fetch,clean,audit}.py`, per-vintage parsers, concept catalogs with caveats) is borrowed directly;
+- **[BoulderPublicData](https://github.com/BoulderPublicData)** — the local civic-data home this repo is part of.
+
+The architecture is codified in the [`data-liberation`](https://github.com/brianckeegan/claude-skills) Claude skill;
+[`docs/architecture-review.md`](docs/architecture-review.md) audits this repo against it.
 
 ## Quickstart
 
@@ -79,7 +101,7 @@ Output lands in [`data/processed/`](data/processed/):
 │   ├── filter-pivot-recipes.md  # pandas / tidyverse / Excel recipes
 │   └── architecture-review.md   # tiered audit vs the data-liberation skill
 ├── Cleaning.ipynb             # rewritten notebook — methodology + worked examples
-├── AGENT.md                   # architecture, gotchas, future-agent handbook
+├── AGENTS.md                  # architecture, gotchas, future-agent handbook
 ├── .github/workflows/
 │   ├── annual-sov-refresh.yml  # cron: every Jan 6 14:00 UTC, runs discovery
 │   └── tests.yml               # pytest on every push + PR
@@ -92,7 +114,8 @@ Are the results of individual contests available at the level of precincts in an
 
 | Year | Boulder | State | Notes |
 |---|---|---|---|
-| 2024 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx) | (not yet) | Amended SoV — verify scope before publishing |
+| 2025 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx) | ❌ | Coordinated election (odd-year). |
+| 2024 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx) | ⚠️ [turnout-only](https://www.coloradosos.gov/pubs/elections/Results/2024/2024GeneralPrecinctVoterTurnout.xlsx) | Amended SoV — verify scope before publishing. SOS file is turnout-only (no candidate detail). |
 | 2023 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx) | ❌ | First Boulder mayoral RCV |
 | 2022 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2022/12/2022G-Boulder-County-Official-Statement-of-Votes.xlsx) | ❌ | Composite precincts in places |
 | 2021 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2021/11/2021-Boulder-County-Coordinated-Election-Official-Statement-of-Votes-1.xlsx) | ❌ | |

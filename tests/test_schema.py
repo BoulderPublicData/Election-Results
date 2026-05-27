@@ -85,13 +85,38 @@ def test_validate_catches_missing_required():
     assert any("election_year" in p for p in problems)
 
 
-def test_validate_allows_negative_votes_only_for_rcv():
-    base = {c: pd.NA for c in COLUMNS}
-    base.update({
-        "election_year": 2023, "data_source": "boulder_county",
-        "contest": "X", "candidate_or_option": "A | Round 2",
+def _well_formed_base() -> dict:
+    """A row that passes every pandera nullability/range check. Tests start
+    from this and mutate one field at a time."""
+    return {
+        "election_year": 2024,
+        "election_date": "2024-11-05",
+        "election_type": "general",
+        "data_source": "boulder_county",
+        "jurisdiction_level": "county",
+        "jurisdiction_name": "Boulder County",
+        "precinct_id": "100",
+        "precinct_name": pd.NA,
+        "contest": "X",
+        "contest_type": "candidate",
+        "candidate_or_option": "A",
+        "party": pd.NA,
+        "votes": 10,
+        "active_voters": pd.NA,
+        "ballots_cast": pd.NA,
+        "source_file": "x.xlsx",
+        "source_url": "https://example.test/x.xlsx",
+        "retrieved_at": "2024-12-01T00:00:00+00:00",
         "extraction_quality": "machine_readable",
-        "votes": -5, "contest_type": "ranked_choice",
+        "extraction_notes": pd.NA,
+    }
+
+
+def test_validate_allows_negative_votes_only_for_rcv():
+    base = _well_formed_base()
+    base.update({
+        "election_year": 2023, "contest_type": "ranked_choice",
+        "candidate_or_option": "A | Round 2", "votes": -5,
     })
     df = coerce(pd.DataFrame([base]))
     assert validate(df) == []  # negative RCV votes are OK
@@ -103,13 +128,8 @@ def test_validate_allows_negative_votes_only_for_rcv():
 
 
 def test_validate_flags_unknown_contest_type():
-    base = {c: pd.NA for c in COLUMNS}
-    base.update({
-        "election_year": 2024, "data_source": "boulder_county",
-        "contest": "X", "candidate_or_option": "A",
-        "extraction_quality": "machine_readable",
-        "contest_type": "bogus_type",
-    })
+    base = _well_formed_base()
+    base["contest_type"] = "bogus_type"
     df = coerce(pd.DataFrame([base]))
     problems = validate(df)
     assert any("contest_type" in p for p in problems)

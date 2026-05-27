@@ -2,7 +2,7 @@
   "$schema_version": "1.1.0",
   "$description": "Harmonized schema for data/processed/. `columns` is the full in-memory schema (20 cols). `csv_columns` is the slim view written to per-year CSV files (15 cols). `provenance_columns` are the 5 fields stored in data/processed/provenance.csv instead of duplicating them on every row.",
   "$generated_by": "scripts/export_lookups.py from scripts/schema.py",
-  "$generated_at": "2026-05-23T18:52:29+00:00",
+  "$generated_at": "2026-05-27T01:36:21+00:00",
   "columns": [
     "election_year",
     "election_date",

@@ -15,17 +15,23 @@ from pathlib import Path
 
 import pandas as pd
 
-from .clean import (
-    BOCO_PDF_YEARS, BOULDER_COUNTY, PROCESSED_DATA, SECRETARY_OF_STATE,
-    clean_source, _output_path, write_csv,
+from .clean import BOCO_PDF_YEARS, clean_source, _output_path, write_csv
+from .config import (
+    BOULDER_COUNTY, PROCESSED as PROCESSED_DATA, REPO_ROOT,
+    SECRETARY_OF_STATE, SOURCES as ALL_SOURCES,
 )
+from .logging_setup import get_logger
 from .schema import PROVENANCE_COLUMNS, provenance_record, validate
-from .sources import ALL_SOURCES
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+log = get_logger(__name__)
 
 
-def main() -> int:
+def _run_end_to_end(argv: list[str] | None = None) -> int:
+    """The full discover → fetch → clean → reconcile → audit driver.
+
+    This used to be `main()`; it's now the implementation of the `run`
+    subcommand. The new `main()` below is an argparse-with-subcommands router.
+    """
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--year", type=int)
     ap.add_argument("--since", type=int)
@@ -39,7 +45,7 @@ def main() -> int:
                          "the static registry (e.g. a newly published year)")
     ap.add_argument("--combined-out", type=Path,
                     default=PROCESSED_DATA / "all-elections-tidy.csv")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     if args.source == "boulder_county":
         pool = list(BOULDER_COUNTY)
@@ -113,6 +119,22 @@ def main() -> int:
         print(f"wrote {prov_path.relative_to(REPO_ROOT)} "
               f"({len(prov_df)} source files; provenance for the slim per-year CSVs)")
 
+    # Reject port — drain the per-parser rejection buffers and emit a single
+    # CSV. Any non-zero count here is a signal that the parser dropped rows;
+    # the row_index column points back into the source file.
+    from .reject import drain as _drain_rejects
+    from .config import REJECTED_CSV
+    rejected = _drain_rejects()
+    REJECTED_CSV.parent.mkdir(parents=True, exist_ok=True)
+    rejected.to_csv(REJECTED_CSV, index=False)
+    if len(rejected):
+        log.warning("pipeline.rejected_rows",
+                    count=len(rejected), path=str(REJECTED_CSV.relative_to(REPO_ROOT)))
+        print(f"wrote {REJECTED_CSV.relative_to(REPO_ROOT)} "
+              f"({len(rejected)} rejected rows — investigate before publishing)")
+    else:
+        print(f"wrote {REJECTED_CSV.relative_to(REPO_ROOT)} (0 rejected rows)")
+
     # Reconciliation audit — compares top-line contest totals between the raw
     # source files and the processed CSVs. Caught regressions in earlier passes.
     print("\n--- reconcile ---")
@@ -168,6 +190,47 @@ def main() -> int:
     print(f"wrote data/audit/summary.md ({len(fragments)} sections)")
 
     return 1 if errors else 0
+
+
+# ---------------------------------------------------------------------------
+# Subcommand CLI — one entry point that dispatches to per-module mains.
+# ---------------------------------------------------------------------------
+
+def main(argv: list[str] | None = None) -> int:
+    """Dispatch to a subcommand. Backwards-compat: `python -m scripts.pipeline`
+    with no subcommand runs the full end-to-end driver (the prior behavior)."""
+    if argv is None:
+        argv = sys.argv[1:]
+
+    # Backwards compat: no subcommand → run the full pipeline as before.
+    subcommands = {
+        "discover": "scripts.discover",
+        "fetch": "scripts.fetch",
+        "clean": "scripts.clean",
+        "audit": "scripts.audit",
+        "reconcile": "scripts.reconcile",
+        "export-lookups": "scripts.export_lookups",
+        "publish": "scripts.publish",
+        "run": None,  # handled inline
+    }
+
+    if not argv or argv[0] not in subcommands:
+        # No subcommand given — treat as `run` for backwards compatibility.
+        return _run_end_to_end(argv)
+
+    sub, *rest = argv
+    if sub == "run":
+        return _run_end_to_end(rest)
+
+    import importlib
+    module_name = subcommands[sub]
+    module = importlib.import_module(module_name)
+    if not hasattr(module, "main"):
+        print(f"{module_name} has no main() — can't run subcommand `{sub}`",
+              file=sys.stderr)
+        return 2
+    # All module main()s accept argv as their first positional arg.
+    return int(module.main(rest) or 0)
 
 
 if __name__ == "__main__":

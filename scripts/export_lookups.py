@@ -13,12 +13,10 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .concepts import CONCEPTS
+from .config import ELECTION_DATES, LOOKUPS, REPO_ROOT, SOURCES as ALL_SOURCES
 from .parsers.common import CHOICE_MAP, PARTY_MAP
 from .schema import COLUMNS, CSV_COLUMNS, DTYPES, PROVENANCE_COLUMNS, SCHEMA_VERSION
-from .sources import ALL_SOURCES, ELECTION_DATES
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-LOOKUPS = REPO_ROOT / "data" / "lookups"
 
 
 def _now() -> str:
@@ -139,14 +137,34 @@ def export_schema() -> None:
     (LOOKUPS / "schema.json").write_text(json.dumps(payload, indent=2) + "\n")
 
 
-def main() -> int:
+def export_concepts() -> None:
+    """Export the source-neutral concept catalog."""
+    payload = {
+        "$schema_version": SCHEMA_VERSION,
+        "$description": (
+            "Source-neutral concept catalog. Each entry maps a snake_case "
+            "canonical concept name to the literal contest-title patterns "
+            "that identify it in each source's files, plus a `caveats` field "
+            "spelling out what is and is NOT comparable across sources. "
+            "Use scripts/concepts.py:concept_for(contest, source) for "
+            "row-by-row lookup."
+        ),
+        "$generated_by": "scripts/export_lookups.py from scripts/concepts.py:CONCEPTS",
+        "$generated_at": _now(),
+        "concepts": [c.to_dict() for c in CONCEPTS],
+    }
+    (LOOKUPS / "concepts.json").write_text(json.dumps(payload, indent=2) + "\n")
+
+
+def main(argv: list[str] | None = None) -> int:
     LOOKUPS.mkdir(parents=True, exist_ok=True)
     export_party_codes()
     export_choice_map()
     export_election_dates()
     export_sources()
     export_schema()
-    print(f"wrote 5 lookup files under {LOOKUPS.relative_to(REPO_ROOT)}/")
+    export_concepts()
+    print(f"wrote 6 lookup files under {LOOKUPS.relative_to(REPO_ROOT)}/")
     return 0
 
 

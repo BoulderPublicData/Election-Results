@@ -133,5 +133,14 @@ dmypy.json
 # 100MB file limit; pipeline.py rebuilds it.
 data/processed/all-elections-tidy.csv
 
+# Datasette artifacts — built by `scripts/publish.py` and shipped via the
+# Datasette Lite link in README (released as GitHub Release artifacts on each
+# main merge). Locally generated; not committed.
+data/processed/elections.db
+data/processed/metadata.yaml
+
+# requests-cache SQLite (per-developer dev cache; not commit-worthy).
+.cache/
+
 # uv-managed virtual environment
 .venv/

@@ -30,7 +30,11 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 
-from .sources import ALL_SOURCES, Source
+from . import http
+from .config import SOURCES, Source
+from .logging_setup import get_logger
+
+log = get_logger(__name__)
 
 # Where to look for Boulder County's published Statements of Votes.
 BOCO_RESULTS_PAGE = "https://bouldercounty.gov/elections/results/"
@@ -54,16 +58,9 @@ _SOS_FILENAME_RE = re.compile(
     r"(Precinct|Turnout|BallotsCast)[A-Za-z]*\.xlsx?$"
 )
 
-USER_AGENT = (
-    "Election-Results-Pipeline/0.1 (+https://github.com/BoulderPublicData/Election-Results) "
-    "discovery"
-)
-
-
-def _fetch_html(url: str, *, timeout: int = 30) -> str:
-    resp = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=timeout)
-    resp.raise_for_status()
-    return resp.text
+def _fetch_html(url: str) -> str:
+    """Fetch a page via the shared cached+retrying HTTP session."""
+    return http.get_text(url)
 
 
 def _classify_boco_url(url: str) -> tuple[int, str] | None:
@@ -206,15 +203,15 @@ def merge_with_registry(
     change as the upstream sites are reorganized.
     """
     if only_new:
-        existing = {(s.year, s.data_source) for s in ALL_SOURCES}
+        existing = {(s.year, s.data_source) for s in SOURCES}
         return [s for s in discovered if (s.year, s.data_source) not in existing]
-    by_key: dict[tuple[int, str], Source] = {(s.year, s.data_source): s for s in ALL_SOURCES}
+    by_key: dict[tuple[int, str], Source] = {(s.year, s.data_source): s for s in SOURCES}
     for s in discovered:
         by_key[(s.year, s.data_source)] = s
     return list(by_key.values())
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--year", type=int, help="Only consider this year")
     ap.add_argument("--since", type=int, help="This year and later")
@@ -226,7 +223,7 @@ def main() -> int:
                          "(default: only show newly discovered entries)")
     ap.add_argument("--json", action="store_true",
                     help="Emit JSON instead of the human-readable summary")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     try:
         if args.source == "boulder_county":

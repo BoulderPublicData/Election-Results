@@ -164,36 +164,45 @@ def coerce(df: pd.DataFrame) -> pd.DataFrame:
 
 def validate(df: pd.DataFrame, source_label: str = "") -> list[str]:
     """Return a list of validation problems. Empty list = clean.
-    Not raised — callers decide how to handle (warn vs. fail)."""
+
+    Backed by pandera (see scripts/pandera_schemas.py:IN_MEMORY_SCHEMA for the
+    in-memory frame; CSV_SCHEMA for the slim CSV view). Pandera errors are
+    flattened to one string per failure so callers can keep handling problems
+    as warnings rather than raising — the existing API.
+
+    Set source_label to prefix each problem with a context tag (e.g. the
+    year-source label used in pipeline output).
+    """
+    from .pandera_schemas import CSV_SCHEMA, IN_MEMORY_SCHEMA
+    import pandera.pandas as pa
+
     problems: list[str] = []
     prefix = f"[{source_label}] " if source_label else ""
 
-    missing = sorted(set(COLUMNS) - set(df.columns))
+    # Missing-column check fires before pandera so the error is a single clean
+    # message rather than 20 per-column failures.
+    schema = IN_MEMORY_SCHEMA if set(COLUMNS).issubset(df.columns) else CSV_SCHEMA
+    missing = sorted(set(schema.columns) - set(df.columns))
     if missing:
         problems.append(f"{prefix}missing columns: {missing}")
         return problems
 
-    for col in ["election_year", "data_source", "contest", "candidate_or_option"]:
-        nulls = df[col].isna().sum()
-        if nulls:
-            problems.append(f"{prefix}{col}: {nulls} nulls (must be non-null)")
+    try:
+        schema.validate(df, lazy=True)
+    except pa.errors.SchemaErrors as err:
+        for _, row in err.failure_cases.iterrows():
+            col = row.get("column", "?")
+            check = row.get("check", "?")
+            problems.append(f"{prefix}{col}: {check} failed "
+                            f"(example: {row.get('failure_case', '?')})")
+    except pa.errors.SchemaError as err:
+        problems.append(f"{prefix}{err}")
 
-    # Negative votes are illegal except for RCV intermediate rounds, where they
-    # represent ballots transferring AWAY from an eliminated candidate.
-    non_rcv = df.loc[df["contest_type"] != "ranked_choice", "votes"].dropna()
-    if (non_rcv < 0).any():
-        problems.append(f"{prefix}negative vote counts in non-RCV rows")
-
-    bad_type = df.loc[~df["contest_type"].isin(
-        ["candidate", "measure", "retention", "recall", "ranked_choice"]
-    ) & df["contest_type"].notna(), "contest_type"].unique()
-    if len(bad_type):
-        problems.append(f"{prefix}unknown contest_type values: {list(bad_type)}")
-
-    bad_q = df.loc[~df["extraction_quality"].isin(
-        ["machine_readable", "pdf_text_layer", "pdf_ocr", "manual"]
-    ) & df["extraction_quality"].notna(), "extraction_quality"].unique()
-    if len(bad_q):
-        problems.append(f"{prefix}unknown extraction_quality values: {list(bad_q)}")
+    # Domain rule pandera can't express cleanly: negative votes are only legal
+    # for RCV intermediate rounds. Check ourselves.
+    if "votes" in df.columns and "contest_type" in df.columns:
+        non_rcv = df.loc[df["contest_type"] != "ranked_choice", "votes"].dropna()
+        if (non_rcv < 0).any():
+            problems.append(f"{prefix}negative vote counts in non-RCV rows")
 
     return problems
