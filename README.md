@@ -114,7 +114,8 @@ Are the results of individual contests available at the level of precincts in an
 
 | Year | Boulder | State | Notes |
 |---|---|---|---|
-| 2024 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx) | (not yet) | Amended SoV — verify scope before publishing |
+| 2025 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx) | ❌ | Coordinated election (odd-year). |
+| 2024 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx) | ⚠️ [turnout-only](https://www.coloradosos.gov/pubs/elections/Results/2024/2024GeneralPrecinctVoterTurnout.xlsx) | Amended SoV — verify scope before publishing. SOS file is turnout-only (no candidate detail). |
 | 2023 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx) | ❌ | First Boulder mayoral RCV |
 | 2022 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2022/12/2022G-Boulder-County-Official-Statement-of-Votes.xlsx) | ❌ | Composite precincts in places |
 | 2021 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2021/11/2021-Boulder-County-Coordinated-Election-Official-Statement-of-Votes-1.xlsx) | ❌ | |
