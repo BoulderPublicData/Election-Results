@@ -76,7 +76,8 @@ Output lands in [`data/processed/`](data/processed/):
 ├── tests/                     # pytest suite (schema, parsers, discovery, …)
 ├── docs/
 │   ├── data-dictionary.md     # what every column means + cross-walks
-│   └── filter-pivot-recipes.md  # pandas / tidyverse / Excel recipes
+│   ├── filter-pivot-recipes.md  # pandas / tidyverse / Excel recipes
+│   └── architecture-review.md   # tiered audit vs the data-liberation skill
 ├── Cleaning.ipynb             # rewritten notebook — methodology + worked examples
 ├── AGENT.md                   # architecture, gotchas, future-agent handbook
 ├── .github/workflows/

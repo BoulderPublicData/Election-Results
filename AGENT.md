@@ -138,6 +138,13 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at). Anyt
 
 ## 5. Future work (good first tasks)
 
+> **See also: [`docs/architecture-review.md`](docs/architecture-review.md)** — a
+> tiered audit of this repo against the `data-liberation` skill template
+> (concept catalog, reject port, pandera at the boundary, Datasette / Quarto
+> / LFS / DocumentCloud publishing surfaces). The items below are the legacy
+> backlog; the architecture review is the **organizing document** for the
+> next several PRs.
+
 In rough order of value:
 
 1. **Fix the 2008/2010 panel-header alignment** by porting the per-contest `iloc` mappings from the original `Cleaning.ipynb`. The original notebook is gone but the git history (`git log --all --source -- Cleaning.ipynb`) has it. Target: restore the ~75k-row coverage observed before the rewrite.
