@@ -29,7 +29,7 @@ This repo harmonizes precinct-level election results from Boulder County (2005-2
         ┌─────────────────────────────────────────────────┐
         │            scripts/clean.py (router)            │
         │  routes by (year, data_source) to one parser:   │
-        │   ├─ parsers/boco_tidy.py   (Boulder 2013-2024) │
+        │   ├─ parsers/boco_tidy.py   (Boulder 2013-2025) │
         │   ├─ parsers/boco_panel.py  (Boulder 2008-2012) │
         │   ├─ parsers/boco_pdf.py    (Boulder 2005-2009) │
         │   └─ parsers/sos.py         (SOS 2004-2020)     │
@@ -47,7 +47,11 @@ This repo harmonizes precinct-level election results from Boulder County (2005-2
        data/audit/*.md    data/audit/reconciliation.{md,csv}
 ```
 
-All modules above sit under `scripts/` and are wired up so `uv run python -m scripts.pipeline` runs end-to-end. The dataset is `data/processed/`, and every row carries provenance fields (`source_url`, `retrieved_at`, `extraction_quality`).
+All modules above sit under `scripts/` and are wired up so `uv run python -m scripts.pipeline` runs end-to-end. The dataset is `data/processed/`; provenance (`source_url`, `retrieved_at`, `extraction_quality`, …) is carried on the in-memory frames and written once per source file to `data/processed/provenance.csv` (§2.1a).
+
+A second, separate dataset rides alongside: **election-night snapshots** (`scripts/vote_counting.py` → `data/processed/vote-counting/`), OCR'd from results-site screenshots through Datalab with a committed response cache, its own schema (`schema.py:VOTE_COUNTING_*`), QA (`data/audit/vote-counting.md`), and a report-only comparison against the SoV in `reconcile.py`. The pipeline rebuilds it from the cache and never calls the API.
+
+All Excel reads go through `parsers/common.py:read_excel` / `excel_file` (the calamine engine — 4-6× faster than openpyxl on the statewide SOS files). `clean.py:clean_source` coerces every parser's output to `schema.DTYPES` before it is validated or written.
 
 ---
 
@@ -112,7 +116,7 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at). Anyt
 | **Property-owner pseudo-precincts (2015, 2023, 2025)** | Rows with `precinct_id` `Property Owner` / `Landowner` have no geography; dropping them undercounts special-district contests. | Keep them for totals, exclude them before spatial joins. See `docs/data-dictionary.md` §4.3a. |
 | **RCV expansion (2023)** | Summing `votes` for RCV contests double-counts (Round 1 + Round 2 + Final). | Filter to `candidate_or_option.str.endswith("| Final")` before summing totals. Reconcile already handles this — see `reconcile.py:reconcile_source`. |
 | **2008/2010 Boulder panel format** | Header column positions don't align with data column positions due to merged cells; the parser captures the major statewide contests but loses some down-ballot detail. Don't claim full precinct-level coverage for these years. | Annotate analyses with this caveat; cross-check against the SOS file when possible. |
-| **2005/2007/2009 PDF years** | Contest titles don't extract from the surrounding narrative; rows arrive with `contest = "<PDF: contest title not extracted>"`. | Treat as provisional; do not publish precinct × contest analyses without manual title backfill. |
+| **2005/2007/2009 PDF years** | Contest titles, candidates, and counts are extracted with pdfplumber, but the page layout is irregular page-to-page. | Treat as provisional (`extraction_quality = pdf_text_layer`); spot-check precinct-level claims against the source PDF before publishing. |
 | **2024 Boulder file** | The upstream "Amended SoV" file contains only 66 rows of local races (Town of Superior, etc.). Federal/state-level Boulder results may have a separate file or appear via SOS once published. | Verify the file's scope before drawing conclusions. |
 | **negative `votes` values** | Legitimately appear in RCV intermediate rounds (ballots transferring away from eliminated candidates). | `validate()` skips this check for `contest_type == "ranked_choice"` rows. Don't "fix" it by taking absolute values — you lose information. |
 | **Election-night snapshots** (`data/processed/vote-counting/`) | Rows are cumulative county-wide totals per snapshot; summing `votes` across snapshots multiplies them, and concatenating with precinct data double-counts. | Use `vote_change` or filter `is_final_snapshot`. Keep the dataset separate (own schema in `schema.py:VOTE_COUNTING_*`). |
@@ -151,15 +155,14 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at). Anyt
 In rough order of value:
 
 1. **Fix the 2008/2010 panel-header alignment** by porting the per-contest `iloc` mappings from the original `Cleaning.ipynb`. The original notebook is gone but the git history (`git log --all --source -- Cleaning.ipynb`) has it. Target: restore the ~75k-row coverage observed before the rewrite.
-2. **Backfill 2005/2007/2009 PDF contest titles** using a page-aware extractor. Each PDF has the contest title as a header above each panel; a vertical-position heuristic should grab it.
+2. **Spot-check 2005/2007/2009 PDF extraction** against the source PDFs. Contest titles are now extracted with pdfplumber; what's missing is a sampled precinct-by-precinct verification (and a golden-output test per PDF year).
 3. **Add Colorado primary elections** to the source registry. Boulder publishes primary SoVs in even-year June; the SOS publishes statewide primary precinct files too.
 4. **Add precinct geographies** as a separate `data/geography/` directory (GeoJSON or shapefile) with a year column so changing precinct boundaries can be joined to historical results.
-5. **Add a `tests/` suite.** Currently empty. A handful of golden-output tests per parser would prevent silent regressions.
+5. **Golden-output tests per parser.** The `tests/` suite (~115 tests) covers helpers, schema, discovery, and the election-night pipeline; small checked-in fixture workbooks per parser generation would catch silent regressions in the parsers themselves.
 6. **Add primary-vs-general party-affiliation tracking** for partisan primaries (the schema already has `party`; needs the primary data to populate it).
-7. **Make the GitHub Action also run reconcile.py** and fail the PR if there are new mismatches. Right now it runs pipeline.py which calls reconcile internally but doesn't surface the mismatch count in the PR body.
-
+7. **Fail the annual-refresh PR on new reconcile mismatches.** The Action now runs `reconcile.py` and puts the mismatch count in the PR body; it doesn't yet fail the job when that count is above 0.
 8. **Repo / org setting prerequisite for the Action:** The Action opens a PR via `peter-evans/create-pull-request`. For that to work, the repo (and the org, if it enforces) must have **Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"** enabled. Without it, the scheduled run fails at the `Open PR` step with `"GitHub Actions is not permitted to create or approve pull requests"`. The workflow has a fallback step that opens an issue containing the same body in that case, but enabling the toggle is the proper fix.
-8. **Per-year contest-name canonicalization.** Right now `contest` carries the as-published title; `data/lookups/contest-aliases.json` has patterns but only for top-line offices. A full crosswalk would let analyses group, e.g., "Representative to the 113th Congress" and "Representative to the 114th Congress" without manual regex.
+9. **Per-year contest-name canonicalization.** Right now `contest` carries the as-published title; `data/lookups/contest-aliases.json` has patterns but only for top-line offices. A full crosswalk would let analyses group, e.g., "Representative to the 113th Congress" and "Representative to the 114th Congress" without manual regex.
 
 ---
 
@@ -200,7 +203,8 @@ In rough order of value:
 | Reconciliation module | [`scripts/reconcile.py`](scripts/reconcile.py) |
 | End-to-end driver | [`scripts/pipeline.py`](scripts/pipeline.py) |
 | JSON lookup exporter | [`scripts/export_lookups.py`](scripts/export_lookups.py) |
-| Test suite | [`tests/`](tests/) (pytest, ~70 tests, runs in 2s) |
+| Test suite | [`tests/`](tests/) (pytest, ~115 tests, runs in ~3s; hermetic — never writes into `data/`) |
+| Shared Excel reader | [`scripts/parsers/common.py`](scripts/parsers/common.py) (`read_excel`, `excel_file`) |
 | Data dictionary | [`docs/data-dictionary.md`](docs/data-dictionary.md) |
 | Filter/pivot recipes | [`docs/filter-pivot-recipes.md`](docs/filter-pivot-recipes.md) |
 | Methodology notebook | [`Cleaning.ipynb`](Cleaning.ipynb) |
@@ -238,15 +242,18 @@ In rough order of value:
 
 ## 10. Sanity-check before declaring done
 
-After any non-trivial change, run all five:
+After any non-trivial change, run all six:
 
 ```bash
-uv run pytest                                            # all unit tests (~2s)
-uv run python -m scripts.pipeline --skip-fetch --no-pdf  # rebuilds processed CSVs
+uv run ruff check .                                      # lint (CI enforces it)
+uv run pytest                                            # all unit tests (~3s)
+uv run python -m scripts.pipeline --skip-fetch --no-pdf  # rebuilds processed CSVs (~2 min)
 uv run python -m scripts.reconcile                       # checks top-line totals
 uv run python -m scripts.export_lookups                  # refreshes JSON lookups
 uv run jupyter nbconvert --to notebook --execute \
     Cleaning.ipynb --output Cleaning.ipynb               # validates notebook
 ```
 
-If `pytest` fails or `reconcile` reports any new `mismatch` rows, **stop and investigate** before committing. CI runs pytest on every push and PR; the annual-refresh workflow also runs reconcile and surfaces the mismatch count in the PR body.
+If `ruff` or `pytest` fails, or `reconcile` reports any new `mismatch` rows, **stop and investigate** before committing. CI runs ruff and pytest on every push and PR; the annual-refresh workflow also runs reconcile and surfaces the mismatch count in the PR body.
+
+`pipeline --no-pdf` rewrites `data/audit/reconciliation.csv` for the non-PDF sources only; the full `scripts.reconcile` run above restores the PDF-year rows, so run it before committing.

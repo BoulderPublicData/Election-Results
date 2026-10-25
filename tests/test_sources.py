@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 from scripts.sources import (
-    ALL_SOURCES, BOULDER_COUNTY, ELECTION_DATES, SECRETARY_OF_STATE, find,
+    ALL_SOURCES,
+    BOULDER_COUNTY,
+    ELECTION_DATES,
+    SECRETARY_OF_STATE,
+    find,
     sources_for_year,
 )
 

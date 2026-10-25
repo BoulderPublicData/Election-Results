@@ -20,11 +20,17 @@ from pathlib import Path
 
 import pandas as pd
 
-from ..reject import Rejector, register as register_rejector
+from ..reject import Rejector
+from ..reject import register as register_rejector
 from ..schema import SourceMeta
 from .common import (
-    add_provenance, clean_cols, infer_contest_type,
-    normalize_choice, normalize_party, precinct_id_str,
+    add_provenance,
+    clean_cols,
+    infer_contest_type,
+    normalize_choice,
+    normalize_party,
+    precinct_id_str,
+    read_excel,
 )
 
 
@@ -65,7 +71,7 @@ def _parse_unified(df: pd.DataFrame, target_county: str, rejector: Rejector | No
     out["active_voters"] = pd.NA
     out["ballots_cast"] = pd.NA
     out["contest_type"] = [
-        infer_contest_type(c, ch) for c, ch in zip(out["contest"], out["candidate_or_option"])
+        infer_contest_type(c, ch) for c, ch in zip(out["contest"], out["candidate_or_option"], strict=True)
     ]
     return out
 
@@ -119,7 +125,7 @@ def _parse_split(df: pd.DataFrame, target_county: str, rejector: Rejector | None
         cand["active_voters"] = pd.NA
         cand["ballots_cast"] = pd.NA
         cand["contest_type"] = [
-            infer_contest_type(c, ch) for c, ch in zip(cand["contest"], cand["candidate_or_option"])
+            infer_contest_type(c, ch) for c, ch in zip(cand["contest"], cand["candidate_or_option"], strict=True)
         ]
         rows.append(cand)
 
@@ -177,7 +183,7 @@ def parse(path: Path, meta: SourceMeta, target_county: str = "Boulder") -> pd.Da
     )
     register_rejector(rejector)
 
-    df = pd.read_excel(path, engine="openpyxl", sheet_name=0)
+    df = read_excel(path, sheet_name=0)
     df = clean_cols(df)
     cols = {c.lower().strip() for c in df.columns}
 

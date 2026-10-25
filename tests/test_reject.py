@@ -7,7 +7,6 @@ import json
 import pandas as pd
 import pytest
 
-from scripts import reject
 from scripts.reject import Rejector, drain, register, reset
 
 

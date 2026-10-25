@@ -4,10 +4,13 @@ Build a SQLite database from the processed CSVs for Datasette publishing.
 This implements the **Publish** phase of the data-liberation workflow. Two
 artifacts are produced under ``data/processed/``:
 
-- ``elections.db`` — single SQLite file with three tables:
+- ``elections.db`` — single SQLite file with these tables:
   - ``elections`` — the long-form tidy data (one row per precinct × contest × candidate).
   - ``provenance`` — one row per source file, keyed on (election_year, election_type, data_source).
   - ``concepts`` — the cross-source concept catalog from scripts/concepts.py.
+  - ``vote_counting_contests`` / ``vote_counting_summary`` — the separate
+    election-night dataset (county-wide totals per results-site update), when
+    data/processed/vote-counting/ is present.
 - ``metadata.yaml`` — Datasette metadata: title, license, source links,
   per-column descriptions (pulled from docs/data-dictionary.md), suggested
   facets, and 2-3 canned queries.
@@ -30,8 +33,9 @@ import pandas as pd
 import yaml
 
 from .concepts import CONCEPTS
-from .config import LOOKUPS, PROCESSED, REPO_ROOT
+from .config import PROCESSED, REPO_ROOT
 from .logging_setup import get_logger
+from .schema import CSV_COLUMNS, DTYPES, VOTE_COUNTING_DTYPES, VOTE_COUNTING_SUMMARY_DTYPES
 
 log = get_logger(__name__)
 
@@ -49,7 +53,7 @@ def _load_combined() -> pd.DataFrame:
         raise FileNotFoundError(
             f"{combined} missing — run `python -m scripts.pipeline run` first"
         )
-    return pd.read_csv(combined, dtype={"precinct_id": "string"}, low_memory=False)
+    return pd.read_csv(combined, dtype={c: DTYPES[c] for c in CSV_COLUMNS}, low_memory=False)
 
 
 def _load_provenance() -> pd.DataFrame:
@@ -59,6 +63,18 @@ def _load_provenance() -> pd.DataFrame:
             f"{prov} missing — run `python -m scripts.pipeline run` first"
         )
     return pd.read_csv(prov, dtype=str)
+
+
+VOTE_COUNTING_TABLES = {
+    "vote_counting_contests": PROCESSED / "vote-counting" / "vote-counting-contests.csv",
+    "vote_counting_summary": PROCESSED / "vote-counting" / "vote-counting-summary.csv",
+}
+
+
+def _records(frame: pd.DataFrame) -> list[dict]:
+    """Rows as dicts with nulls as None, so nullable-integer columns stay
+    INTEGER in SQLite instead of collapsing to REAL ("92408.0")."""
+    return frame.astype(object).where(frame.notna(), None).to_dict(orient="records")
 
 
 def _concepts_frame() -> pd.DataFrame:
@@ -87,7 +103,7 @@ def build(db_path: Path = DB_PATH) -> Path:
 
     # `elections` table — facetable columns indexed for query speed.
     db["elections"].insert_all(
-        elections.to_dict(orient="records"),
+        _records(elections),
         batch_size=10_000,
     )
     for col in ("election_year", "data_source", "election_type", "contest_type",
@@ -107,6 +123,21 @@ def build(db_path: Path = DB_PATH) -> Path:
         concepts.to_dict(orient="records"),
         pk="name",
     )
+
+    # Election-night snapshots — a separate dataset with its own grain; never
+    # union it with `elections`.
+    for table, path in VOTE_COUNTING_TABLES.items():
+        if not path.exists():
+            log.warning("publish.vote_counting_missing", path=str(path.relative_to(REPO_ROOT)))
+            continue
+        dtypes = VOTE_COUNTING_DTYPES if table == "vote_counting_contests" \
+            else VOTE_COUNTING_SUMMARY_DTYPES
+        frame = pd.read_csv(path, dtype=dtypes, low_memory=False)
+        db[table].insert_all(_records(frame), batch_size=10_000)
+        index_cols = ("election_year", "contest") if table == "vote_counting_contests" \
+            else ("election_year",)
+        for col in index_cols:
+            db[table].create_index([col])
 
     # Convenience view: elections + provenance joined on the file key.
     db.create_view(
@@ -143,7 +174,7 @@ _COLUMN_DESCRIPTIONS: dict[str, str] = {
     "data_source": "Which agency published the file (boulder_county or secretary_of_state).",
     "jurisdiction_level": "county / state / city / school_district / special_district.",
     "jurisdiction_name": "Always 'Boulder County' in this project.",
-    "precinct_id": "10-digit Boulder/Colorado precinct identifier (string, preserves leading zeros). Composite IDs (2015, 2022) appear comma-joined.",
+    "precinct_id": "10-digit Boulder/Colorado precinct identifier (string, preserves leading zeros). Composite IDs (2015, 2022) appear comma-joined. 'Property Owner' / 'Landowner' rows are property-owner ballots with no precinct geography.",
     "precinct_name": "Short-form (3-digit) precinct code. Null for SOS rows.",
     "contest": "Contest title as published.",
     "contest_type": "candidate / measure / retention / recall / ranked_choice.",
@@ -152,6 +183,29 @@ _COLUMN_DESCRIPTIONS: dict[str, str] = {
     "votes": "Vote tally. May be negative for RCV intermediate rounds.",
     "active_voters": "Active registered voters in the precinct. Null on SOS rows.",
     "ballots_cast": "Ballots cast in the precinct. Null on SOS rows.",
+}
+
+
+# Pulled from docs/data-dictionary.md § 8. Keep in sync if a column is added.
+_VOTE_COUNTING_DESCRIPTIONS: dict[str, str] = {
+    "election_year": "Calendar year the election was held.",
+    "election_date": "Election day, ISO YYYY-MM-DD.",
+    "election_type": "general / coordinated.",
+    "snapshot_seq": "1..n in last_updated order within the election (null for RCV report rows).",
+    "last_updated": "Local time (America/Denver) from the results page's 'Last Updated' box.",
+    "results_label": "As published ('Official Results' / 'Unofficial Results'). Not a certification flag.",
+    "is_final_snapshot": "1 for the latest update of the election.",
+    "contest": "Contest title as published.",
+    "vote_for": "N from 'Vote for no more than N', when shown.",
+    "contest_type": "candidate / measure / retention / recall / ranked_choice.",
+    "candidate_or_option": "Candidate name (party and write-in suffix removed) or Yes/No.",
+    "party": "Party code (normalized where known).",
+    "is_write_in": "1 if the candidate was listed as a write-in.",
+    "votes": "Cumulative votes as of last_updated. Never sum across snapshots.",
+    "percent": "Percent as published.",
+    "contest_total_votes": "The contest card's TOTAL VOTES row.",
+    "vote_change": "Votes gained since the previous snapshot (negative after canvass adjustments).",
+    "source_file": "Screenshot or PDF under data/original/boulder-county/.",
 }
 
 
@@ -202,6 +256,27 @@ def build_metadata(out: Path = METADATA_PATH) -> Path:
                             "recover the source URL and download timestamp."
                         ),
                     },
+                    "vote_counting_contests": {
+                        "title": "Election-night results by update (2014-2025)",
+                        "description": (
+                            "County-wide totals for every contest and candidate at each "
+                            "'Last Updated' time on the Boulder County results site, OCR'd "
+                            "from screenshots and checked against each contest's total. "
+                            "Votes are cumulative: filter is_final_snapshot = 1 for final "
+                            "counts, or use vote_change for per-update increments."
+                        ),
+                        "columns": _VOTE_COUNTING_DESCRIPTIONS,
+                        "facets": ["election_year", "contest_type", "is_final_snapshot"],
+                        "size": 100,
+                    },
+                    "vote_counting_summary": {
+                        "title": "Election-night summary by update",
+                        "description": (
+                            "One row per results-site update: registration, ballots counted, "
+                            "and the page's footnotes."
+                        ),
+                        "facets": ["election_year"],
+                    },
                     "concepts": {
                         "title": "Cross-source concept catalog",
                         "description": (
@@ -238,6 +313,17 @@ def build_metadata(out: Path = METADATA_PATH) -> Path:
                             "  AND candidate_or_option LIKE '% | Final' "
                             "GROUP BY election_year, contest, candidate "
                             "ORDER BY election_year DESC, contest, final_votes DESC"
+                        ),
+                    },
+                    "election_night_progress": {
+                        "title": "How a contest's count grew on election night",
+                        "description": "Each update's cumulative votes and the change since the previous update, for one contest.",
+                        "sql": (
+                            "SELECT last_updated, candidate_or_option, votes, vote_change, percent "
+                            "FROM vote_counting_contests "
+                            "WHERE election_year = :year AND contest = :contest "
+                            "  AND snapshot_seq IS NOT NULL "
+                            "ORDER BY snapshot_seq, votes DESC"
                         ),
                     },
                     "concept_caveats": {

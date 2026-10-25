@@ -12,8 +12,10 @@ Uses cached HTML fixtures captured 2026-05; re-capture by running:
 from __future__ import annotations
 
 from scripts.discover import (
-    _classify_boco_url, _classify_sos_url,
-    discover_boulder_county, discover_secretary_of_state,
+    _classify_boco_url,
+    _classify_sos_url,
+    discover_boulder_county,
+    discover_secretary_of_state,
     merge_with_registry,
 )
 from scripts.sources import ALL_SOURCES

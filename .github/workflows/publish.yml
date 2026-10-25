@@ -17,7 +17,7 @@ on:
     branches: [main]
     paths:
       - "data/processed/*.csv"
-      - "data/processed/provenance.csv"
+      - "data/processed/vote-counting/*.csv"
       - "scripts/publish.py"
       - "scripts/concepts.py"
       - ".github/workflows/publish.yml"
@@ -25,6 +25,12 @@ on:
 
 permissions:
   contents: write  # to create / update the Release
+
+# Two pushes in quick succession would race on deleting and recreating the
+# rolling "latest" release; queue them instead.
+concurrency:
+  group: publish-latest
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -63,8 +69,8 @@ jobs:
           Auto-built harmonized dataset.
 
           **Files**
-          - `elections.db` — single SQLite with `elections` + `provenance` + `concepts` tables, plus an `elections_with_provenance` join view.
-          - `metadata.yaml` — Datasette annotations: per-column docs, suggested facets, three canned queries.
+          - `elections.db` — single SQLite with `elections` + `provenance` + `concepts` tables, the election-night `vote_counting_contests` + `vote_counting_summary` tables, and an `elections_with_provenance` join view.
+          - `metadata.yaml` — Datasette annotations: per-column docs, suggested facets, canned queries.
 
           **Open in Datasette Lite (no install):**
           https://lite.datasette.io/?url=https://github.com/__REPO__/releases/download/latest/elections.db

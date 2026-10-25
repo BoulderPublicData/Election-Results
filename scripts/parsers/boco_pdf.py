@@ -36,7 +36,10 @@ import pdfplumber
 
 from ..schema import SourceMeta
 from .common import (
-    add_provenance, infer_contest_type, normalize_choice, precinct_id_str,
+    add_provenance,
+    infer_contest_type,
+    normalize_choice,
+    precinct_id_str,
 )
 
 # Header/boilerplate lines we always skip when looking for the contest title.
@@ -232,9 +235,11 @@ def _infer_n_candidates(lines: list[str]) -> int:
 def _parse_data_row(line: str, n_candidates: int) -> tuple[str, dict[str, int | None], list[int | None]] | None:
     """Decode a single precinct row into (precinct_id, meta_values, candidate_votes).
 
-    Layout: ``precinct  6×meta  N×candidate  total``. We slice positionally;
-    if the token count doesn't match the expected length we return None and let
-    the caller drop the row."""
+    Layout: ``precinct  6×meta  N×candidate  total``. We slice positionally:
+    rows too short to hold the meta block return None; otherwise the first six
+    tokens are the meta block, the next ``n_candidates`` are candidate votes,
+    and a row short on candidate tokens is padded with None (the caller skips
+    None votes)."""
     m = _DATA_ROW_RE.match(line)
     if not m:
         return None
@@ -242,7 +247,6 @@ def _parse_data_row(line: str, n_candidates: int) -> tuple[str, dict[str, int | 
     if precinct in _BAD_PRECINCT_VALUES:
         return None
     tokens = m.group(2).split()
-    expected = len(_META_COLUMNS) + n_candidates + 1  # +1 for the "Totals" column
     if len(tokens) < len(_META_COLUMNS) + 1:
         # too short — almost certainly not a data row
         return None
@@ -262,7 +266,7 @@ def _parse_data_row(line: str, n_candidates: int) -> tuple[str, dict[str, int | 
     # If the row has more tokens than we expect, trust the meta block at the
     # start and the trailing totals; everything in between is candidate votes.
     meta_tokens = tokens[: len(_META_COLUMNS)]
-    meta = dict(zip(_META_COLUMNS, [_to_int(t) for t in meta_tokens]))
+    meta = dict(zip(_META_COLUMNS, [_to_int(t) for t in meta_tokens], strict=True))
 
     candidate_slice = tokens[len(_META_COLUMNS) : len(_META_COLUMNS) + n_candidates]
     candidate_votes = [_to_int(t) for t in candidate_slice]
@@ -314,7 +318,7 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
                 if parsed is None:
                     continue
                 precinct, meta_values, candidate_votes = parsed
-                for cand_label, votes in zip(candidates, candidate_votes):
+                for cand_label, votes in zip(candidates, candidate_votes, strict=True):
                     if votes is None:
                         continue
                     rows.append({
@@ -344,7 +348,7 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
 
     df = pd.DataFrame(rows)
     df["contest_type"] = [
-        infer_contest_type(c, ch) for c, ch in zip(df["contest"], df["candidate_or_option"])
+        infer_contest_type(c, ch) for c, ch in zip(df["contest"], df["candidate_or_option"], strict=True)
     ]
 
     notes = [

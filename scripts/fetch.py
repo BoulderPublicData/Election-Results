@@ -14,12 +14,17 @@ import argparse
 import hashlib
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
-from . import config, http
+from . import http
 from .config import (
-    BOULDER_COUNTY, MANIFEST_PATH, SECRETARY_OF_STATE, SOURCES, Source, original_path,
+    BOULDER_COUNTY,
+    MANIFEST_PATH,
+    SECRETARY_OF_STATE,
+    SOURCES,
+    Source,
+    original_path,
 )
 from .logging_setup import get_logger
 
@@ -89,7 +94,7 @@ def fetch_one(s: Source, *, force: bool = False, dry_run: bool = False) -> tuple
         "filename": s.local_filename,
         "sha256": digest,
         "bytes": dest.stat().st_size,
-        "retrieved_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "retrieved_at": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     _save_manifest(manifest)
     log.info("fetch.ok", key=key, bytes=dest.stat().st_size)

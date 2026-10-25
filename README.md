@@ -53,7 +53,7 @@ uv run python -m scripts.pipeline
 #    then fetch + clean them (handles years missing from sources.py)
 uv run python -m scripts.pipeline --discover
 
-# 4. Just clean what's already on disk (faster, no network)
+# 4. Just clean what's already on disk (no network; ~2 minutes)
 uv run python -m scripts.pipeline --skip-fetch --no-pdf
 
 # 5. Run the test suite
@@ -119,30 +119,30 @@ Are the results of individual contests available at the level of precincts in an
 
 | Year | Boulder | State | Notes |
 |---|---|---|---|
-| 2025 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx) | ❌ | Coordinated election (odd-year). |
-| 2024 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx) | ⚠️ [turnout-only](https://www.coloradosos.gov/pubs/elections/Results/2024/2024GeneralPrecinctVoterTurnout.xlsx) | Amended SoV — verify scope before publishing. SOS file is turnout-only (no candidate detail). |
-| 2023 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx) | ❌ | First Boulder mayoral RCV |
-| 2022 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2022/12/2022G-Boulder-County-Official-Statement-of-Votes.xlsx) | ❌ | Composite precincts in places |
-| 2021 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2021/11/2021-Boulder-County-Coordinated-Election-Official-Statement-of-Votes-1.xlsx) | ❌ | |
-| 2020 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2020/11/2020-Boulder-County-General-Election-Official-Statement-of-Votes.xlsx) | [✅](https://www.coloradosos.gov/pubs/elections/Results/2020/2020GEPrecinctLevelResultsPosted.xlsx) | |
-| 2019 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2019/11/2019C-Official-Statement-Of-Votes-SOV.xls) | ❌ | |
-| 2018 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2018/11/2018-General-Election-Official-Statement-Of-Votes.xlsx) | [✅](https://www.coloradosos.gov/pubs/elections/Results/2018/2018GEPrecinctLevelResults.xlsx) | |
-| 2017 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2017/11/Results_SOV_Final.xlsx) | ❌ | |
-| 2016 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2016-general-election-results-final-sov.xls) | [✅](https://www.coloradosos.gov/pubs/elections/Results/2016/General/2016GeneralTurnoutPrecinctLevel.xlsx) | |
-| 2015 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2015-election-sov.xls) | ❌ | Composite precincts in places |
-| 2014 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2014-general-election-sov.xls) | [✅](https://www.coloradosos.gov/pubs/elections/Results/2014/2014GeneralPrecinctTurnout.xlsx) | |
-| 2013 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2013-election-sov.xls) | ❌ | XLSX mislabeled as `.xls` |
-| 2012 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2012-general-election-sov.xls) | [✅](https://www.coloradosos.gov/pubs/elections/Results/2012/2012GeneralPrecinctLevelTurnout.xlsx) | Panel format |
-| 2011 | [✅](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2011-election-sov.xls) | ❌ | Panel format |
-| 2010 | ⚠️ [partial](https://assets.bouldercounty.gov/wp-content/uploads/2017/09/2010-general-sov.xls) | [✅](https://www.coloradosos.gov/pubs/elections/Results/2010/general/2010GeneralPrecinctTurnout.xlsx) | Merged-cell panels limit extraction |
-| 2009 | ⚠️ [PDF](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2009-election-sov.pdf) | ❌ | pdfplumber extract |
-| 2008 | ⚠️ [partial](https://assets.bouldercounty.gov/wp-content/uploads/2017/12/2008-general-election-sov.xls) | [✅](https://www.coloradosos.gov/pubs/elections/Results/2008/2008GeneralPrecinctTurnout.xlsx) | Merged-cell panels limit extraction |
-| 2007 | ⚠️ [PDF](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2007-election-sov.pdf) | ❌ | pdfplumber extract |
-| 2006 | ❌ | [✅](https://www.coloradosos.gov/pubs/elections/Results/2006/2006GeneralPrecinctBallotsCast.xlsx) | |
-| 2005 | ⚠️ [PDF](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2005-election-sov.pdf) | ❌ | pdfplumber extract |
-| 2004 | ❌ | [✅](https://www.coloradosos.gov/pubs/elections/Results/2004/2004GeneralPrecinctBallotsCast.xlsx) | |
+| 2025 | ✅ [2025 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx) | ❌ not published | Coordinated election (odd-year). |
+| 2024 | ✅ [2024 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx) | ⚠️ [2024 SOS turnout-only](https://www.coloradosos.gov/pubs/elections/Results/2024/2024GeneralPrecinctVoterTurnout.xlsx) | Amended SoV — verify scope before publishing. SOS file is turnout-only (no candidate detail). |
+| 2023 | ✅ [2023 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx) | ❌ not published | First Boulder mayoral RCV |
+| 2022 | ✅ [2022 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2022/12/2022G-Boulder-County-Official-Statement-of-Votes.xlsx) | ❌ not published | Composite precincts in places |
+| 2021 | ✅ [2021 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2021/11/2021-Boulder-County-Coordinated-Election-Official-Statement-of-Votes-1.xlsx) | ❌ not published | |
+| 2020 | ✅ [2020 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2020/11/2020-Boulder-County-General-Election-Official-Statement-of-Votes.xlsx) | ✅ [2020 SOS xlsx](https://www.coloradosos.gov/pubs/elections/Results/2020/2020GEPrecinctLevelResultsPosted.xlsx) | |
+| 2019 | ✅ [2019 SoV xls](https://assets.bouldercounty.gov/wp-content/uploads/2019/11/2019C-Official-Statement-Of-Votes-SOV.xls) | ❌ not published | |
+| 2018 | ✅ [2018 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2018/11/2018-General-Election-Official-Statement-Of-Votes.xlsx) | ✅ [2018 SOS xlsx](https://www.coloradosos.gov/pubs/elections/Results/2018/2018GEPrecinctLevelResults.xlsx) | |
+| 2017 | ✅ [2017 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2017/11/Results_SOV_Final.xlsx) | ❌ not published | |
+| 2016 | ✅ [2016 SoV xls](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2016-general-election-results-final-sov.xls) | ✅ [2016 SOS xlsx](https://www.coloradosos.gov/pubs/elections/Results/2016/General/2016GeneralTurnoutPrecinctLevel.xlsx) | |
+| 2015 | ✅ [2015 SoV xls](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2015-election-sov.xls) | ❌ not published | Composite precincts in places |
+| 2014 | ✅ [2014 SoV xls](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2014-general-election-sov.xls) | ✅ [2014 SOS xlsx](https://www.coloradosos.gov/pubs/elections/Results/2014/2014GeneralPrecinctTurnout.xlsx) | |
+| 2013 | ✅ [2013 SoV xls](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2013-election-sov.xls) | ❌ not published | XLSX mislabeled as `.xls` |
+| 2012 | ✅ [2012 SoV xls](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2012-general-election-sov.xls) | ✅ [2012 SOS xlsx](https://www.coloradosos.gov/pubs/elections/Results/2012/2012GeneralPrecinctLevelTurnout.xlsx) | Panel format |
+| 2011 | ✅ [2011 SoV xls](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2011-election-sov.xls) | ❌ not published | Panel format |
+| 2010 | ⚠️ [2010 SoV partial (xls)](https://assets.bouldercounty.gov/wp-content/uploads/2017/09/2010-general-sov.xls) | ✅ [2010 SOS xlsx](https://www.coloradosos.gov/pubs/elections/Results/2010/general/2010GeneralPrecinctTurnout.xlsx) | Merged-cell panels limit extraction |
+| 2009 | ⚠️ [2009 SoV PDF](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2009-election-sov.pdf) | ❌ not published | pdfplumber extract |
+| 2008 | ⚠️ [2008 SoV partial (xls)](https://assets.bouldercounty.gov/wp-content/uploads/2017/12/2008-general-election-sov.xls) | ✅ [2008 SOS xlsx](https://www.coloradosos.gov/pubs/elections/Results/2008/2008GeneralPrecinctTurnout.xlsx) | Merged-cell panels limit extraction |
+| 2007 | ⚠️ [2007 SoV PDF](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2007-election-sov.pdf) | ❌ not published | pdfplumber extract |
+| 2006 | ❌ not published | ✅ [2006 SOS xlsx](https://www.coloradosos.gov/pubs/elections/Results/2006/2006GeneralPrecinctBallotsCast.xlsx) | |
+| 2005 | ⚠️ [2005 SoV PDF](https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2005-election-sov.pdf) | ❌ not published | pdfplumber extract |
+| 2004 | ❌ not published | ✅ [2004 SOS xlsx](https://www.coloradosos.gov/pubs/elections/Results/2004/2004GeneralPrecinctBallotsCast.xlsx) | |
 
-✅ machine-readable extraction · ⚠️ partial / PDF-extracted (verify before publishing) · ❌ not available upstream
+✅ machine-readable extraction · ⚠️ partial / PDF-extracted (verify before publishing) · ❌ not available upstream. Each link downloads the original file; its text gives the file type.
 
 ### Election-night incremental results (2014–2025)
 
@@ -176,7 +176,7 @@ Machine-readable lookups (regenerated by [`scripts/export_lookups.py`](scripts/e
 
 ## How we know the data is right
 
-[`scripts/reconcile.py`](scripts/reconcile.py) re-opens each original file, sums top-line contest totals, and compares them to the processed CSVs. The report lands at [`data/audit/reconciliation.md`](data/audit/reconciliation.md); 149 of the 150 cross-checks currently `match` exactly, the remaining row is a `not_reconcilable` panel/PDF year. Any new `mismatch` is a regression — investigate before merging.
+[`scripts/reconcile.py`](scripts/reconcile.py) re-opens each original file, sums top-line contest totals, and compares them to the processed CSVs. The report lands at [`data/audit/reconciliation.md`](data/audit/reconciliation.md): all 129 reconcilable contest totals `match` exactly, and the other 39 rows are `not_reconcilable` panel/PDF years (2005–2012), whose originals can't be re-summed without re-running the parser. Any new `mismatch` is a regression — investigate before merging. The same report compares each election's final election-night snapshot with the certified SoV (report only).
 
 ## Annual refresh
 
@@ -197,18 +197,19 @@ uv run python -m scripts.pipeline --discover            # full end-to-end with d
 
 ## Testing
 
-The pytest suite runs on every push and PR via [`.github/workflows/tests.yml`](.github/workflows/tests.yml). It covers schema contracts, per-parser helpers, the discovery classifier (with cached HTML fixtures so it works offline), source-registry shape, and a sample of committed processed CSVs.
+The pytest suite and [ruff](https://docs.astral.sh/ruff/) lint run on every push and PR via [`.github/workflows/tests.yml`](.github/workflows/tests.yml). The tests cover schema contracts, per-parser helpers, the discovery classifier (with cached HTML fixtures so it works offline), source-registry shape, the election-night parser and QA, and a sample of committed processed CSVs. They never touch the network or rewrite committed files.
 
 ```bash
-uv run pytest                  # run everything (~2 seconds)
+uv run pytest                  # run everything (~3 seconds)
 uv run pytest tests/test_discover.py -v
+uv run ruff check .            # lint (rules in pyproject.toml)
 ```
 
 ## Known limitations
 
 - **2008 / 2010 Boulder SoV panel format** — these XLS files use merged header cells so candidate-column ↔ data-column alignment is irregular. The pipeline captures the major statewide and county contests cleanly; precinct-level detail for some down-ballot contests is reduced. Tracked in [`docs/data-dictionary.md §4.2`](docs/data-dictionary.md).
-- **2005 / 2007 / 2009 PDF extraction** — `extraction_quality = pdf_text_layer` but contest titles are not reliably extracted from the surrounding narrative text. Treat as provisional until manually backfilled.
-- **2024 Boulder SoV** — only 66 rows of local races (Town of Superior, etc.). Federal/state-level Boulder results may not be in the published file; the SOS 2024 file will fill the gap when published.
+- **2005 / 2007 / 2009 PDF extraction** — `extraction_quality = pdf_text_layer`. Contest titles, candidate names, and per-precinct counts are extracted with pdfplumber, but the page layout is irregular, so spot-check precinct-level claims against the source PDF before publishing.
+- **2024 Boulder SoV** — only 66 rows of local races (Town of Superior, etc.), and the 2024 SOS file is turnout-only. For county-wide 2024 totals across all 65 contests, use the final election-night snapshot in [`data/processed/vote-counting/`](data/processed/vote-counting/) (`is_final_snapshot`).
 - **`Cleaning.ipynb` rewrite** preserves the methodology of the original notebook but no longer re-implements every per-year transform — those live in `scripts/parsers/` now.
 
 ## License

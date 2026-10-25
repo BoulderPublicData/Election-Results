@@ -10,7 +10,8 @@ in extraction_notes.
 gets contest_type='ranked_choice'; each row corresponds to one round's tally for one
 candidate.
 
-2013 is an XLSX file with a .xls extension — read with openpyxl, not xlrd.
+2013 is an XLSX file with a .xls extension; the calamine engine (see
+common.read_excel) detects the real format, so no special case is needed.
 """
 
 from __future__ import annotations
@@ -19,13 +20,18 @@ from pathlib import Path
 
 import pandas as pd
 
-from ..reject import Rejector, register as register_rejector
+from ..reject import Rejector
+from ..reject import register as register_rejector
 from ..schema import SourceMeta
 from .common import (
-    add_provenance, clean_cols, infer_contest_type,
-    normalize_choice, normalize_party, precinct_id_str,
+    add_provenance,
+    clean_cols,
+    excel_file,
+    infer_contest_type,
+    normalize_choice,
+    normalize_party,
+    precinct_id_str,
 )
-
 
 # Per-year column name → canonical name aliases.
 # After clean_cols() collapses whitespace/newlines, we map known variants here.
@@ -51,13 +57,6 @@ def _pick(df: pd.DataFrame, aliases: set[str]) -> str | None:
     return None
 
 
-def _read_excel(path: Path, sheet: int | str = 0) -> pd.DataFrame:
-    engine = "openpyxl" if path.suffix.lower() == ".xlsx" else "xlrd"
-    if path.name == "2013-coordinated-sov.xls":
-        engine = "openpyxl"  # mislabeled extension
-    return pd.read_excel(path, engine=engine, sheet_name=sheet)
-
-
 def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
     """Return harmonized long-form DataFrame for a Boulder tidy-format SoV."""
     notes: list[str] = []
@@ -69,16 +68,13 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
     register_rejector(rejector)
 
     # Read all sheets, then concatenate (handles 2023's Plurality+RCV split).
-    engine = "openpyxl" if path.suffix.lower() == ".xlsx" else "xlrd"
-    if path.name == "2013-coordinated-sov.xls":
-        engine = "openpyxl"
-    xl = pd.ExcelFile(path, engine=engine)
+    xl = excel_file(path)
 
     frames: list[pd.DataFrame] = []
     for sheet in xl.sheet_names:
         if sheet.lower() in {"summary_of_results", "summary of results"}:
             continue
-        raw = pd.read_excel(path, engine=engine, sheet_name=sheet)
+        raw = xl.parse(sheet)
         if raw.empty:
             continue
         df = clean_cols(raw)
@@ -156,21 +152,19 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
             )
         else:
             out["contest_type"] = [
-                infer_contest_type(c, ch) for c, ch in zip(out["contest"], out["candidate_or_option"])
+                infer_contest_type(c, ch) for c, ch in zip(out["contest"], out["candidate_or_option"], strict=True)
             ]
 
         # Reject rows with missing required fields (was a silent dropna).
         # `sheet:row` lets reviewers find the bad row in the source XLSX.
-        sheet_label = sheet
-        out = out.assign(_row_in_sheet=range(len(out)))
-        out["_row_index"] = out["_row_in_sheet"].map(lambda i: f"{sheet_label}:{i+2}")
+        out["_row_index"] = [f"{sheet}:{i + 2}" for i in range(len(out))]
         out = rejector.drop_na_with_reject(
             out,
             required=["precinct_id", "contest", "candidate_or_option"],
             reason="missing_required_field",
             row_index_col="_row_index",
         )
-        out = out.drop(columns=["_row_in_sheet", "_row_index"])
+        out = out.drop(columns=["_row_index"])
         # Strip totals rows (these are display-only summaries, not data).
         out = out[~out["precinct_id"].astype("string").str.lower().isin(
             {"total", "totals", "grand total", "summary", "nan", ""}

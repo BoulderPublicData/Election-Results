@@ -29,17 +29,22 @@ from pathlib import Path
 
 import pandas as pd
 
-from ..reject import Rejector, register as register_rejector
+from ..reject import Rejector
+from ..reject import register as register_rejector
 from ..schema import SourceMeta
 from .common import (
-    add_provenance, clean_col, infer_contest_type, normalize_choice,
-    normalize_party, precinct_id_str,
+    add_provenance,
+    clean_col,
+    infer_contest_type,
+    normalize_choice,
+    normalize_party,
+    precinct_id_str,
+    read_excel,
 )
 
 
 def _read_raw(path: Path) -> pd.DataFrame:
-    engine = "openpyxl" if path.suffix.lower() == ".xlsx" else "xlrd"
-    return pd.read_excel(path, engine=engine, sheet_name=0, header=None)
+    return read_excel(path, sheet_name=0, header=None)
 
 
 def _find_panel_starts(raw: pd.DataFrame) -> list[int]:

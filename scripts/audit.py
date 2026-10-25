@@ -23,7 +23,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from .config import AUDIT as AUDIT_DIR, PROCESSED, PROVENANCE_CSV, REPO_ROOT  # noqa: F401
+from .config import AUDIT as AUDIT_DIR  # noqa: F401
+from .config import PROCESSED, PROVENANCE_CSV, REPO_ROOT
 
 
 def _md_table(rows: list[dict], cols: list[str]) -> str:

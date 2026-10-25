@@ -15,13 +15,20 @@ from pathlib import Path
 
 import pandas as pd
 
-from .clean import BOCO_PDF_YEARS, clean_source, _output_path, write_csv
+from .clean import BOCO_PDF_YEARS, _output_path, clean_source, write_csv
 from .config import (
-    BOULDER_COUNTY, PROCESSED as PROCESSED_DATA, REPO_ROOT,
-    SECRETARY_OF_STATE, SOURCES as ALL_SOURCES,
+    BOULDER_COUNTY,
+    REPO_ROOT,
+    SECRETARY_OF_STATE,
+)
+from .config import (
+    PROCESSED as PROCESSED_DATA,
+)
+from .config import (
+    SOURCES as ALL_SOURCES,
 )
 from .logging_setup import get_logger
-from .schema import PROVENANCE_COLUMNS, provenance_record, validate
+from .schema import provenance_record, validate
 
 log = get_logger(__name__)
 
@@ -122,8 +129,8 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     # Reject port — drain the per-parser rejection buffers and emit a single
     # CSV. Any non-zero count here is a signal that the parser dropped rows;
     # the row_index column points back into the source file.
-    from .reject import drain as _drain_rejects
     from .config import REJECTED_CSV
+    from .reject import drain as _drain_rejects
     rejected = _drain_rejects()
     REJECTED_CSV.parent.mkdir(parents=True, exist_ok=True)
     rejected.to_csv(REJECTED_CSV, index=False)
@@ -155,7 +162,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     # source files and the processed CSVs. Caught regressions in earlier passes.
     print("\n--- reconcile ---")
     try:
-        from .reconcile import reconcile_source, _load_patterns
+        from .reconcile import _load_patterns, reconcile_source
         patterns = _load_patterns()
         recon_frames = []
         for s in pool:

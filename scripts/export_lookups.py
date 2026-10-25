@@ -10,21 +10,28 @@ JavaScript) can read them directly.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
-from pathlib import Path
+from datetime import UTC, datetime
 
 from .concepts import CONCEPTS
-from .config import ELECTION_DATES, LOOKUPS, REPO_ROOT, SOURCES as ALL_SOURCES
+from .config import ELECTION_DATES, LOOKUPS, REPO_ROOT
+from .config import SOURCES as ALL_SOURCES
 from .parsers.common import CHOICE_MAP, PARTY_MAP
 from .schema import (
-    COLUMNS, CSV_COLUMNS, DTYPES, PROVENANCE_COLUMNS, SCHEMA_VERSION,
-    VOTE_COUNTING_COLUMNS, VOTE_COUNTING_DTYPES, VOTE_COUNTING_SCHEMA_VERSION,
-    VOTE_COUNTING_SUMMARY_COLUMNS, VOTE_COUNTING_SUMMARY_DTYPES,
+    COLUMNS,
+    CSV_COLUMNS,
+    DTYPES,
+    PROVENANCE_COLUMNS,
+    SCHEMA_VERSION,
+    VOTE_COUNTING_COLUMNS,
+    VOTE_COUNTING_DTYPES,
+    VOTE_COUNTING_SCHEMA_VERSION,
+    VOTE_COUNTING_SUMMARY_COLUMNS,
+    VOTE_COUNTING_SUMMARY_DTYPES,
 )
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 def export_party_codes() -> None:

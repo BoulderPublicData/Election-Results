@@ -29,18 +29,19 @@ from .schema import COLUMNS, CSV_COLUMNS
 # that travels into the serialized schema.
 # ----------------------------------------------------------------------------
 
-# Required string columns (never null).
-_REQ_STR = lambda desc: pa.Column(
-    "string", nullable=False, required=True, description=desc,
-)
-# Optional string columns (null allowed).
-_OPT_STR = lambda desc: pa.Column(
-    "string", nullable=True, required=True, description=desc,
-)
-# Nullable integer columns.
-_OPT_INT64 = lambda desc: pa.Column(
-    "Int64", nullable=True, required=True, description=desc,
-)
+def _REQ_STR(desc: str) -> pa.Column:
+    """Required string column (never null)."""
+    return pa.Column("string", nullable=False, required=True, description=desc)
+
+
+def _OPT_STR(desc: str) -> pa.Column:
+    """Optional string column (null allowed)."""
+    return pa.Column("string", nullable=True, required=True, description=desc)
+
+
+def _OPT_INT64(desc: str) -> pa.Column:
+    """Nullable integer column."""
+    return pa.Column("Int64", nullable=True, required=True, description=desc)
 
 
 _BASE_COLUMNS = {
