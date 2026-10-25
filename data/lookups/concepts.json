@@ -2,7 +2,7 @@
   "$schema_version": "1.1.0",
   "$description": "Source-neutral concept catalog. Each entry maps a snake_case canonical concept name to the literal contest-title patterns that identify it in each source's files, plus a `caveats` field spelling out what is and is NOT comparable across sources. Use scripts/concepts.py:concept_for(contest, source) for row-by-row lookup.",
   "$generated_by": "scripts/export_lookups.py from scripts/concepts.py:CONCEPTS",
-  "$generated_at": "2026-05-27T01:36:21+00:00",
+  "$generated_at": "2026-10-25T22:37:47+00:00",
   "concepts": [
     {
       "name": "presidential_electors",

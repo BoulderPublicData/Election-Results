@@ -16,7 +16,11 @@ from pathlib import Path
 from .concepts import CONCEPTS
 from .config import ELECTION_DATES, LOOKUPS, REPO_ROOT, SOURCES as ALL_SOURCES
 from .parsers.common import CHOICE_MAP, PARTY_MAP
-from .schema import COLUMNS, CSV_COLUMNS, DTYPES, PROVENANCE_COLUMNS, SCHEMA_VERSION
+from .schema import (
+    COLUMNS, CSV_COLUMNS, DTYPES, PROVENANCE_COLUMNS, SCHEMA_VERSION,
+    VOTE_COUNTING_COLUMNS, VOTE_COUNTING_DTYPES, VOTE_COUNTING_SCHEMA_VERSION,
+    VOTE_COUNTING_SUMMARY_COLUMNS, VOTE_COUNTING_SUMMARY_DTYPES,
+)
 
 
 def _now() -> str:
@@ -85,7 +89,8 @@ def export_sources() -> None:
         "$schema_version": SCHEMA_VERSION,
         "$description": (
             "Source URL registry. One entry per (year, data_source). "
-            "`local_filename` is the path under data/original/{data_source-kebab}/."
+            "`local_filename` is the file under data/original/boulder-county/statement-of-votes/ "
+            "(Boulder County) or data/original/secretary-of-state/ (SOS)."
         ),
         "$generated_by": "scripts/export_lookups.py from scripts/sources.py:ALL_SOURCES",
         "$generated_at": _now(),
@@ -137,6 +142,28 @@ def export_schema() -> None:
     (LOOKUPS / "schema.json").write_text(json.dumps(payload, indent=2) + "\n")
 
 
+def export_vote_counting_schema() -> None:
+    """Schema for the separate election-night dataset in data/processed/vote-counting/."""
+    payload = {
+        "$schema_version": VOTE_COUNTING_SCHEMA_VERSION,
+        "$description": (
+            "Election-night incremental results OCR'd from screenshots of the Boulder "
+            "County results site. County-wide totals at a point in time, NOT precincts: "
+            "never concatenate with all-elections-tidy.csv, and never sum `votes` across "
+            "snapshots (they are cumulative). `contests` is one row per election x "
+            "snapshot x contest x candidate; `summary` is one row per snapshot."
+        ),
+        "$generated_by": "scripts/export_lookups.py from scripts/schema.py",
+        "$generated_at": _now(),
+        "contests": {"file": "data/processed/vote-counting/vote-counting-contests.csv",
+                     "columns": VOTE_COUNTING_COLUMNS, "dtypes": VOTE_COUNTING_DTYPES},
+        "summary": {"file": "data/processed/vote-counting/vote-counting-summary.csv",
+                    "columns": VOTE_COUNTING_SUMMARY_COLUMNS,
+                    "dtypes": VOTE_COUNTING_SUMMARY_DTYPES},
+    }
+    (LOOKUPS / "vote-counting-schema.json").write_text(json.dumps(payload, indent=2) + "\n")
+
+
 def export_concepts() -> None:
     """Export the source-neutral concept catalog."""
     payload = {
@@ -164,7 +191,8 @@ def main(argv: list[str] | None = None) -> int:
     export_sources()
     export_schema()
     export_concepts()
-    print(f"wrote 6 lookup files under {LOOKUPS.relative_to(REPO_ROOT)}/")
+    export_vote_counting_schema()
+    print(f"wrote 7 lookup files under {LOOKUPS.relative_to(REPO_ROOT)}/")
     return 0
 
 

@@ -31,8 +31,8 @@ from pathlib import Path
 import pandas as pd
 
 from .config import (
-    AUDIT, BOULDER_COUNTY, LOOKUPS, ORIGINAL as ORIGINAL_DATA,
-    PROCESSED, REPO_ROOT, SECRETARY_OF_STATE, SOURCES as ALL_SOURCES, Source,
+    AUDIT, BOULDER_COUNTY, LOOKUPS,
+    PROCESSED, REPO_ROOT, SECRETARY_OF_STATE, SOURCES as ALL_SOURCES, Source, original_path,
 )
 from .logging_setup import get_logger
 from .parsers.common import clean_cols
@@ -146,7 +146,7 @@ def _read_boco_tidy_original(path: Path) -> pd.DataFrame:
 
 
 def _read_original(source: Source) -> pd.DataFrame | None:
-    path = ORIGINAL_DATA / source.data_source.replace("_", "-") / source.local_filename
+    path = original_path(source.data_source, source.local_filename)
     if not path.exists():
         return None
     if source.data_source == "secretary_of_state":
@@ -223,6 +223,112 @@ def reconcile_source(source: Source, patterns: list[ContestPattern]) -> pd.DataF
     out["data_source"] = source.data_source
     return out[["year", "election_type", "data_source", "canonical",
                 "original_total", "processed_total", "delta", "status"]]
+
+
+# ----- Election-night snapshots vs. the certified Statement of Votes -----
+
+VOTE_COUNTING_VS_SOV_CSV = AUDIT / "vote-counting-vs-sov.csv"
+
+
+def _name_key(text: object) -> str:
+    return re.sub(r"[^a-z0-9]", "", str(text).lower())
+
+
+def reconcile_vote_counting() -> pd.DataFrame:
+    """Compare each election's FINAL election-night snapshot
+    (data/processed/vote-counting/) with the Boulder County SoV CSV, per
+    contest × candidate.
+
+    Report-only: the last web update often precedes certification (cures,
+    late UOCAVA ballots, canvass adjustments), so deltas are expected and
+    never counted as reconciliation mismatches. A large delta on the final
+    snapshot is still worth a look — it is the only external check on the
+    OCR beyond the internal sum/percent QA.
+    """
+    import difflib
+
+    path = PROCESSED / "vote-counting" / "vote-counting-contests.csv"
+    if not path.exists():
+        return pd.DataFrame()
+    web = pd.read_csv(path, low_memory=False)
+    web = web[web["is_final_snapshot"].astype(bool)]
+    # RCV: compare the final-round tallies (the SoV's '| Final' rows).
+    web = web[(web["contest_type"] != "ranked_choice")
+              | web["candidate_or_option"].str.endswith("| Final")]
+
+    rows: list[dict] = []
+    for (year, etype), w in web.groupby(["election_year", "election_type"]):
+        sov_path = PROCESSED / f"{year}-{etype}-boulder-county.csv"
+        if not sov_path.exists():
+            continue
+        sov = pd.read_csv(sov_path, low_memory=False,
+                          usecols=["contest", "contest_type", "candidate_or_option", "votes"])
+        sov = sov[(sov["contest_type"] != "ranked_choice")
+                  | sov["candidate_or_option"].astype("string").str.endswith("| Final")]
+        # SoV candidate cells sometimes carry "Name  Party" (double space).
+        sov["cand_key"] = sov["candidate_or_option"].astype("string").str.split("  ").str[0] \
+            .map(_name_key)
+        sov["contest_key"] = sov["contest"].map(_name_key)
+        sov_tot = sov.groupby(["contest_key", "cand_key"])["votes"].sum()
+        sov_contests = dict(zip(sov["contest_key"], sov["contest"], strict=False))
+
+        w = w.assign(contest_key=w["contest"].map(_name_key),
+                     cand_key=w["candidate_or_option"].map(_name_key))
+        snapshot = w.loc[w["contest_type"] != "ranked_choice", "last_updated"].max()
+        for ckey, cw in w.groupby("contest_key", sort=False):
+            match = ckey if ckey in sov_contests else next(
+                iter(difflib.get_close_matches(ckey, list(sov_contests), n=1, cutoff=0.85)),
+                None)
+            if match is None:
+                # The web card often appends the measure's subtitle to the SoV
+                # title ("Ballot Issue 1A" + "Open Space Sales and Use Tax ...").
+                prefixes = [k for k in sov_contests if len(k) >= 12 and ckey.startswith(k)]
+                match = max(prefixes, key=len) if prefixes else None
+            for r in cw.itertuples(index=False):
+                sov_votes = sov_tot.get((match, r.cand_key)) if match else None
+                status = ("contest_not_in_sov" if match is None else
+                          "candidate_not_in_sov" if sov_votes is None else
+                          "match" if sov_votes == r.votes else
+                          "near_match" if abs(sov_votes - r.votes) < 50 else "differs")
+                rows.append({
+                    "year": year, "election_type": etype, "final_snapshot": snapshot,
+                    "contest": r.contest, "sov_contest": sov_contests.get(match, pd.NA),
+                    "candidate_or_option": r.candidate_or_option,
+                    "snapshot_votes": r.votes,
+                    "sov_votes": pd.NA if sov_votes is None else int(sov_votes),
+                    "delta": pd.NA if sov_votes is None else int(r.votes - sov_votes),
+                    "status": status,
+                })
+    return pd.DataFrame(rows)
+
+
+def vote_counting_markdown(vc: pd.DataFrame) -> list[str]:
+    """Report-only section for reconciliation.md."""
+    if vc.empty:
+        return []
+    lines = [
+        "## Election-night final snapshot vs. Statement of Votes (report only)",
+        "",
+        "Compares the last election-night web update in "
+        "`data/processed/vote-counting/` with the certified SoV, candidate by candidate. "
+        "The final web update usually precedes certification, so differences are "
+        "**expected** and are not counted as mismatches above. Full detail: "
+        "[`vote-counting-vs-sov.csv`](vote-counting-vs-sov.csv).",
+        "",
+        "| election | final web update | match | near_match (<50) | differs | not in SoV | "
+        "web total | SoV total |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for (year, etype), g in vc.groupby(["year", "election_type"]):
+        n = g["status"].value_counts()
+        both = g.dropna(subset=["sov_votes"])
+        lines.append(
+            f"| {year} {etype} | {g['final_snapshot'].iloc[0]} | {n.get('match', 0)} | "
+            f"{n.get('near_match', 0)} | {n.get('differs', 0)} | "
+            f"{n.get('contest_not_in_sov', 0) + n.get('candidate_not_in_sov', 0)} | "
+            f"{int(both['snapshot_votes'].sum()):,} | {int(both['sov_votes'].sum()):,} |")
+    lines.append("")
+    return lines
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -310,6 +416,13 @@ def main(argv: list[str] | None = None) -> int:
                 f"| {r['canonical']} | {orig} | {proc} | {delta} | `{r['status']}` |"
             )
         md_lines.append("")
+
+    vc = reconcile_vote_counting()
+    if not vc.empty:
+        vc.to_csv(VOTE_COUNTING_VS_SOV_CSV, index=False)
+        md_lines += vote_counting_markdown(vc)
+        print(f"vote-counting vs SoV: {len(vc)} candidate rows "
+              f"({(vc['status'] == 'match').sum()} exact matches; report only)")
 
     (AUDIT / "reconciliation.md").write_text("\n".join(md_lines))
     print(f"\nwrote data/audit/reconciliation.md and reconciliation.csv "

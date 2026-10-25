@@ -21,7 +21,7 @@ class Source:
     election_type: Literal["general", "primary", "coordinated"]
     data_source: Literal["boulder_county", "secretary_of_state"]
     url: str
-    local_filename: str  # path under data/original/{data_source-kebab}/
+    local_filename: str  # file under config.ORIGINAL_SUBDIRS[data_source]
 
 
 # Boulder County Statement of Votes.

@@ -135,6 +135,22 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     else:
         print(f"wrote {REJECTED_CSV.relative_to(REPO_ROOT)} (0 rejected rows)")
 
+    # Election-night vote counting — rebuilt from the committed Datalab cache
+    # only (never calls the API; run `pipeline vote-counting --ocr` for new
+    # screenshots). Runs before reconcile so the SoV comparison sees it.
+    if args.source in ("all", "boulder_county"):
+        print("\n--- vote counting ---")
+        try:
+            from . import vote_counting
+            vc_contests, vc_summary, vc_qa = vote_counting.build(vote_counting.discover())
+            vote_counting.write_outputs(vc_contests, vc_summary, vc_qa)
+            if (vc_qa["status"] == "open").any():
+                print("  WARN: open vote-counting QA issues — see data/audit/vote-counting.md",
+                      file=sys.stderr)
+        except Exception as e:
+            print(f"  vote-counting FAIL: {type(e).__name__}: {e}", file=sys.stderr)
+            errors += 1
+
     # Reconciliation audit — compares top-line contest totals between the raw
     # source files and the processed CSVs. Caught regressions in earlier passes.
     print("\n--- reconcile ---")
@@ -155,6 +171,10 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
             from .reconcile import AUDIT as _AUDIT_DIR
             _AUDIT_DIR.mkdir(parents=True, exist_ok=True)
             all_recon.to_csv(_AUDIT_DIR / "reconciliation.csv", index=False)
+            from .reconcile import VOTE_COUNTING_VS_SOV_CSV, reconcile_vote_counting
+            vc_recon = reconcile_vote_counting()
+            if not vc_recon.empty:
+                vc_recon.to_csv(VOTE_COUNTING_VS_SOV_CSV, index=False)
             mismatches = (all_recon["status"] == "mismatch").sum()
             print(f"reconciled {len(all_recon)} contest-source rows; mismatches={mismatches}")
             if mismatches:
@@ -211,6 +231,7 @@ def main(argv: list[str] | None = None) -> int:
         "reconcile": "scripts.reconcile",
         "export-lookups": "scripts.export_lookups",
         "publish": "scripts.publish",
+        "vote-counting": "scripts.vote_counting",
         "run": None,  # handled inline
     }
 

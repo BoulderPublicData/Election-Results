@@ -105,6 +105,19 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
         out["precinct_name"] = (
             df[p_short].map(precinct_id_str) if p_short else pd.NA
         )
+        if p_long and p_short:
+            # "Property Owner" rows (2023, 2025): ballots cast by non-resident
+            # property owners in special-district elections. They carry a
+            # Precinct Code but no Precinct Number; without this fallback they
+            # were rejected for a missing precinct_id and the contest totals
+            # came up short of the certified SoV.
+            short = df[p_short].astype("string").str.strip()
+            pseudo = out["precinct_id"].isna() & short.str.fullmatch(
+                r"property owners?", case=False).fillna(False)
+            if pseudo.any():
+                out.loc[pseudo, "precinct_id"] = "Property Owner"
+                notes.append("includes 'Property Owner' pseudo-precinct rows (property-owner "
+                             "ballots in special-district contests; no precinct geography)")
         out["contest"] = df[contest].astype("string").str.strip()
         out["candidate_or_option"] = df[choice].map(normalize_choice).astype("string").str.strip()
         out["party"] = df[party].map(normalize_party) if party else pd.NA

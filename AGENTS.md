@@ -109,11 +109,14 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at). Anyt
 |---|---|---|
 | **Schema changes** | Adding/removing a column without updating `scripts/schema.py` breaks coercion and validation downstream. | Edit `COLUMNS` + `DTYPES` in one place; every parser will fail-fast until it returns the new shape. |
 | **Composite precinct IDs (2015, 2022)** | Joining to precinct geography on `precinct_id` silently drops these rows. | Split on `,` before joins; `extraction_notes` flags these years. |
+| **Property-owner pseudo-precincts (2015, 2023, 2025)** | Rows with `precinct_id` `Property Owner` / `Landowner` have no geography; dropping them undercounts special-district contests. | Keep them for totals, exclude them before spatial joins. See `docs/data-dictionary.md` §4.3a. |
 | **RCV expansion (2023)** | Summing `votes` for RCV contests double-counts (Round 1 + Round 2 + Final). | Filter to `candidate_or_option.str.endswith("| Final")` before summing totals. Reconcile already handles this — see `reconcile.py:reconcile_source`. |
 | **2008/2010 Boulder panel format** | Header column positions don't align with data column positions due to merged cells; the parser captures the major statewide contests but loses some down-ballot detail. Don't claim full precinct-level coverage for these years. | Annotate analyses with this caveat; cross-check against the SOS file when possible. |
 | **2005/2007/2009 PDF years** | Contest titles don't extract from the surrounding narrative; rows arrive with `contest = "<PDF: contest title not extracted>"`. | Treat as provisional; do not publish precinct × contest analyses without manual title backfill. |
 | **2024 Boulder file** | The upstream "Amended SoV" file contains only 66 rows of local races (Town of Superior, etc.). Federal/state-level Boulder results may have a separate file or appear via SOS once published. | Verify the file's scope before drawing conclusions. |
 | **negative `votes` values** | Legitimately appear in RCV intermediate rounds (ballots transferring away from eliminated candidates). | `validate()` skips this check for `contest_type == "ranked_choice"` rows. Don't "fix" it by taking absolute values — you lose information. |
+| **Election-night snapshots** (`data/processed/vote-counting/`) | Rows are cumulative county-wide totals per snapshot; summing `votes` across snapshots multiplies them, and concatenating with precinct data double-counts. | Use `vote_change` or filter `is_final_snapshot`. Keep the dataset separate (own schema in `schema.py:VOTE_COUNTING_*`). |
+| **Vote-counting OCR fixes** | Editing a cached Datalab JSON hides the fix and is overwritten on re-OCR. | Add a row to `scripts/corrections/vote-counting.csv` (the build fails if its `ocr_value` stops matching). `data/audit/vote-counting.md` must show 0 open issues. |
 | **Combined CSV size** | `all-elections-tidy.csv` is 152 MB. Gitignored. | The pipeline regenerates it from per-year files in ~30s; never check it in. |
 
 ---
@@ -209,6 +212,9 @@ In rough order of value:
 | Schema (JSON) | [`data/lookups/schema.json`](data/lookups/schema.json) |
 | Top-line contest patterns | [`data/lookups/contest-aliases.json`](data/lookups/contest-aliases.json) |
 | Reconciliation report | [`data/audit/reconciliation.md`](data/audit/reconciliation.md) |
+| Election-night vote counting | [`scripts/vote_counting.py`](scripts/vote_counting.py), parser [`scripts/parsers/boco_vote_counting.py`](scripts/parsers/boco_vote_counting.py), OCR client [`scripts/datalab.py`](scripts/datalab.py) |
+| Vote-counting OCR corrections | [`scripts/corrections/vote-counting.csv`](scripts/corrections/vote-counting.csv) |
+| Vote-counting QA | [`data/audit/vote-counting.md`](data/audit/vote-counting.md) |
 | Per-file audits | [`data/audit/*.md`](data/audit/) |
 | Annual refresh workflow | [`.github/workflows/annual-sov-refresh.yml`](.github/workflows/annual-sov-refresh.yml) |
 | CI tests workflow | [`.github/workflows/tests.yml`](.github/workflows/tests.yml) |
@@ -217,6 +223,7 @@ In rough order of value:
 
 ## 9. Common agent failure modes (avoid these)
 
+- **Building a path to a raw SoV by hand.** Boulder SoVs live in `data/original/boulder-county/statement-of-votes/`; always go through `config.original_path(data_source, local_filename)`.
 - **Editing `data/original/` instead of the parser.** The raw files are reference. Fix the parser.
 - **Adding a parser without updating `scripts/clean.py`'s router.** The orchestrator picks the parser by year; a new parser orphaned outside the router won't run.
 - **Hardcoding a path.** Everything should resolve from `REPO_ROOT = Path(__file__).resolve().parents[1]`.

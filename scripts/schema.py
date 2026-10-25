@@ -206,3 +206,110 @@ def validate(df: pd.DataFrame, source_label: str = "") -> list[str]:
             problems.append(f"{prefix}negative vote counts in non-RCV rows")
 
     return problems
+
+
+# ---------------------------------------------------------------------------
+# Election-night incremental results ("vote counting") — a separate dataset.
+#
+# Grain: county-wide totals at a point in time, NOT precincts. Never concat
+# these rows into all-elections-tidy.csv; summing across snapshots multiplies
+# votes. Built by scripts/vote_counting.py from screenshots of the Boulder
+# County results site (OCR'd via Datalab) and the 2023 RCV short reports.
+# ---------------------------------------------------------------------------
+
+VOTE_COUNTING_SCHEMA_VERSION = "1.0.0"
+
+# One row per (election × snapshot × contest × candidate_or_option).
+VOTE_COUNTING_COLUMNS: list[str] = [
+    "election_year",
+    "election_date",
+    "election_type",
+    "snapshot_seq",         # 1..n in last_updated order within the election (web pages only)
+    "last_updated",         # ISO local time (America/Denver) from the "Last Updated" box
+    "results_label",        # as published: "Official Results" / "Unofficial Results"
+    "is_final_snapshot",    # last_updated is the latest for this election + contest source
+    "contest",
+    "vote_for",             # "Vote for no more than N", when shown
+    "contest_type",
+    "candidate_or_option",
+    "party",
+    "is_write_in",
+    "votes",                # cumulative as of last_updated
+    "percent",              # as published
+    "contest_total_votes",  # the card's TOTAL VOTES row
+    "vote_change",          # votes minus the previous snapshot's votes
+    "source_file",          # path under data/original/boulder-county/
+]
+
+VOTE_COUNTING_DTYPES: dict[str, str] = {
+    "election_year": "Int16",
+    "election_date": "string",
+    "election_type": "string",
+    "snapshot_seq": "Int16",
+    "last_updated": "string",
+    "results_label": "string",
+    "is_final_snapshot": "boolean",
+    "contest": "string",
+    "vote_for": "Int16",
+    "contest_type": "string",
+    "candidate_or_option": "string",
+    "party": "string",
+    "is_write_in": "boolean",
+    "votes": "Int64",
+    "percent": "Float64",
+    "contest_total_votes": "Int64",
+    "vote_change": "Int64",
+    "source_file": "string",
+}
+
+# One row per (election × snapshot): the "Election Summary" box plus provenance.
+VOTE_COUNTING_SUMMARY_COLUMNS: list[str] = [
+    "election_year",
+    "election_date",
+    "election_type",
+    "snapshot_seq",
+    "last_updated",
+    "results_label",
+    "is_final_snapshot",
+    "total_registration",
+    "active_registered_voters",
+    "mail_ballots_distributed",
+    "property_owner_only_ballots_distributed",
+    "expected_turnout",
+    "mail_ballots",
+    "in_person_ballots",
+    "property_owner_ballots",
+    "total_ballots_counted",
+    "ballots_counted_change",
+    "n_contests",
+    "summary_notes",
+    "source_file",
+    "source_sha256",
+    "ocr_retrieved_at",
+    "extraction_quality",   # "datalab_ocr"
+]
+
+VOTE_COUNTING_SUMMARY_DTYPES: dict[str, str] = {
+    **{c: "string" for c in VOTE_COUNTING_SUMMARY_COLUMNS},
+    "election_year": "Int16",
+    "snapshot_seq": "Int16",
+    "is_final_snapshot": "boolean",
+    **{c: "Int64" for c in [
+        "total_registration", "active_registered_voters", "mail_ballots_distributed",
+        "property_owner_only_ballots_distributed", "expected_turnout", "mail_ballots",
+        "in_person_ballots", "property_owner_ballots", "total_ballots_counted",
+        "ballots_counted_change", "n_contests",
+    ]},
+}
+
+
+def coerce_to(df: pd.DataFrame, columns: list[str], dtypes: dict[str, str]) -> pd.DataFrame:
+    """Order + type a frame to an arbitrary column contract (missing → null)."""
+    out = pd.DataFrame(index=df.index)
+    for col in columns:
+        s = df[col] if col in df.columns else pd.Series([pd.NA] * len(df), index=df.index)
+        dt = dtypes[col]
+        if dt.startswith(("Int", "Float")):
+            s = pd.to_numeric(s, errors="coerce")
+        out[col] = s.astype(dt)
+    return out.reset_index(drop=True)

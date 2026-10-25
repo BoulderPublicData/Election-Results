@@ -18,7 +18,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import config, http
-from .config import BOULDER_COUNTY, MANIFEST_PATH, ORIGINAL, SECRETARY_OF_STATE, SOURCES, Source
+from .config import (
+    BOULDER_COUNTY, MANIFEST_PATH, SECRETARY_OF_STATE, SOURCES, Source, original_path,
+)
 from .logging_setup import get_logger
 
 log = get_logger(__name__)
@@ -43,12 +45,8 @@ def _save_manifest(manifest: dict) -> None:
     MANIFEST_PATH.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
 
 
-def _data_dir(s: Source) -> Path:
-    return ORIGINAL / s.data_source.replace("_", "-")
-
-
 def local_path(s: Source) -> Path:
-    return _data_dir(s) / s.local_filename
+    return original_path(s.data_source, s.local_filename)
 
 
 def fetch_one(s: Source, *, force: bool = False, dry_run: bool = False) -> tuple[bool, str]:

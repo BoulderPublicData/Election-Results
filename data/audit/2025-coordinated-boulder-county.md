@@ -4,15 +4,15 @@
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx
 - **Retrieved at:** 2026-05-23T18:30:06+00:00
 - **Extraction quality:** machine_readable
-- **Extraction notes:** contains composite precinct IDs (multiple precincts joined, comma-separated); votes are reported for the combined unit
+- **Extraction notes:** includes 'Property Owner' pseudo-precinct rows (property-owner ballots in special-district contests; no precinct geography); contains composite precinct IDs (multiple precincts joined, comma-separated); votes are reported for the combined unit
 
-- **Rows:** 4,340
+- **Rows:** 4,342
 - **Distinct contests:** 32
-- **Distinct precincts:** 195
-- **Total votes summed:** 1,122,198
+- **Distinct precincts:** 196
+- **Total votes summed:** 1,122,213
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 2342, 'measure': 1998}
-- **Party breakdown (top 8):** {'(none)': 4340}
+- **Contest type breakdown:** {'candidate': 2342, 'measure': 2000}
+- **Party breakdown (top 8):** {'(none)': 4342}
 
 **Top 10 contests by vote total** (sanity check):
 

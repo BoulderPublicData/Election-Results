@@ -20,7 +20,7 @@ import pandas as pd
 
 from .config import (
     BOULDER_COUNTY, ELECTION_DATES, MANIFEST_PATH, ORIGINAL,
-    PROCESSED, REPO_ROOT, SECRETARY_OF_STATE, SOURCES, Source,
+    PROCESSED, REPO_ROOT, SECRETARY_OF_STATE, SOURCES, Source, original_path,
 )
 from .logging_setup import get_logger
 from .parsers import boco_panel, boco_pdf, boco_tidy, sos
@@ -50,7 +50,7 @@ def _retrieved_at_for(source_file: str, data_source: str) -> str:
             return rec["retrieved_at"]
     # Manifest absent or missing this entry — fall back to file mtime as a
     # conservative proxy. Better than NULL; flagged in the audit.
-    p = ORIGINAL_DATA / data_source.replace("_", "-") / source_file
+    p = original_path(data_source, source_file)
     if p.exists():
         return datetime.fromtimestamp(p.stat().st_mtime, tz=timezone.utc).isoformat(timespec="seconds")
     return "unknown"
@@ -73,7 +73,7 @@ def _meta_for(s: Source) -> SourceMeta:
 
 
 def clean_source(s: Source) -> pd.DataFrame:
-    path = ORIGINAL_DATA / s.data_source.replace("_", "-") / s.local_filename
+    path = original_path(s.data_source, s.local_filename)
     if not path.exists():
         raise FileNotFoundError(f"raw file missing: {path}")
     meta = _meta_for(s)

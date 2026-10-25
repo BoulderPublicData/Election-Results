@@ -4,15 +4,15 @@
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx
 - **Retrieved at:** 2026-05-23T18:13:44+00:00
 - **Extraction quality:** machine_readable
-- **Extraction notes:** contains composite precinct IDs (multiple precincts joined, comma-separated); votes are reported for the combined unit; RCV: candidate_or_option suffixed with '| Round N' for each tabulation round and '| Final' for the Total Votes column
+- **Extraction notes:** includes 'Property Owner' pseudo-precinct rows (property-owner ballots in special-district contests; no precinct geography); contains composite precinct IDs (multiple precincts joined, comma-separated); votes are reported for the combined unit; RCV: candidate_or_option suffixed with '| Round N' for each tabulation round and '| Final' for the Total Votes column
 
-- **Rows:** 5,691
+- **Rows:** 5,695
 - **Distinct contests:** 38
-- **Distinct precincts:** 197
-- **Total votes summed:** 1,262,679
+- **Distinct precincts:** 198
+- **Total votes summed:** 1,262,823
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 2573, 'measure': 2398, 'ranked_choice': 720}
-- **Party breakdown (top 8):** {'(none)': 5691}
+- **Contest type breakdown:** {'candidate': 2573, 'measure': 2402, 'ranked_choice': 720}
+- **Party breakdown (top 8):** {'(none)': 5695}
 
 **Top 10 contests by vote total** (sanity check):
 

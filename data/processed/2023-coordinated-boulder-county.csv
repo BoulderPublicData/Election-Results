@@ -4970,6 +4970,10 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2154907916,916,Boulder County Ballot Issue 1A,measure,No,,200,1200.0,711
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2154907916,916,Boulder County Ballot Issue 1B,measure,Yes,,462,1200.0,711
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2154907916,916,Boulder County Ballot Issue 1B,measure,No,,239,1200.0,711
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,Property Owner,Property Owner,Nederland Eco Pass Public Improvement District Ballot Issue 6A,measure,Yes,,101,,145
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,Property Owner,Property Owner,Nederland Eco Pass Public Improvement District Ballot Issue 6A,measure,No,,43,,145
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,Property Owner,Property Owner,North Metro Fire Rescue District Ballot Issue 7A,measure,Yes,,0,0.0,0
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,Property Owner,Property Owner,North Metro Fire Rescue District Ballot Issue 7A,measure,No,,0,0.0,0
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181207503,503,City of Boulder Mayoral Candidates,ranked_choice,Aaron Brockett | Round 1,,0,593.0,0
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181207503,503,City of Boulder Mayoral Candidates,ranked_choice,Nicole Speer | Round 1,,0,593.0,0
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181207503,503,City of Boulder Mayoral Candidates,ranked_choice,Bob Yates | Round 1,,0,593.0,0
