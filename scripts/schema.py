@@ -173,8 +173,9 @@ def validate(df: pd.DataFrame, source_label: str = "") -> list[str]:
     Set source_label to prefix each problem with a context tag (e.g. the
     year-source label used in pipeline output).
     """
-    from .pandera_schemas import CSV_SCHEMA, IN_MEMORY_SCHEMA
     import pandera.pandas as pa
+
+    from .pandera_schemas import CSV_SCHEMA, IN_MEMORY_SCHEMA
 
     problems: list[str] = []
     prefix = f"[{source_label}] " if source_label else ""

@@ -13,14 +13,15 @@ User-Agent baked in. Every module that does GET requests should go through
 
 from __future__ import annotations
 
-import time
 from typing import Any
 
 import requests
 import requests_cache
 from tenacity import (
-    retry, retry_if_exception_type, stop_after_attempt,
-    wait_exponential, before_sleep_log,
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
 )
 
 from . import config

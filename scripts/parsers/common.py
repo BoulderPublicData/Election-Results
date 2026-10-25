@@ -3,12 +3,30 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pandas as pd
 
-from ..schema import COLUMNS, DTYPES, SourceMeta
+from ..schema import COLUMNS, SourceMeta
+
+# Every workbook is read with the Rust-based calamine engine: 4-6x faster than
+# openpyxl/xlrd on the 200k-370k-row SOS statewide files, handles .xls and
+# .xlsx alike (including 2013's XLSX-with-.xls-extension), and produces
+# identical frames for every source in the registry.
+EXCEL_ENGINE = "calamine"
+
+
+def read_excel(path: Path, **kwargs) -> pd.DataFrame:
+    """pd.read_excel with the project's engine."""
+    return pd.read_excel(path, engine=EXCEL_ENGINE, **kwargs)
+
+
+def excel_file(path: Path) -> pd.ExcelFile:
+    """pd.ExcelFile with the project's engine. Use `.parse(sheet)` on the
+    result rather than re-opening the workbook once per sheet."""
+    return pd.ExcelFile(path, engine=EXCEL_ENGINE)
+
 
 # Normalize "Total \nBallots" → "Total Ballots", "Active\nVoters" → "Active Voters", etc.
 _WS = re.compile(r"\s+")
@@ -113,7 +131,7 @@ def infer_contest_type(contest: object, choice: object) -> str:
 
 
 def now_utc_iso() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 def precinct_id_str(value: object) -> object:

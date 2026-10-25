@@ -1,11 +1,12 @@
 """
 Cleaning orchestrator. Reads one raw file and routes it to the appropriate parser.
 
-Output: a DataFrame matching scripts.schema.COLUMNS, written to
-data/processed/{data_source}-{year}-{election_type}.csv
+Output: a DataFrame coerced to scripts.schema.COLUMNS / DTYPES, written (as the
+slim 15-column view) to data/processed/{year}-{election_type}-{data-source}.csv.
 
-Each row has provenance (source_url, retrieved_at, sha256 via the manifest) so
-downstream analyses always know where a number came from.
+The five provenance fields (source_url, retrieved_at, ...) travel on the
+in-memory frame and are written once per source file to
+data/processed/provenance.csv by pipeline.py.
 """
 
 from __future__ import annotations
@@ -13,18 +14,28 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from functools import cache
 from pathlib import Path
 
 import pandas as pd
 
 from .config import (
-    BOULDER_COUNTY, ELECTION_DATES, MANIFEST_PATH, ORIGINAL,
-    PROCESSED, REPO_ROOT, SECRETARY_OF_STATE, SOURCES, Source, original_path,
+    BOULDER_COUNTY,
+    ELECTION_DATES,
+    MANIFEST_PATH,
+    ORIGINAL,
+    PROCESSED,
+    PROVENANCE_CSV,
+    REPO_ROOT,
+    SECRETARY_OF_STATE,
+    SOURCES,
+    Source,
+    original_path,
 )
 from .logging_setup import get_logger
 from .parsers import boco_panel, boco_pdf, boco_tidy, sos
-from .schema import SourceMeta, validate
+from .schema import SourceMeta, coerce, validate
 
 log = get_logger(__name__)
 
@@ -42,17 +53,38 @@ BOCO_PANEL_YEARS = {2008, 2010, 2011, 2012}
 BOCO_PDF_YEARS = {2005, 2007, 2009}
 
 
+@cache
+def _recorded_retrieved_at() -> dict[tuple[str, str], str]:
+    """retrieved_at values already published in provenance.csv, keyed on
+    (data_source, source_file)."""
+    if not PROVENANCE_CSV.exists():
+        return {}
+    prov = pd.read_csv(PROVENANCE_CSV, dtype=str, keep_default_na=False)
+    return {(r.data_source, r.source_file): r.retrieved_at
+            for r in prov.itertuples(index=False) if r.retrieved_at}
+
+
 def _retrieved_at_for(source_file: str, data_source: str) -> str:
+    """When was this raw file downloaded? In order of preference:
+
+    1. data/original/manifest.json — written by fetch.py at download time.
+    2. The value already recorded in data/processed/provenance.csv. Files
+       added by hand have no manifest entry; reusing the published value keeps
+       re-runs reproducible instead of re-dating every file whenever a fresh
+       clone or a `git mv` changes its mtime.
+    3. The file's mtime — a conservative proxy for brand-new hand-added files.
+    """
     if MANIFEST_PATH.exists():
         m = json.loads(MANIFEST_PATH.read_text())
         rec = m.get("files", {}).get(f"{data_source}/{source_file}")
         if rec and rec.get("retrieved_at"):
             return rec["retrieved_at"]
-    # Manifest absent or missing this entry — fall back to file mtime as a
-    # conservative proxy. Better than NULL; flagged in the audit.
+    recorded = _recorded_retrieved_at().get((data_source, source_file))
+    if recorded:
+        return recorded
     p = original_path(data_source, source_file)
     if p.exists():
-        return datetime.fromtimestamp(p.stat().st_mtime, tz=timezone.utc).isoformat(timespec="seconds")
+        return datetime.fromtimestamp(p.stat().st_mtime, tz=UTC).isoformat(timespec="seconds")
     return "unknown"
 
 
@@ -80,13 +112,19 @@ def clean_source(s: Source) -> pd.DataFrame:
 
     if s.data_source == "boulder_county":
         if s.year in BOCO_PDF_YEARS:
-            return boco_pdf.parse(path, meta)
-        if s.year in BOCO_PANEL_YEARS:
-            return boco_panel.parse(path, meta)
-        return boco_tidy.parse(path, meta)
-    if s.data_source == "secretary_of_state":
-        return sos.parse(path, meta)
-    raise ValueError(f"unknown data_source: {s.data_source}")
+            df = boco_pdf.parse(path, meta)
+        elif s.year in BOCO_PANEL_YEARS:
+            df = boco_panel.parse(path, meta)
+        else:
+            df = boco_tidy.parse(path, meta)
+    elif s.data_source == "secretary_of_state":
+        df = sos.parse(path, meta)
+    else:
+        raise ValueError(f"unknown data_source: {s.data_source}")
+    # One choke point for the schema dtypes, so validate() checks real
+    # problems rather than flagging int64-vs-Int16 on every parser, and
+    # integer columns are written as integers ("1291", not "1291.0").
+    return coerce(df)
 
 
 def _output_path(s: Source) -> Path:

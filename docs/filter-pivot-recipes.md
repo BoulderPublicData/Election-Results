@@ -35,7 +35,12 @@ duckdb -c "FROM 'data/processed/all-elections-tidy.csv' LIMIT 5"
 ```
 
 **Excel**
-1. Open `data/processed/all-elections-tidy.csv` in Excel.
+1. Import, don't double-click: **Data → From Text/CSV**, choose
+   `data/processed/all-elections-tidy.csv`, set **File Origin** to
+   **65001: Unicode (UTF-8)** so accented names (e.g. *Gilbert M. Román*,
+   *Paul Noël Fiorino*) aren't garbled, then **Transform Data** and set
+   `precinct_id` and `precinct_name` to **Text** before **Close & Load**.
+   (Double-clicking the file uses your system encoding and turns IDs into numbers.)
 2. Click anywhere in the data → **Insert → PivotTable**. Place it in a new sheet.
 3. The recipes below tell you which fields to drag into Rows / Columns / Values / Filters.
 
@@ -383,4 +388,6 @@ LEFT JOIN 'data/processed/provenance.csv' p
 - **Negative votes only appear in RCV intermediate rounds** — they represent ballots transferring *away* from an eliminated candidate. Use the `Round` suffix to filter for `Final` rows when you want final totals.
 - **`data_source` matters** — Boulder SoV reports all Boulder precincts; SOS reports only precincts that recorded votes. Counts differ slightly. When in doubt, prefer Boulder SoV for Boulder-specific analysis and SOS for state-level comparisons.
 - **Pre-2013 panel-format quirks** — 2008 and 2010 are partial extractions; consult the `data/original/` XLS before publishing precinct-level findings for these years.
+- **Property-owner pseudo-precincts** — some special-district contests (2015, 2023, 2025) include rows whose `precinct_id` is `Property Owner` or `Landowner`. Keep them when summing contest totals (they are part of the certified count); drop them before joining to precinct geography.
+- **Election-night snapshots are a different dataset** — `data/processed/vote-counting/` holds county-wide totals per results-site update, not precinct rows. Don't concatenate it with `all-elections-tidy.csv`, and don't sum `votes` across snapshots (they're cumulative); filter `is_final_snapshot` or use `vote_change`. See [`data-dictionary.md` §8](data-dictionary.md#8-election-night-incremental-results-dataprocessedvote-counting).
 - **Composite precincts** — in 2015 and 2022, some `precinct_id` values are comma-joined (e.g. `"2181007800, 2181207403"`). These represent ballots tallied jointly across two underlying precincts. If you're joining to precinct geography, split first.

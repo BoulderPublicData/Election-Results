@@ -19,9 +19,11 @@ from pathlib import Path
 # the Source dataclass; we just give it a friendlier name here.
 from .sources import (  # noqa: F401
     ALL_SOURCES as SOURCES,
+)
+from .sources import (
     BOULDER_COUNTY,
-    SECRETARY_OF_STATE,
     ELECTION_DATES,
+    SECRETARY_OF_STATE,
     Source,
 )
 

@@ -5,7 +5,10 @@ from __future__ import annotations
 import pandas as pd
 
 from scripts.parsers.common import (
-    clean_col, infer_contest_type, normalize_choice, normalize_party,
+    clean_col,
+    infer_contest_type,
+    normalize_choice,
+    normalize_party,
     precinct_id_str,
 )
 

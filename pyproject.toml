@@ -9,8 +9,8 @@ authors = [{ name = "Brian Keegan" }]
 
 dependencies = [
     "pandas>=2.2",
-    "openpyxl>=3.1",
-    "xlrd>=2.0",
+    "python-calamine>=0.3",  # Excel reader (see scripts/parsers/common.py:read_excel)
+    "openpyxl>=3.1",         # Excel writer (pandas.to_excel)
     "requests>=2.32",
     "beautifulsoup4>=4.12",
     "lxml>=5.2",

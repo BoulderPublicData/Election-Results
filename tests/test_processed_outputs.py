@@ -77,3 +77,16 @@ def test_provenance_sidecar_present_and_complete():
     # One row per (year, election_type, data_source)
     keys = prov[["election_year", "election_type", "data_source"]].apply(tuple, axis=1)
     assert keys.is_unique, "provenance sidecar has duplicate keys"
+
+
+INT_COLUMNS = [c for c in CSV_COLUMNS if c in {"election_year", "votes", "active_voters", "ballots_cast"}]
+
+
+@pytest.mark.parametrize("path", sorted(PROCESSED.glob("[0-9]*.csv")), ids=lambda p: p.name)
+def test_integer_columns_written_as_integers(path):
+    """clean_source() coerces to schema.DTYPES, so counts are written as "1291",
+    never "1291.0" (which Excel and R read as a float)."""
+    df = pd.read_csv(path, dtype=str, usecols=INT_COLUMNS)
+    for col in INT_COLUMNS:
+        floaty = df[col].dropna().str.contains(r"\.", regex=True)
+        assert not floaty.any(), f"{path.name}:{col} has float-formatted values"

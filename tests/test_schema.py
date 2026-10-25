@@ -5,8 +5,16 @@ from __future__ import annotations
 import pandas as pd
 
 from scripts.schema import (
-    COLUMNS, CSV_COLUMNS, DTYPES, PROVENANCE_COLUMNS, SCHEMA_VERSION,
-    coerce, empty_frame, provenance_record, to_csv_frame, validate,
+    COLUMNS,
+    CSV_COLUMNS,
+    DTYPES,
+    PROVENANCE_COLUMNS,
+    SCHEMA_VERSION,
+    coerce,
+    empty_frame,
+    provenance_record,
+    to_csv_frame,
+    validate,
 )
 
 

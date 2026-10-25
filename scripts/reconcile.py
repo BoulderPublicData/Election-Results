@@ -31,11 +31,19 @@ from pathlib import Path
 import pandas as pd
 
 from .config import (
-    AUDIT, BOULDER_COUNTY, LOOKUPS,
-    PROCESSED, REPO_ROOT, SECRETARY_OF_STATE, SOURCES as ALL_SOURCES, Source, original_path,
+    AUDIT,
+    BOULDER_COUNTY,
+    LOOKUPS,
+    PROCESSED,
+    SECRETARY_OF_STATE,
+    Source,
+    original_path,
+)
+from .config import (
+    SOURCES as ALL_SOURCES,
 )
 from .logging_setup import get_logger
-from .parsers.common import clean_cols
+from .parsers.common import clean_cols, excel_file, read_excel
 
 log = get_logger(__name__)
 
@@ -71,9 +79,11 @@ def _match_canonical(text: object, patterns: list[ContestPattern]) -> str | None
 
 # ----- Original-file readers (lightweight; just enough to sum totals) -----
 
-def _read_sos_original(path: Path) -> pd.DataFrame:
-    """SOS files are already long-form; just need to load and filter Boulder."""
-    df = pd.read_excel(path, engine="openpyxl", sheet_name=0)
+def _read_sos_original(path: Path) -> pd.DataFrame | None:
+    """SOS files are already long-form; just need to load and filter Boulder.
+    Returns None for turnout-only files (no contest column), which have no
+    vote totals to reconcile."""
+    df = read_excel(path, sheet_name=0)
     df = clean_cols(df)
     # Locate columns by case-insensitive aliases.
     cols = {c.lower(): c for c in df.columns}
@@ -87,43 +97,50 @@ def _read_sos_original(path: Path) -> pd.DataFrame:
     votes_col = cols.get("candidate votes") or cols.get("votes")
     yes_col = cols.get("yes votes")
     no_col = cols.get("no votes")
+    if county_col and not contest_col:
+        log.info("reconcile.turnout_only", file=path.name)
+        return None
     if not (county_col and contest_col):
         raise ValueError(f"{path.name}: missing county/contest columns; have={list(df.columns)}")
-    sub = df[df[county_col].astype("string").str.strip().str.upper() == "BOULDER"].copy()
+    sub = df[df[county_col].astype("string").str.strip().str.upper() == "BOULDER"]
+    contest = sub[contest_col].astype("string").str.strip().fillna("")
+    cand_col = cols.get("candidate") or cols.get("candidate/yes or no")
 
-    rows: list[dict] = []
-    for _, r in sub.iterrows():
-        contest = str(r[contest_col]).strip() if pd.notna(r[contest_col]) else ""
-        # Candidate vote
-        if votes_col and pd.notna(r[votes_col]):
-            rows.append({
-                "contest": contest,
-                "candidate_or_option": str(r.get("candidate") or r.get("candidate/yes or no") or "").strip(),
-                "party": str(r[party_col]).strip() if party_col and pd.notna(r[party_col]) else None,
-                "votes": pd.to_numeric(r[votes_col], errors="coerce"),
-            })
-        if yes_col and pd.notna(r[yes_col]):
-            rows.append({"contest": contest, "candidate_or_option": "Yes", "party": None,
-                         "votes": pd.to_numeric(r[yes_col], errors="coerce")})
-        if no_col and pd.notna(r[no_col]):
-            rows.append({"contest": contest, "candidate_or_option": "No", "party": None,
-                         "votes": pd.to_numeric(r[no_col], errors="coerce")})
-    return pd.DataFrame(rows)
+    # One frame per vote column: candidate votes keep the candidate's name;
+    # Yes/No columns become "Yes"/"No" rows. Vectorized — the SOS files carry
+    # ~20k Boulder rows each.
+    frames: list[pd.DataFrame] = []
+    if votes_col:
+        m = sub[votes_col].notna()
+        frames.append(pd.DataFrame({
+            "contest": contest[m],
+            "candidate_or_option": (sub.loc[m, cand_col].astype("string").str.strip()
+                                    if cand_col else ""),
+            "party": sub.loc[m, party_col].astype("string").str.strip() if party_col else None,
+            "votes": pd.to_numeric(sub.loc[m, votes_col], errors="coerce"),
+        }))
+    for col, label in ((yes_col, "Yes"), (no_col, "No")):
+        if col:
+            m = sub[col].notna()
+            frames.append(pd.DataFrame({
+                "contest": contest[m], "candidate_or_option": label, "party": None,
+                "votes": pd.to_numeric(sub.loc[m, col], errors="coerce"),
+            }))
+    if not frames:
+        return pd.DataFrame(columns=["contest", "candidate_or_option", "party", "votes"])
+    return pd.concat(frames, ignore_index=True)
 
 
 def _read_boco_tidy_original(path: Path) -> pd.DataFrame:
-    """Boulder tidy years (2013-2024). Cheap reader that just sums Total Votes
+    """Boulder tidy years (2013-2025). Cheap reader that just sums Total Votes
     by Contest Title × Choice Name."""
-    engine = "openpyxl" if path.suffix.lower() == ".xlsx" else "xlrd"
-    if path.name == "2013-coordinated-sov.xls":
-        engine = "openpyxl"
-    xl = pd.ExcelFile(path, engine=engine)
+    xl = excel_file(path)
 
     frames = []
     for sheet in xl.sheet_names:
         if sheet.lower() in {"summary_of_results", "summary of results"}:
             continue
-        raw = pd.read_excel(path, engine=engine, sheet_name=sheet)
+        raw = xl.parse(sheet)
         if raw.empty:
             continue
         df = clean_cols(raw)

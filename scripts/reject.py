@@ -88,15 +88,25 @@ class Rejector:
         `reason` and a `detail` listing the missing fields. The original row
         values (excluding null fields) are saved in `raw_row`.
         """
-        mask = df[required].isna().any(axis=1)
+        na = df[required].isna()
+        mask = na.any(axis=1)
         if mask.any():
-            for idx, row in df[mask].iterrows():
-                missing = [c for c in required if pd.isna(row.get(c))]
+            bad = df[mask]
+            # to_dict("records") instead of iterrows(): the 2008/2010 panel
+            # parsers reject ~45k rows, and iterrows() builds a Series per row.
+            if row_index_col and row_index_col in bad.columns:
+                indices = bad[row_index_col].astype(str).tolist()
+            else:
+                indices = [str(i) for i in bad.index]
+            for rec, row_index, na_row in zip(
+                bad.to_dict("records"), indices, na[mask].to_numpy(), strict=True,
+            ):
+                missing = [c for c, is_na in zip(required, na_row, strict=True) if is_na]
                 self.add(
-                    row_index=str(row.get(row_index_col, idx)) if row_index_col else str(idx),
+                    row_index=row_index,
                     reason=reason,
                     detail=f"missing: {', '.join(missing)}",
-                    raw_row={k: row[k] for k in row.index if pd.notna(row[k])},
+                    raw_row={k: v for k, v in rec.items() if pd.notna(v)},
                 )
         return df[~mask].copy()
 
