@@ -26,6 +26,8 @@ dependencies = [
     "sqlite-utils>=3.37",
     "duckdb>=1.0",
     "datasette>=0.65",
+    "pillow>=10.0",
+    "numpy>=1.26",
 ]
 
 [project.optional-dependencies]

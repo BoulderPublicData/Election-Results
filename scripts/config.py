@@ -42,6 +42,20 @@ PROCESSED = DATA / "processed"
 AUDIT = DATA / "audit"
 LOOKUPS = DATA / "lookups"
 
+# Where each data source's raw downloads live under ORIGINAL. Boulder County's
+# Statement of Votes files sit in a subfolder next to the election-night
+# screenshots (vote-counting/); SOS files sit at the top of their folder.
+ORIGINAL_SUBDIRS: dict[str, str] = {
+    "boulder_county": "boulder-county/statement-of-votes",
+    "secretary_of_state": "secretary-of-state",
+}
+
+
+def original_path(data_source: str, local_filename: str) -> Path:
+    """Absolute path of a registry file under data/original/."""
+    return ORIGINAL / ORIGINAL_SUBDIRS[data_source] / local_filename
+
+
 # Specific files used in several places.
 MANIFEST_PATH = ORIGINAL / "manifest.json"
 PROVENANCE_CSV = PROCESSED / "provenance.csv"
@@ -89,6 +103,7 @@ LOG_FORMAT = os.environ.get("ELECTIONS_LOG_FORMAT", "auto")
 # REPO_ROOT, swap it out for an import from here.
 __all__ = [
     "REPO_ROOT", "DATA", "ORIGINAL", "PROCESSED", "AUDIT", "LOOKUPS",
+    "ORIGINAL_SUBDIRS", "original_path",
     "MANIFEST_PATH", "PROVENANCE_CSV", "COMBINED_CSV",
     "RECONCILIATION_CSV", "RECONCILIATION_MD", "REJECTED_CSV", "AUDIT_SUMMARY_MD",
     "HTTP_TIMEOUT", "HTTP_USER_AGENT",

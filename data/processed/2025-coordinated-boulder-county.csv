@@ -4335,6 +4335,8 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2025,2025-11-04,coordinated,boulder_county,county,Boulder County,2154907916,916,Boulder County Ballot Issue 1B,measure,No,,250.0,1228.0,721.0
 2025,2025-11-04,coordinated,boulder_county,county,Boulder County,2154907916,916,Hygiene Fire Protection District Ballot Issue 6A,measure,Yes,,22.0,1228.0,30.0
 2025,2025-11-04,coordinated,boulder_county,county,Boulder County,2154907916,916,Hygiene Fire Protection District Ballot Issue 6A,measure,No,,8.0,1228.0,30.0
+2025,2025-11-04,coordinated,boulder_county,county,Boulder County,Property Owner,Property Owner,Coal Creek Canyon Fire Protection District Ballot Issue 7B,measure,Yes,,7.0,36.0,15.0
+2025,2025-11-04,coordinated,boulder_county,county,Boulder County,Property Owner,Property Owner,Coal Creek Canyon Fire Protection District Ballot Issue 7B,measure,No,,8.0,36.0,15.0
 2025,2025-11-04,coordinated,boulder_county,county,Boulder County,2171107627,"Property Owner, 627",Hygiene Fire Protection District Ballot Issue 6A,measure,Yes,,9.0,1017.0,19.0
 2025,2025-11-04,coordinated,boulder_county,county,Boulder County,2171107627,"Property Owner, 627",Hygiene Fire Protection District Ballot Issue 6A,measure,No,,10.0,1017.0,19.0
 2025,2025-11-04,coordinated,boulder_county,county,Boulder County,2154907910,"Property Owner, 910",Sunshine Fire Protection District Ballot Issue 6B,measure,Yes,,126.0,715.0,173.0

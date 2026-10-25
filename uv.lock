@@ -597,10 +597,12 @@ dependencies = [
     { name = "ipykernel" },
     { name = "jupyter" },
     { name = "lxml" },
+    { name = "numpy" },
     { name = "openpyxl" },
     { name = "pandas" },
     { name = "pandera" },
     { name = "pdfplumber" },
+    { name = "pillow" },
     { name = "pypdf" },
     { name = "pyyaml" },
     { name = "requests" },
@@ -630,10 +632,12 @@ requires-dist = [
     { name = "ipykernel", specifier = ">=6.29" },
     { name = "jupyter", specifier = ">=1.0" },
     { name = "lxml", specifier = ">=5.2" },
+    { name = "numpy", specifier = ">=1.26" },
     { name = "openpyxl", specifier = ">=3.1" },
     { name = "pandas", specifier = ">=2.2" },
     { name = "pandera", specifier = ">=0.20" },
     { name = "pdfplumber", specifier = ">=0.11.9" },
+    { name = "pillow", specifier = ">=10.0" },
     { name = "pypdf", specifier = ">=4.3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
     { name = "pyyaml", specifier = ">=6.0" },
@@ -1711,7 +1715,7 @@ name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
+    { name = "ptyprocess" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [

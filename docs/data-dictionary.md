@@ -152,6 +152,12 @@ precinct_name = "800, 403"
 
 Vote tallies are for the **combined** unit. To match these against single-precinct geography, split the comma-separated IDs into a one-to-many lookup. The parser flags these in `extraction_notes`.
 
+**Source anomaly — 2023 City of Louisville City Council Ward 2.** The 2023 SoV reports this contest under two *overlapping* composite units, `2181207201,2181207202` and `2181207202,2181207500`, with near-identical tallies (Fahey 184 / 183, Colbert 234 / 234, 458 ballots each). Summed as published, the SoV gives 1,602 / 1,441; without the `202,500` row it gives 1,419 / 1,207 — exactly the county's final election-night web totals (§8). It looks like a double-listed tally in the published file, but the data is left as published (never split or drop composite rows on a guess). It is the only contest in the 2015, 2022 or 2023 files where one precinct appears in two reporting units.
+
+### 4.3a Property-owner / landowner pseudo-precincts
+
+Special-district contests can include ballots from non-resident property owners. The SoV reports them on a row whose precinct code is `Property Owner` (2023, 2025) or `Landowner` (2015) instead of a real precinct. They count toward the certified totals, so they are kept with `precinct_id = "Property Owner"` (or `Landowner`) and flagged in `extraction_notes`. They have no precinct geography — exclude them before a spatial join, but keep them when summing contest totals. (Before 2026-10 the 2023/2025 rows were rejected for a missing `precinct_id`, which undercounted e.g. 2023 Nederland Eco Pass 6A by 101 Yes / 43 No.)
+
 ### 4.4 PDF years (2005, 2007, 2009)
 
 These are 100+-page coordinated-election Canvass Reports published only as PDFs. They have a text layer, so `scripts/parsers/boco_pdf.py` reads them with **pdfplumber** (pure Python, no JVM). Contest titles come straight from the page text; candidate names are reconstructed by clustering rotated `upright=False` words by x-coordinate and reversing their characters.
@@ -274,8 +280,89 @@ uv run python -m scripts.pipeline --discover
 
 When a discovery finds something new, **add it to `sources.py`** in the same PR that introduces the year's data. Discovery's role is to keep the pipeline working between hand-curated updates; it's not a substitute for the registry.
 
-## 8. Changelog
+## 8. Election-night incremental results (`data/processed/vote-counting/`)
+
+A **separate dataset** (vote-counting schema **1.0.0**, defined in
+[`scripts/schema.py`](../scripts/schema.py) under `VOTE_COUNTING_*`) built by
+[`scripts/vote_counting.py`](../scripts/vote_counting.py) from 122 full-page screenshots of the
+Boulder County election-night results site (2014–2025, one per published update) in
+`data/original/boulder-county/vote-counting/{YYYY}{G|C}/`, plus the nine 2023 City of Boulder
+mayoral RCV "Short Report" PDFs.
+
+> **Grain:** county-wide totals *at a point in time* — not precincts. Never concatenate with
+> `all-elections-tidy.csv`, and never sum `votes` across snapshots (they are cumulative). Use
+> `vote_change` for per-update increments, or filter `is_final_snapshot`.
+
+```
+data/processed/vote-counting/
+├── vote-counting-contests.csv   ← one row per election × snapshot × contest × candidate
+├── vote-counting-summary.csv    ← one row per snapshot ("Election Summary" box + provenance)
+└── datalab/{YYYY}{G|C}/*.json   ← cached Datalab OCR responses (keyed on image sha256)
+```
+
+### 8.1 `vote-counting-contests.csv`
+
+| Column | Type | Description |
+|---|---|---|
+| `election_year`, `election_date`, `election_type` | Int16, ISO date, string | As in §1. |
+| `snapshot_seq` | Int16 | 1…n in `last_updated` order within the election. Null for RCV report rows. |
+| `last_updated` | string | ISO local time (America/Denver, no offset) from the page's **Last Updated** box. For RCV rows, the report's own timestamp. |
+| `results_label` | string | As published: `Official Results` / `Unofficial Results`; `RCV Short Report` for RCV rows. **Not a certification flag** — 2014–2024 pages say "Official Results" from 7 p.m. on election night. |
+| `is_final_snapshot` | boolean | The latest update for the election (web pages and RCV reports are separate series). |
+| `contest` | string | Card title as published, with any "Vote for no more than N" line removed. |
+| `vote_for` | Int16 | N from "Vote for (no/not more than) N", when shown. |
+| `contest_type` | string | As in §3 (inferred the same way). RCV report rows are `ranked_choice` with `\| Round N` / `\| Final` suffixes, matching the 2023 SoV convention. |
+| `candidate_or_option` | string | Candidate name with party and write-in suffix removed; Yes/No choices canonicalized (§2.2). Other measure labels (e.g. `For the Measure`) pass through. |
+| `party` | string | Text after the last ` - ` in the published name, normalized via `PARTY_MAP` (§2.3); unknown parties verbatim. |
+| `is_write_in` | boolean | Name carried `- Write-in Candidate`, `- Write-In`, or `- Certified Write-in Candidate`. |
+| `votes` | Int64 | Cumulative votes as of `last_updated`. Null only where the source image is illegible. |
+| `percent` | Float64 | Percent as published (null where illegible). |
+| `contest_total_votes` | Int64 | The card's **TOTAL VOTES** row. |
+| `vote_change` | Int64 | `votes` minus the same candidate's votes in the previous snapshot. Equals `votes` in the first snapshot (nothing is reported before polls close); null if the candidate is missing from the previous snapshot. Can be negative after canvass adjustments and recounts. |
+| `source_file` | string | Screenshot/PDF path under `data/original/boulder-county/`. |
+
+### 8.2 `vote-counting-summary.csv`
+
+One row per snapshot: the identifying columns above, then every figure the page's
+**Election Summary** box published (`total_registration`, `active_registered_voters`,
+`mail_ballots_distributed`, `property_owner_only_ballots_distributed`, `expected_turnout`,
+`mail_ballots`, `in_person_ballots`, `property_owner_ballots`, `total_ballots_counted`; null when
+that year's page didn't show it), `ballots_counted_change`, `n_contests`, `summary_notes` (the
+box's footnotes and update notices, verbatim), and provenance (`source_file`, `source_sha256`,
+`ocr_retrieved_at`, `extraction_quality = "datalab_ocr"`).
+
+### 8.3 How it is built and checked
+
+1. **OCR.** Screenshots are 9,000–21,000 px tall, over Datalab's 15,000 px limit, so each is
+   sliced into ≤3,600 px pages *at the white gaps between contest cards* (no table is ever split)
+   and sent as one PDF to Datalab's `/api/v1/convert` (`mode=accurate`, Markdown output). Responses
+   are committed, so rebuilding never calls the API. `uv run python -m scripts.vote_counting --ocr`
+   converts only new or changed screenshots (needs `DATALAB_API_KEY`).
+2. **QA.** Every card must satisfy *sum of candidate votes = TOTAL VOTES*, and every published
+   percent must equal votes / total (±0.011). Rows that look like data but don't parse are
+   reported, never dropped. Results: [`data/audit/vote-counting.md`](../data/audit/vote-counting.md).
+3. **Corrections.** Every fix is a row in
+   [`scripts/corrections/vote-counting.csv`](../scripts/corrections/vote-counting.csv) with the
+   OCR'd value, the verified value, and a note. A correction whose OCR'd value no longer matches
+   fails the build. Current corrections: 2017C City of Boulder Council (one row hidden by a
+   screenshot stitching seam in all 8 snapshots — votes derived as TOTAL minus the 13 legible
+   rows; the final value matches the SoV exactly) and three 2023C pages where OCR left two cards'
+   vote cells blank (read from the image).
+4. **External check.** `scripts/reconcile.py` compares each election's final snapshot with the
+   SoV, candidate by candidate (report only — see the last section of
+   [`data/audit/reconciliation.md`](../data/audit/reconciliation.md)). For 2014–2022 every
+   matchable candidate agrees **exactly**.
+
+**Known gaps:** write-in candidates can't be matched to the SoV (it lumps them); the 2024 SoV in
+this repo has only local races, so for 2024 this dataset is the fullest county-level record we
+hold; 2025's final snapshot is pre-certification ("Unofficial Results").
+
+---
+
+## 9. Changelog
 
 - **2026-05-23** — Schema 1.0.0 released alongside the new pipeline. Initial dictionary published.
 - **2026-05** — Added `discover.py` (BoCo + SOS upstream scraping), pytest suite under `tests/`, CI workflow at `.github/workflows/tests.yml`, plus 2025 Boulder coordinated + 2024 SOS general entries. `infer_contest_type` now handles `pd.NA` inputs.
 - **2026-05** — Schema bumped to **1.1.0**. Per-row CSVs now hold a slim 15-column view; the 5 provenance columns (`source_file`, `source_url`, `retrieved_at`, `extraction_quality`, `extraction_notes`) moved to `data/processed/provenance.csv`. Combined-CSV size dropped from 152 MB to 49 MB; per-year files shrank by ~60%.
+- **2026-10** — Added the election-night incremental results dataset (§8, vote-counting schema 1.0.0), OCR'd from results-site screenshots via Datalab. Boulder SoV raw files moved to `data/original/boulder-county/statement-of-votes/`; paths now resolve through `config.original_path()`.
+- **2026-10** — Boulder tidy parser keeps `Property Owner` pseudo-precinct rows (2023, 2025) instead of rejecting them (§4.3a).
