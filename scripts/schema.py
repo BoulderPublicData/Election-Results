@@ -126,11 +126,11 @@ PROVENANCE_DTYPES: dict[str, str] = {
 
 ElectionType = Literal["general", "primary", "coordinated"]
 ContestType = Literal[
-    "candidate",       # partisan or non-partisan candidate race
-    "measure",         # yes/no ballot measure, referendum, amendment
-    "retention",       # judicial retention (yes/no)
-    "recall",          # recall question (yes/no)
-    "ranked_choice",   # RCV contest — round-level detail in candidate_or_option
+    "candidate",  # partisan or non-partisan candidate race
+    "measure",  # yes/no ballot measure, referendum, amendment
+    "retention",  # judicial retention (yes/no)
+    "recall",  # recall question (yes/no)
+    "ranked_choice",  # RCV contest — round-level detail in candidate_or_option
 ]
 JurisdictionLevel = Literal["county", "state", "city", "school_district", "special_district"]
 DataSource = Literal["boulder_county", "secretary_of_state"]
@@ -140,6 +140,7 @@ ExtractionQuality = Literal["machine_readable", "pdf_text_layer", "pdf_ocr", "ma
 @dataclass(frozen=True)
 class SourceMeta:
     """Provenance metadata threaded through every row a parser emits."""
+
     election_year: int
     election_date: str  # ISO YYYY-MM-DD
     election_type: ElectionType
@@ -169,6 +170,7 @@ def coerce(df: pd.DataFrame) -> pd.DataFrame:
     if "is_pseudo_precinct" not in df.columns and "precinct_id" in df.columns:
         # Derived column: frames built outside add_provenance() get it too.
         from .parsers.common import is_pseudo_precinct
+
         df = df.assign(is_pseudo_precinct=df["precinct_id"].map(is_pseudo_precinct))
 
     out = pd.DataFrame()
@@ -182,8 +184,14 @@ def coerce(df: pd.DataFrame) -> pd.DataFrame:
                 series = pd.to_numeric(series, errors="coerce").astype(DTYPES[col])
             elif DTYPES[col] == "boolean" and series.dtype == object:
                 series = series.map(
-                    lambda v: pd.NA if pd.isna(v) else str(v).strip().lower() in {"true", "1"}
-                    if isinstance(v, str) else bool(v)).astype("boolean")
+                    lambda v: (
+                        pd.NA
+                        if pd.isna(v)
+                        else str(v).strip().lower() in {"true", "1"}
+                        if isinstance(v, str)
+                        else bool(v)
+                    )
+                ).astype("boolean")
             else:
                 series = series.astype(DTYPES[col])
         except (ValueError, TypeError) as e:
@@ -226,8 +234,9 @@ def validate(df: pd.DataFrame, source_label: str = "") -> list[str]:
         for _, row in err.failure_cases.iterrows():
             col = row.get("column", "?")
             check = row.get("check", "?")
-            problems.append(f"{prefix}{col}: {check} failed "
-                            f"(example: {row.get('failure_case', '?')})")
+            problems.append(
+                f"{prefix}{col}: {check} failed (example: {row.get('failure_case', '?')})"
+            )
     except pa.errors.SchemaError as err:
         problems.append(f"{prefix}{err}")
 
@@ -257,21 +266,21 @@ VOTE_COUNTING_COLUMNS: list[str] = [
     "election_year",
     "election_date",
     "election_type",
-    "snapshot_seq",         # 1..n in last_updated order within the election (web pages only)
-    "last_updated",         # ISO local time (America/Denver) from the "Last Updated" box
-    "results_label",        # as published: "Official Results" / "Unofficial Results"
-    "is_final_snapshot",    # last_updated is the latest for this election + contest source
+    "snapshot_seq",  # 1..n in last_updated order within the election (web pages only)
+    "last_updated",  # ISO local time (America/Denver) from the "Last Updated" box
+    "results_label",  # as published: "Official Results" / "Unofficial Results"
+    "is_final_snapshot",  # last_updated is the latest for this election + contest source
     "contest",
-    "vote_for",             # "Vote for no more than N", when shown
+    "vote_for",  # "Vote for no more than N", when shown
     "contest_type",
     "candidate_or_option",
     "party",
     "is_write_in",
-    "votes",                # cumulative as of last_updated
-    "percent",              # as published
+    "votes",  # cumulative as of last_updated
+    "percent",  # as published
     "contest_total_votes",  # the card's TOTAL VOTES row
-    "vote_change",          # votes minus the previous snapshot's votes
-    "source_file",          # path under data/original/boulder-county/
+    "vote_change",  # votes minus the previous snapshot's votes
+    "source_file",  # path under data/original/boulder-county/
 ]
 
 VOTE_COUNTING_DTYPES: dict[str, str] = {
@@ -319,7 +328,7 @@ VOTE_COUNTING_SUMMARY_COLUMNS: list[str] = [
     "source_file",
     "source_sha256",
     "ocr_retrieved_at",
-    "extraction_quality",   # "datalab_ocr"
+    "extraction_quality",  # "datalab_ocr"
 ]
 
 VOTE_COUNTING_SUMMARY_DTYPES: dict[str, str] = {
@@ -327,12 +336,22 @@ VOTE_COUNTING_SUMMARY_DTYPES: dict[str, str] = {
     "election_year": "Int16",
     "snapshot_seq": "Int16",
     "is_final_snapshot": "boolean",
-    **{c: "Int64" for c in [
-        "total_registration", "active_registered_voters", "mail_ballots_distributed",
-        "property_owner_only_ballots_distributed", "expected_turnout", "mail_ballots",
-        "in_person_ballots", "property_owner_ballots", "total_ballots_counted",
-        "ballots_counted_change", "n_contests",
-    ]},
+    **{
+        c: "Int64"
+        for c in [
+            "total_registration",
+            "active_registered_voters",
+            "mail_ballots_distributed",
+            "property_owner_only_ballots_distributed",
+            "expected_turnout",
+            "mail_ballots",
+            "in_person_ballots",
+            "property_owner_ballots",
+            "total_ballots_counted",
+            "ballots_counted_change",
+            "n_contests",
+        ]
+    },
 }
 
 

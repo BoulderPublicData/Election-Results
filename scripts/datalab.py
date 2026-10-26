@@ -47,8 +47,13 @@ def _api_key() -> str:
     return key
 
 
-def convert(path: Path, *, mode: str = "accurate", output_format: str = "json",
-            mime: str = "application/pdf") -> dict[str, Any]:
+def convert(
+    path: Path,
+    *,
+    mode: str = "accurate",
+    output_format: str = "json",
+    mime: str = "application/pdf",
+) -> dict[str, Any]:
     """Convert one file and return the completed job payload.
 
     Raises DatalabError if the job fails or never completes.
@@ -66,7 +71,9 @@ def convert(path: Path, *, mode: str = "accurate", output_format: str = "json",
         try:
             with path.open("rb") as fh:
                 resp = requests.post(
-                    CONVERT_ENDPOINT, headers=headers, data=data,
+                    CONVERT_ENDPOINT,
+                    headers=headers,
+                    data=data,
                     files={"file": (path.name, fh, mime)},
                     timeout=config.HTTP_TIMEOUT,
                 )
@@ -76,9 +83,10 @@ def convert(path: Path, *, mode: str = "accurate", output_format: str = "json",
         except requests.RequestException as e:
             if attempt == SUBMIT_ATTEMPTS:
                 raise DatalabError(f"submit {path.name}: {e}") from e
-            wait = 2 ** attempt
-            log.warning("datalab.submit_retry", file=path.name, attempt=attempt,
-                        wait=wait, error=str(e))
+            wait = 2**attempt
+            log.warning(
+                "datalab.submit_retry", file=path.name, attempt=attempt, wait=wait, error=str(e)
+            )
             time.sleep(wait)
     assert resp is not None
     if resp.status_code != 200:

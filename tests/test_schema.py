@@ -69,7 +69,10 @@ def test_schema_version_is_semver():
 
 def test_required_columns_present():
     required = {
-        "election_year", "data_source", "contest", "candidate_or_option",
+        "election_year",
+        "data_source",
+        "contest",
+        "candidate_or_option",
         "extraction_quality",
     }
     assert required.issubset(COLUMNS)
@@ -82,10 +85,15 @@ def test_empty_frame_has_schema():
 
 
 def test_coerce_adds_missing_columns():
-    inp = pd.DataFrame({
-        "election_year": [2024], "contest": ["X"], "candidate_or_option": ["A"],
-        "data_source": ["boulder_county"], "extraction_quality": ["machine_readable"],
-    })
+    inp = pd.DataFrame(
+        {
+            "election_year": [2024],
+            "contest": ["X"],
+            "candidate_or_option": ["A"],
+            "data_source": ["boulder_county"],
+            "extraction_quality": ["machine_readable"],
+        }
+    )
     out = coerce(inp)
     assert list(out.columns) == COLUMNS
     assert out["precinct_id"].iloc[0] is pd.NA or pd.isna(out["precinct_id"].iloc[0])
@@ -127,10 +135,14 @@ def _well_formed_base() -> dict:
 
 def test_validate_allows_negative_votes_only_for_rcv():
     base = _well_formed_base()
-    base.update({
-        "election_year": 2023, "contest_type": "ranked_choice",
-        "candidate_or_option": "A | Round 2", "votes": -5,
-    })
+    base.update(
+        {
+            "election_year": 2023,
+            "contest_type": "ranked_choice",
+            "candidate_or_option": "A | Round 2",
+            "votes": -5,
+        }
+    )
     df = coerce(pd.DataFrame([base]))
     assert validate(df) == []  # negative RCV votes are OK
 
@@ -155,10 +167,16 @@ def test_provenance_record_from_meta_for_an_empty_frame():
     from scripts.schema import SourceMeta, coerce, provenance_record
 
     meta = SourceMeta(
-        election_year=2024, election_date="2024-11-05", election_type="general",
-        data_source="secretary_of_state", jurisdiction_level="state",
-        jurisdiction_name="Boulder County", source_file="t.xlsx", source_url="https://x",
-        retrieved_at="2026-05-23T18:30:07+00:00", extraction_quality="machine_readable",
+        election_year=2024,
+        election_date="2024-11-05",
+        election_type="general",
+        data_source="secretary_of_state",
+        jurisdiction_level="state",
+        jurisdiction_name="Boulder County",
+        source_file="t.xlsx",
+        source_url="https://x",
+        retrieved_at="2026-05-23T18:30:07+00:00",
+        extraction_quality="machine_readable",
     )
     df = coerce(add_provenance(pd.DataFrame(), meta, extraction_notes="turnout-only file"))
     assert df.empty

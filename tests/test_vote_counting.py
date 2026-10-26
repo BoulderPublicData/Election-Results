@@ -111,17 +111,20 @@ def test_split_title():
     assert split_title(["United States Senator"]) == ("United States Senator", None)
 
 
-@pytest.mark.parametrize("raw,expected", [
-    ("Mark Udall - Democratic", ("Mark Udall", "DEM", False)),
-    ("Hillary Clinton / Tim Kaine - Democratic", ("Hillary Clinton / Tim Kaine", "DEM", False)),
-    ("Willoughby - Unaffiliated - Write-in Candidate", ("Willoughby", "UAF", True)),
-    ("Mike Watson - Write-In", ("Mike Watson", pd.NA, True)),
-    ("Lynn Greer - Certified Write-in Candidate", ("Lynn Greer", pd.NA, True)),
-    ("YES/FOR", ("Yes", None, False)),
-    # Local questions' For/Against labels normalize to Yes/No, as in the SoV (#24).
-    ("Against the Measure", ("No", None, False)),
-    ("Nicole Speer", ("Nicole Speer", None, False)),
-])
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        ("Mark Udall - Democratic", ("Mark Udall", "DEM", False)),
+        ("Hillary Clinton / Tim Kaine - Democratic", ("Hillary Clinton / Tim Kaine", "DEM", False)),
+        ("Willoughby - Unaffiliated - Write-in Candidate", ("Willoughby", "UAF", True)),
+        ("Mike Watson - Write-In", ("Mike Watson", pd.NA, True)),
+        ("Lynn Greer - Certified Write-in Candidate", ("Lynn Greer", pd.NA, True)),
+        ("YES/FOR", ("Yes", None, False)),
+        # Local questions' For/Against labels normalize to Yes/No, as in the SoV (#24).
+        ("Against the Measure", ("No", None, False)),
+        ("Nicole Speer", ("Nicole Speer", None, False)),
+    ],
+)
 def test_split_candidate(raw, expected):
     name, party, write_in = split_candidate(raw)
     assert name == expected[0] and write_in == expected[2]
@@ -147,22 +150,38 @@ def test_cut_points_respect_gaps_and_limit():
 
 def test_stale_correction_raises(snap, tmp_path):
     shot = vc.Screenshot("2015-coordinated", 2015, "coordinated", vc.INPUT_DIR / "2015C" / "x.jpeg")
-    fixes = pd.DataFrame([{
-        "source_file": shot.source_file, "contest": "City of Boulder Ballot Question 2R "
-        "Compensation for Council Members", "candidate": "For the Measure", "field": "votes",
-        "ocr_value": "9999", "corrected_value": "1", "note": "",
-    }])
+    fixes = pd.DataFrame(
+        [
+            {
+                "source_file": shot.source_file,
+                "contest": "City of Boulder Ballot Question 2R Compensation for Council Members",
+                "candidate": "For the Measure",
+                "field": "votes",
+                "ocr_value": "9999",
+                "corrected_value": "1",
+                "note": "",
+            }
+        ]
+    )
     with pytest.raises(ValueError, match="did not apply"):
         vc.apply_corrections(shot, snap, fixes)
 
 
 def test_add_row_correction(snap):
     shot = vc.Screenshot("2015-coordinated", 2015, "coordinated", vc.INPUT_DIR / "2015C" / "x.jpeg")
-    fixes = pd.DataFrame([{
-        "source_file": shot.source_file, "contest": "Town Question 2C", "candidate": "",
-        "field": "add_row", "ocr_value": "YES/FOR 51,35 6.95%",
-        "corrected_value": "YES/FOR|64|100.00", "note": "",
-    }])
+    fixes = pd.DataFrame(
+        [
+            {
+                "source_file": shot.source_file,
+                "contest": "Town Question 2C",
+                "candidate": "",
+                "field": "add_row",
+                "ocr_value": "YES/FOR 51,35 6.95%",
+                "corrected_value": "YES/FOR|64|100.00",
+                "note": "",
+            }
+        ]
+    )
     applied, _ = vc.apply_corrections(shot, snap, fixes)
     assert applied == 1 and snap.unparsed == []
     assert snap.contests[-1].candidates[0]["votes"] == 64
@@ -178,8 +197,12 @@ def test_rcv_report():
     assert stamp == "2023-11-16T14:26:33"
     brockett = {r["round"]: r["votes"] for r in rows if r["raw"] == "Aaron Brockett"}
     assert brockett == {1: 11504, 2: 16823}
-    assert {r["raw"] for r in rows} == {"Aaron Brockett", "Nicole Speer", "Bob Yates",
-                                        "Paul Tweedlie"}
+    assert {r["raw"] for r in rows} == {
+        "Aaron Brockett",
+        "Nicole Speer",
+        "Bob Yates",
+        "Paul Tweedlie",
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -188,7 +211,8 @@ def test_rcv_report():
 
 needs_outputs = pytest.mark.skipif(
     not (vc.CONTESTS_CSV.exists() and vc.SUMMARY_CSV.exists() and vc.QA_CSV.exists()),
-    reason="vote-counting CSVs not built locally")
+    reason="vote-counting CSVs not built locally",
+)
 
 
 @needs_outputs
@@ -208,7 +232,8 @@ def test_candidate_votes_sum_to_contest_totals():
     df = pd.read_csv(vc.CONTESTS_CSV, low_memory=False)
     web = df[df["contest_type"] != "ranked_choice"]
     g = web.groupby(["source_file", "contest"]).agg(
-        votes=("votes", "sum"), total=("contest_total_votes", "first"))
+        votes=("votes", "sum"), total=("contest_total_votes", "first")
+    )
     assert (g["votes"] == g["total"]).all(), g[g["votes"] != g["total"]].head()
 
 
@@ -216,8 +241,11 @@ def test_candidate_votes_sum_to_contest_totals():
 def test_one_final_snapshot_per_election():
     s = pd.read_csv(vc.SUMMARY_CSV)
     assert (s.groupby("election_year")["is_final_snapshot"].sum() == 1).all()
-    assert s.groupby("election_year")["snapshot_seq"].apply(
-        lambda x: list(x) == list(range(1, len(x) + 1))).all()
+    assert (
+        s.groupby("election_year")["snapshot_seq"]
+        .apply(lambda x: list(x) == list(range(1, len(x) + 1)))
+        .all()
+    )
 
 
 @needs_outputs
@@ -244,13 +272,26 @@ def test_cache_covers_every_screenshot():
 def test_rcv_reports_sharing_a_timestamp_are_deduped():
     """#26: 2023 RCV reports 7, 8 and 9 share the final timestamp."""
     from scripts.vote_counting import _dedupe_rcv
+
     rows = []
     for f in ("(7).pdf", "(8).pdf", "(9).pdf"):
         for cand, v in (("Aaron Brockett | Final", 16823), ("Bob Yates | Final", 15592)):
-            rows.append({"source_file": f, "last_updated": "2023-11-16T14:26:33",
-                         "candidate_or_option": cand, "votes": v})
-    rows.append({"source_file": "(6).pdf", "last_updated": "2023-11-08T21:23:01",
-                 "candidate_or_option": "Aaron Brockett | Final", "votes": 16000})
+            rows.append(
+                {
+                    "source_file": f,
+                    "last_updated": "2023-11-16T14:26:33",
+                    "candidate_or_option": cand,
+                    "votes": v,
+                }
+            )
+    rows.append(
+        {
+            "source_file": "(6).pdf",
+            "last_updated": "2023-11-08T21:23:01",
+            "candidate_or_option": "Aaron Brockett | Final",
+            "votes": 16000,
+        }
+    )
     out, qa = _dedupe_rcv(pd.DataFrame(rows))
     final = out[out["last_updated"] == "2023-11-16T14:26:33"]
     assert final["source_file"].unique().tolist() == ["(9).pdf"]
@@ -262,17 +303,24 @@ def test_rcv_reports_sharing_a_timestamp_are_deduped():
 def test_election_flag_never_narrows_the_rebuild(monkeypatch):
     """#33: `--election 2016-general` used to rewrite the dataset with one election."""
     from scripts import vote_counting as vc
+
     seen = {}
     monkeypatch.setattr(vc, "discover", lambda election=None, suffix=".jpeg": [election])
-    monkeypatch.setattr(vc, "build", lambda shots: seen.setdefault("shots", shots) and
-                        (pd.DataFrame(), pd.DataFrame(), pd.DataFrame()))
+    monkeypatch.setattr(
+        vc,
+        "build",
+        lambda shots: (
+            seen.setdefault("shots", shots) and (pd.DataFrame(), pd.DataFrame(), pd.DataFrame())
+        ),
+    )
     monkeypatch.setattr(vc, "write_outputs", lambda *a: None)
     assert vc.main(["--election", "2016-general"]) == 0
-    assert seen["shots"] == [None]   # discover() with no filter
+    assert seen["shots"] == [None]  # discover() with no filter
 
 
 def test_committed_final_snapshots_have_unique_keys():
     from scripts.config import VOTE_COUNTING_CONTESTS_CSV
+
     if not VOTE_COUNTING_CONTESTS_CSV.exists():
         pytest.skip("vote-counting CSV not built")
     df = pd.read_csv(VOTE_COUNTING_CONTESTS_CSV, low_memory=False)
@@ -285,6 +333,7 @@ def test_election_keys_replace_folder_codes():
     """#34: one key format, `{year}-{type}`, shared with Cast-Vote-Records. The
     raw folders keep their names; the cache and CLI use the key."""
     from scripts.sources import election_key, parse_election_key
+
     assert election_key(2016, "general") == "2016-general"
     assert parse_election_key("2023-coordinated") == (2023, "coordinated")
     assert parse_election_key("2016G") == (2016, "general")  # legacy folder code
@@ -300,6 +349,7 @@ def test_election_keys_replace_folder_codes():
 
 def test_cache_folders_use_election_keys():
     from scripts.sources import parse_election_key
+
     if not vc.CACHE_DIR.exists():
         pytest.skip("no Datalab cache")
     for d in vc.CACHE_DIR.iterdir():

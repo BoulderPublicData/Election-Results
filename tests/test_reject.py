@@ -20,8 +20,13 @@ def _clear_buffer():
 def test_empty_drain_returns_well_typed_frame():
     out = drain()
     assert list(out.columns) == [
-        "source_file", "election_year", "data_source", "row_index",
-        "reason", "detail", "raw_row",
+        "source_file",
+        "election_year",
+        "data_source",
+        "row_index",
+        "reason",
+        "detail",
+        "raw_row",
     ]
     assert len(out) == 0
 
@@ -29,11 +34,13 @@ def test_empty_drain_returns_well_typed_frame():
 def test_drop_na_with_reject_filters_and_records():
     rej = Rejector(source_file="x.xlsx", election_year=2024, data_source="boulder_county")
     register(rej)
-    df = pd.DataFrame({
-        "precinct_id": ["100", None, "200"],
-        "contest": ["A", "A", None],
-        "votes": [10, 20, 30],
-    })
+    df = pd.DataFrame(
+        {
+            "precinct_id": ["100", None, "200"],
+            "contest": ["A", "A", None],
+            "votes": [10, 20, 30],
+        }
+    )
     out = rej.drop_na_with_reject(df, required=["precinct_id", "contest"])
     assert len(out) == 1
     assert out["precinct_id"].iloc[0] == "100"

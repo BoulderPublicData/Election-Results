@@ -39,8 +39,7 @@ def test_concept_for_presidential_electors_boulder():
 
 
 def test_concept_for_presidential_sos():
-    c = concept_for("President of the United States/Vice President",
-                    source="secretary_of_state")
+    c = concept_for("President of the United States/Vice President", source="secretary_of_state")
     assert c is not None
     assert c.name == "presidential_electors"
 
@@ -51,6 +50,7 @@ def test_concept_for_returns_none_on_unknown():
 
 def test_concept_for_handles_none_and_nan():
     import math
+
     assert concept_for(None) is None
     assert concept_for(math.nan) is None  # type: ignore[arg-type]
 
@@ -69,23 +69,32 @@ def test_county_commissioner_is_boulder_only():
     cc = by_name("county_commissioner")
     assert cc is not None
     assert cc.secretary_of_state_patterns == ()
-    assert concept_for("County Commissioner District 1",
-                       source="secretary_of_state") is None
+    assert concept_for("County Commissioner District 1", source="secretary_of_state") is None
 
 
 def test_presidential_patterns_skip_elector_measures():
-    assert concept_for("President/Vice President", source="secretary_of_state").name == \
-        "presidential_electors"
-    assert concept_for("PRESIDENTIAL ELECTORS/ PRESIDENTIAL ELECTORS (VICE)",
-                       source="secretary_of_state").name == "presidential_electors"
-    assert concept_for("Amend 36 Selection of Presidential Electors",
-                       source="secretary_of_state") is None
+    assert (
+        concept_for("President/Vice President", source="secretary_of_state").name
+        == "presidential_electors"
+    )
+    assert (
+        concept_for(
+            "PRESIDENTIAL ELECTORS/ PRESIDENTIAL ELECTORS (VICE)", source="secretary_of_state"
+        ).name
+        == "presidential_electors"
+    )
+    assert (
+        concept_for("Amend 36 Selection of Presidential Electors", source="secretary_of_state")
+        is None
+    )
 
 
 def test_us_representative_matches_boulder_titles():
-    for title in ("Representative to the 113th United States Congress - District 2",
-                  "REPRESENTATIVE TO THE US CONGRESS - DISTRICT 4",
-                  "Representative to the United States Congress - District 2"):
+    for title in (
+        "Representative to the 113th United States Congress - District 2",
+        "REPRESENTATIVE TO THE US CONGRESS - DISTRICT 4",
+        "Representative to the United States Congress - District 2",
+    ):
         assert concept_for(title, source="boulder_county").name == "us_representative"
 
 
@@ -93,6 +102,7 @@ def _contests_by_source():
     import pandas as pd
 
     from scripts.config import STATEMENTS_OF_VOTES
+
     files = sorted(STATEMENTS_OF_VOTES.glob("[0-9]*.csv"))
     if not files:
         return None
@@ -110,14 +120,20 @@ def test_every_concept_matches_a_contest_in_each_source_it_claims():
     import re
 
     import pytest
+
     contests = _contests_by_source()
     if contests is None:
         pytest.skip("processed CSVs not present; run the pipeline first")
     for c in CONCEPTS:
-        for source, pats in (("boulder_county", c.boulder_county_patterns),
-                             ("secretary_of_state", c.secretary_of_state_patterns)):
+        for source, pats in (
+            ("boulder_county", c.boulder_county_patterns),
+            ("secretary_of_state", c.secretary_of_state_patterns),
+        ):
             if not pats:
                 continue
-            hits = [t for t in contests.get(source, ())
-                    if any(re.search(p, t, re.IGNORECASE) for p in pats)]
+            hits = [
+                t
+                for t in contests.get(source, ())
+                if any(re.search(p, t, re.IGNORECASE) for p in pats)
+            ]
             assert hits, f"{c.name} matches no {source} contest"

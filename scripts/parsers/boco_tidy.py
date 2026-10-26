@@ -36,10 +36,14 @@ from .common import (
 # Per-year column name → canonical name aliases.
 # After clean_cols() collapses whitespace/newlines, we map known variants here.
 _PRECINCT_LONG_ALIASES = {
-    "Precinct Name", "Precinct Name (Long)", "Precinct Number",
+    "Precinct Name",
+    "Precinct Name (Long)",
+    "Precinct Number",
 }
 _PRECINCT_SHORT_ALIASES = {
-    "Precinct Name (Short)", "Precinct Name Short", "Precinct Name(Short)",
+    "Precinct Name (Short)",
+    "Precinct Name Short",
+    "Precinct Name(Short)",
     "Precinct Code",
 }
 _CONTEST_ALIASES = {"Contest Title", "Contest Name"}
@@ -98,9 +102,7 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
 
         out = pd.DataFrame()
         out["precinct_id"] = (df[p_long] if p_long else df[p_short]).map(precinct_id_str)
-        out["precinct_name"] = (
-            df[p_short].map(precinct_id_str) if p_short else pd.NA
-        )
+        out["precinct_name"] = df[p_short].map(precinct_id_str) if p_short else pd.NA
         if p_long and p_short:
             # "Property Owner" rows (2023, 2025): ballots cast by non-resident
             # property owners in special-district elections. They carry a
@@ -109,11 +111,14 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
             # came up short of the certified SoV.
             short = df[p_short].astype("string").str.strip()
             pseudo = out["precinct_id"].isna() & short.str.fullmatch(
-                r"property owners?", case=False).fillna(False)
+                r"property owners?", case=False
+            ).fillna(False)
             if pseudo.any():
                 out.loc[pseudo, "precinct_id"] = "Property Owner"
-                notes.append("includes 'Property Owner' pseudo-precinct rows (property-owner "
-                             "ballots in special-district contests; no precinct geography)")
+                notes.append(
+                    "includes 'Property Owner' pseudo-precinct rows (property-owner "
+                    "ballots in special-district contests; no precinct geography)"
+                )
         out["contest"] = df[contest].astype("string").str.strip()
         out["candidate_or_option"] = df[choice].map(normalize_choice).astype("string").str.strip()
         out["party"] = df[party].map(normalize_party) if party else pd.NA
@@ -126,7 +131,11 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
             # (precinct, contest, candidate, round) tally. Encode round in
             # candidate_or_option as 'Candidate Name | Round N' to keep one
             # canonical schema.
-            round_cols = [c for c in df.columns if c.lower().startswith("round ") and c.lower().endswith(" votes")]
+            round_cols = [
+                c
+                for c in df.columns
+                if c.lower().startswith("round ") and c.lower().endswith(" votes")
+            ]
             if round_cols:
                 rounds = []
                 for rc in round_cols:
@@ -152,7 +161,8 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
             )
         else:
             out["contest_type"] = [
-                infer_contest_type(c, ch) for c, ch in zip(out["contest"], out["candidate_or_option"], strict=True)
+                infer_contest_type(c, ch)
+                for c, ch in zip(out["contest"], out["candidate_or_option"], strict=True)
             ]
 
         # Reject rows with missing required fields (was a silent dropna).
@@ -166,14 +176,19 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
         )
         out = out.drop(columns=["_row_index"])
         # Strip totals rows (these are display-only summaries, not data).
-        out = out[~out["precinct_id"].astype("string").str.lower().isin(
-            {"total", "totals", "grand total", "summary", "nan", ""}
-        )]
+        out = out[
+            ~out["precinct_id"]
+            .astype("string")
+            .str.lower()
+            .isin({"total", "totals", "grand total", "summary", "nan", ""})
+        ]
 
         # Composite precinct flag (2015, 2022)
         if out["precinct_id"].astype("string").str.contains(",", na=False).any():
-            notes.append("contains composite precinct IDs (multiple precincts joined, "
-                         "comma-separated); votes are reported for the combined unit")
+            notes.append(
+                "contains composite precinct IDs (multiple precincts joined, "
+                "comma-separated); votes are reported for the combined unit"
+            )
 
         frames.append(out)
 

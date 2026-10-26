@@ -70,7 +70,9 @@ def to_tiled_pdf(path: Path) -> tuple[bytes, list[int]]:
     """Return (pdf_bytes, cut_points) for one screenshot."""
     im = Image.open(path).convert("RGB")
     cuts = cut_points(im.height, gap_midpoints(im))
-    pages = [im.crop((0, top, im.width, bottom)) for top, bottom in zip(cuts, cuts[1:], strict=False)]
+    pages = [
+        im.crop((0, top, im.width, bottom)) for top, bottom in zip(cuts, cuts[1:], strict=False)
+    ]
     buf = io.BytesIO()
     pages[0].save(buf, format="PDF", save_all=True, append_images=pages[1:], resolution=150)
     return buf.getvalue(), cuts

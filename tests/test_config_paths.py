@@ -6,10 +6,14 @@ from scripts import config
 def test_sov_outputs_live_under_statements_of_votes():
     sov = config.PROCESSED / "statements-of-votes"
     assert config.STATEMENTS_OF_VOTES == sov
-    assert config.sov_csv_path(2023, "coordinated", "boulder_county") == \
-        sov / "2023-coordinated-boulder-county.csv"
-    assert config.sov_csv_path(2020, "general", "secretary_of_state") == \
-        sov / "2020-general-secretary-of-state.csv"
+    assert (
+        config.sov_csv_path(2023, "coordinated", "boulder_county")
+        == sov / "2023-coordinated-boulder-county.csv"
+    )
+    assert (
+        config.sov_csv_path(2020, "general", "secretary_of_state")
+        == sov / "2020-general-secretary-of-state.csv"
+    )
     assert config.PROVENANCE_CSV.parent == sov
     assert config.COMBINED_CSV.parent == sov
 
@@ -33,8 +37,9 @@ def _config_paths(env_value):
         "print(c.DATA, c.ORIGINAL, c.STATEMENTS_OF_VOTES, c.VOTE_COUNTING, c.AUDIT, "
         "c.display_path(c.PROVENANCE_CSV), sep='\\n')"
     )
-    out = subprocess.run([sys.executable, "-c", code], cwd=root, env=env,
-                         capture_output=True, text=True, check=True)
+    out = subprocess.run(
+        [sys.executable, "-c", code], cwd=root, env=env, capture_output=True, text=True, check=True
+    )
     return root, out.stdout.splitlines()
 
 

@@ -82,7 +82,9 @@ def get(url: str, **kwargs: Any) -> requests.Response:
     # 429 + 5xx are worth retrying.
     if resp.status_code == 429 or 500 <= resp.status_code < 600:
         log.warning(
-            "http.transient_status", url=url, status=resp.status_code,
+            "http.transient_status",
+            url=url,
+            status=resp.status_code,
             from_cache=getattr(resp, "from_cache", False),
         )
         raise _Transient(f"HTTP {resp.status_code} from {url}")

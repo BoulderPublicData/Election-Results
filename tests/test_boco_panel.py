@@ -19,8 +19,12 @@ from scripts.schema import SourceMeta
 
 WIDTH = 26
 META_HEADERS = {
-    0: "Precinct", 4: "Absentee\nVoting\nBallots\nCast", 6: "Early\nVoting\nBallots\nCast",
-    8: "Election\nDay\nBallots\nCast", 10: "Total\nBallots Cast", 12: "Registered\nVoters",
+    0: "Precinct",
+    4: "Absentee\nVoting\nBallots\nCast",
+    6: "Early\nVoting\nBallots\nCast",
+    8: "Election\nDay\nBallots\nCast",
+    10: "Total\nBallots Cast",
+    12: "Registered\nVoters",
     14: "Percent\nTurnout",
 }
 
@@ -53,29 +57,50 @@ def _data(precinct, values: list[object]) -> list[object]:
 
 def _sheet() -> pd.DataFrame:
     rows = _banner("UNITED STATES SENATOR")
-    rows.append(_row({**META_HEADERS, 15: "\nBob Schaffer Republican", 17: "\nMark Udall Democratic",
-                      19: "REP\nKen Buck", 21: "\nBruce E. Lohmiller - GRN", 25: "Continued"}))
+    rows.append(
+        _row(
+            {
+                **META_HEADERS,
+                15: "\nBob Schaffer Republican",
+                17: "\nMark Udall Democratic",
+                19: "REP\nKen Buck",
+                21: "\nBruce E. Lohmiller - GRN",
+                25: "Continued",
+            }
+        )
+    )
     rows.append(_data("001", ["236", "35", 52.0, "323", 426, 75.8, 129, 191, 0, 1]))
-    rows.append(_row({0: "002"}))                     # precinct printed alone…
+    rows.append(_row({0: "002"}))  # precinct printed alone…
     rows.append(_row({}))
-    rows.append(_data(None, ["365", "27", 131.0, "523", 649, 80.6, 181, 331, 0, 2]))  # …values below
+    rows.append(
+        _data(None, ["365", "27", 131.0, "523", 649, 80.6, 181, 331, 0, 2])
+    )  # …values below
     rows.append(_data("FMFPD", ["29", "0", 0.0, "29", 0, 0, 10, 19, 0, 0]))
-    rows.append(_row({0: "Totals:", 4: 630, 6: 62, 8: 183, 10: 875, 12: 1075,
-                      14: 320, 15: 541, 16: 0, 17: 3}))
+    rows.append(
+        _row(
+            {0: "Totals:", 4: 630, 6: 62, 8: 183, 10: 875, 12: 1075, 14: 320, 15: 541, 16: 0, 17: 3}
+        )
+    )
     rows += _banner("CITY OF BOULDER BALLOT QUESTION 2A")
     rows.append(_row({**META_HEADERS, 15: "\nFOR THE MEASURE", 17: "\nAGAINST THE MEASURE"}))
     rows.append(_data("001", ["236", "35", 52.0, "323", 426, 75.8, 200, 100]))
-    rows.append(_data("003", ["10", "1", 2.0]))       # too short: rejected, not guessed
+    rows.append(_data("003", ["10", "1", 2.0]))  # too short: rejected, not guessed
     rows.append(_row({0: "Totals:", 4: 236, 6: 35, 8: 52, 10: 323, 12: 426, 14: 200, 15: 100}))
     return pd.DataFrame(rows)
 
 
 def _meta() -> SourceMeta:
     return SourceMeta(
-        election_year=2008, election_date="2008-11-04", election_type="general",
-        data_source="boulder_county", jurisdiction_level="county",
-        jurisdiction_name="Boulder County", source_file="panel.xlsx", source_url="x",
-        retrieved_at="2026-01-01T00:00:00+00:00", extraction_quality="machine_readable",
+        election_year=2008,
+        election_date="2008-11-04",
+        election_type="general",
+        data_source="boulder_county",
+        jurisdiction_level="county",
+        jurisdiction_name="Boulder County",
+        source_file="panel.xlsx",
+        source_url="x",
+        retrieved_at="2026-01-01T00:00:00+00:00",
+        extraction_quality="machine_readable",
     )
 
 
@@ -149,27 +174,53 @@ def test_short_row_goes_to_reject_port(parsed):
     assert rejected["reason"].tolist() == ["panel_row_width_mismatch"]
 
 
-@pytest.mark.parametrize(("label", "year", "expected"), [
-    ("\nJohn McCain /  Sarah Palin Republican", 2008, ("John McCain / Sarah Palin", "REP")),
-    ("\nGene C. Amondson /  Leroy J. Pletten  Prohibition", 2008,
-     ("Gene C. Amondson / Leroy J. Pletten", "PRB")),
-    ("\nBrian Moore /  Stewart A. Alexander Socialist, USA", 2008,
-     ("Brian Moore / Stewart A. Alexander", "SPU")),          # was party "USA"
-    ("\nAlan Keyes /  Brian Rohrbough America's ", 2008, ("Alan Keyes / Brian Rohrbough", "AMI")),
-    ("\nDouglas \"Dayhorse\" Campbell American Constitution", 2008,
-     ("Douglas \"Dayhorse\" Campbell", "ACN")),
-    ("REP\nKen Buck", 2010, ("Ken Buck", "REP")),
-    ("\nMichele M. Newman - UAF", 2010, ("Michele M. Newman", "UAF")),  # was "Michele M. Newman -"
-    ("\nWillie Travis Chambers / Ed E. Coron - DEM / REP", 2010,
-     ("Willie Travis Chambers / Ed E. Coron", "DEM / REP")),
-    ("Barack Obama /  Joe Biden    Democratic", 2012, ("Barack Obama / Joe Biden", "DEM")),
-    ("Tom Hoefling /  Jonathan D. Ellis    America's", 2012,
-     ("Tom Hoefling / Jonathan D. Ellis", "AMP")),
-    ("\nFOR THE MEASURE", 2011, ("Yes", None)),
-    ("   Against the measure", 2011, ("No", None)),
-    ("\nLee Kemp", 2008, ("Lee Kemp", None)),
-    ("   Mark Gelband", 2011, ("Mark Gelband", None)),
-])
+@pytest.mark.parametrize(
+    ("label", "year", "expected"),
+    [
+        ("\nJohn McCain /  Sarah Palin Republican", 2008, ("John McCain / Sarah Palin", "REP")),
+        (
+            "\nGene C. Amondson /  Leroy J. Pletten  Prohibition",
+            2008,
+            ("Gene C. Amondson / Leroy J. Pletten", "PRB"),
+        ),
+        (
+            "\nBrian Moore /  Stewart A. Alexander Socialist, USA",
+            2008,
+            ("Brian Moore / Stewart A. Alexander", "SPU"),
+        ),  # was party "USA"
+        (
+            "\nAlan Keyes /  Brian Rohrbough America's ",
+            2008,
+            ("Alan Keyes / Brian Rohrbough", "AMI"),
+        ),
+        (
+            '\nDouglas "Dayhorse" Campbell American Constitution',
+            2008,
+            ('Douglas "Dayhorse" Campbell', "ACN"),
+        ),
+        ("REP\nKen Buck", 2010, ("Ken Buck", "REP")),
+        (
+            "\nMichele M. Newman - UAF",
+            2010,
+            ("Michele M. Newman", "UAF"),
+        ),  # was "Michele M. Newman -"
+        (
+            "\nWillie Travis Chambers / Ed E. Coron - DEM / REP",
+            2010,
+            ("Willie Travis Chambers / Ed E. Coron", "DEM / REP"),
+        ),
+        ("Barack Obama /  Joe Biden    Democratic", 2012, ("Barack Obama / Joe Biden", "DEM")),
+        (
+            "Tom Hoefling /  Jonathan D. Ellis    America's",
+            2012,
+            ("Tom Hoefling / Jonathan D. Ellis", "AMP"),
+        ),
+        ("\nFOR THE MEASURE", 2011, ("Yes", None)),
+        ("   Against the measure", 2011, ("No", None)),
+        ("\nLee Kemp", 2008, ("Lee Kemp", None)),
+        ("   Mark Gelband", 2011, ("Mark Gelband", None)),
+    ],
+)
 def test_split_party(label, year, expected):
     name, party = split_party(label, year)
     assert name == expected[0]

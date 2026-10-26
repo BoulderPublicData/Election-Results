@@ -94,9 +94,14 @@ def audit_frame(df: pd.DataFrame, stem: str, *, provenance: dict | None = None) 
 
     top = (
         df.groupby("contest", dropna=False)["_votes"]
-        .sum().sort_values(ascending=False).head(10).reset_index()
+        .sum()
+        .sort_values(ascending=False)
+        .head(10)
+        .reset_index()
     )
-    top_rows = [{"contest": r["contest"], "total_votes": f"{int(r['_votes']):,}"} for _, r in top.iterrows()]
+    top_rows = [
+        {"contest": r["contest"], "total_votes": f"{int(r['_votes']):,}"} for _, r in top.iterrows()
+    ]
     party_counts = df["party"].fillna("(none)").value_counts().head(8).to_dict()
 
     parts = [
@@ -131,30 +136,41 @@ def audit_file(csv_path: Path, *, provenance_lookup: dict | None = None) -> str:
     lookup = provenance_lookup if provenance_lookup is not None else _provenance_lookup()
     prov = None
     if not df.empty:
-        key = (str(df["election_year"].iloc[0]),
-               str(df["election_type"].iloc[0]),
-               str(df["data_source"].iloc[0]))
+        key = (
+            str(df["election_year"].iloc[0]),
+            str(df["election_type"].iloc[0]),
+            str(df["data_source"].iloc[0]),
+        )
         prov = lookup.get(key)
     return audit_frame(df, csv_path.stem, provenance=prov)
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--out", type=Path, default=AUDIT_SUMMARY_MD,
-                    help="Concatenated audit output (default: data/audit/summary.md, "
-                         "rebuilt from every per-file fragment so auditing a few "
-                         "CSVs never drops the others' sections)")
-    ap.add_argument("csv", nargs="*", type=Path,
-                    help="Specific CSVs (default: every per-year CSV in "
-                         "data/processed/statements-of-votes/ "
-                         "except provenance.csv and all-elections-tidy.csv)")
+    ap.add_argument(
+        "--out",
+        type=Path,
+        default=AUDIT_SUMMARY_MD,
+        help="Concatenated audit output (default: data/audit/summary.md, "
+        "rebuilt from every per-file fragment so auditing a few "
+        "CSVs never drops the others' sections)",
+    )
+    ap.add_argument(
+        "csv",
+        nargs="*",
+        type=Path,
+        help="Specific CSVs (default: every per-year CSV in "
+        "data/processed/statements-of-votes/ "
+        "except provenance.csv and all-elections-tidy.csv)",
+    )
     args = ap.parse_args(argv)
 
     if args.csv:
         csvs = args.csv
     else:
-        csvs = [p for p in sorted(STATEMENTS_OF_VOTES.glob("[0-9]*.csv"))
-                if p.name != "provenance.csv"]
+        csvs = [
+            p for p in sorted(STATEMENTS_OF_VOTES.glob("[0-9]*.csv")) if p.name != "provenance.csv"
+        ]
     if not csvs:
         print(f"No CSVs found under {STATEMENTS_OF_VOTES}", file=sys.stderr)
         return 2
@@ -173,6 +189,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.out == AUDIT_SUMMARY_MD:
         from .shared_outputs import rebuild_audit_summary
+
         n = rebuild_audit_summary(AUDIT_DIR, args.out)
     else:
         args.out.write_text("\n".join(fragments))

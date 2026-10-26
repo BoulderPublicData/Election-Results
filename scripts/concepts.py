@@ -41,12 +41,12 @@ from dataclasses import asdict, dataclass, field
 
 @dataclass(frozen=True)
 class Concept:
-    name: str                          # snake_case canonical id
-    description: str                   # one line
+    name: str  # snake_case canonical id
+    description: str  # one line
     boulder_county_patterns: tuple[str, ...] = field(default_factory=tuple)
     secretary_of_state_patterns: tuple[str, ...] = field(default_factory=tuple)
-    caveats: str = ""                  # what's NOT comparable across sources
-    tier: str = "federal"              # federal / state / county / city / district
+    caveats: str = ""  # what's NOT comparable across sources
+    tier: str = "federal"  # federal / state / county / city / district
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -59,7 +59,7 @@ CONCEPTS: tuple[Concept, ...] = (
         description="Electors for President and Vice President of the United States.",
         boulder_county_patterns=(r"^Presidential Electors", r"^President.*Vice President"),
         secretary_of_state_patterns=(
-            r"^Presidential Electors",          # 2004, 2008 ("…/ PRESIDENTIAL ELECTORS (VICE)")
+            r"^Presidential Electors",  # 2004, 2008 ("…/ PRESIDENTIAL ELECTORS (VICE)")
             r"^President\s*/\s*Vice President",  # 2012-2020
             r"^President of the United States",
         ),
@@ -86,7 +86,7 @@ CONCEPTS: tuple[Concept, ...] = (
     Concept(
         name="us_representative",
         description="United States Representative — Boulder is mostly in CO-2, "
-                    "with a small piece historically in CO-4.",
+        "with a small piece historically in CO-4.",
         boulder_county_patterns=(
             # "Representative to the 113th United States Congress - District 2",
             # "Representative to the United States Congress - District 4",
@@ -250,12 +250,10 @@ CONCEPTS: tuple[Concept, ...] = (
 # returns the right concept even when the same contest name happens to match
 # multiple concepts (rare, but defensive).
 _BOCO_PATTERNS: list[tuple[re.Pattern, Concept]] = [
-    (re.compile(pat, re.IGNORECASE), c)
-    for c in CONCEPTS for pat in c.boulder_county_patterns
+    (re.compile(pat, re.IGNORECASE), c) for c in CONCEPTS for pat in c.boulder_county_patterns
 ]
 _SOS_PATTERNS: list[tuple[re.Pattern, Concept]] = [
-    (re.compile(pat, re.IGNORECASE), c)
-    for c in CONCEPTS for pat in c.secretary_of_state_patterns
+    (re.compile(pat, re.IGNORECASE), c) for c in CONCEPTS for pat in c.secretary_of_state_patterns
 ]
 
 

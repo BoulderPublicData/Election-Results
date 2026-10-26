@@ -10,8 +10,13 @@ import pytest
 from scripts import fetch
 from scripts.sources import Source
 
-SRC = Source(2025, "coordinated", "boulder_county", "https://example.invalid/sov.xlsx",
-             "2025-coordinated-sov.xlsx")
+SRC = Source(
+    2025,
+    "coordinated",
+    "boulder_county",
+    "https://example.invalid/sov.xlsx",
+    "2025-coordinated-sov.xlsx",
+)
 
 
 @pytest.fixture
@@ -26,6 +31,7 @@ def env(tmp_path, monkeypatch):
     def fake_get(url, **kw):
         calls.append(url)
         return b"downloaded"
+
     monkeypatch.setattr(fetch.http, "get_bytes", fake_get)
     return manifest, raw, calls
 

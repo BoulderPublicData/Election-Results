@@ -142,6 +142,7 @@ def discover(election: str | None = None, suffix: str = ".jpeg") -> list[Screens
 # Stage 1: OCR (cached)
 # ---------------------------------------------------------------------------
 
+
 def load_cached(shot: Screenshot) -> dict | None:
     """Return the cached Datalab record if it exists *and* matches the image."""
     if not shot.cache_path.exists():
@@ -225,8 +226,15 @@ QA_COLUMNS = ["source_file", "last_updated", "contest", "candidate", "check", "d
 INFO_CHECKS = {"duplicate_dropped", "votes_decreased"}
 
 
-CORRECTION_COLUMNS = ["source_file", "contest", "candidate", "field",
-                      "ocr_value", "corrected_value", "note"]
+CORRECTION_COLUMNS = [
+    "source_file",
+    "contest",
+    "candidate",
+    "field",
+    "ocr_value",
+    "corrected_value",
+    "note",
+]
 
 
 def load_corrections() -> pd.DataFrame:
@@ -266,8 +274,9 @@ def _int_or_none(text: str) -> int | None:
     return int(text.replace(",", "")) if text.strip() else None
 
 
-def apply_corrections(shot: Screenshot, snap: Snapshot,
-                      fixes: pd.DataFrame) -> tuple[int, list[tuple[str, str, str]]]:
+def apply_corrections(
+    shot: Screenshot, snap: Snapshot, fixes: pd.DataFrame
+) -> tuple[int, list[tuple[str, str, str]]]:
     """Mutate `snap` in place. Returns (applied count, accepted QA keys) where
     an accepted key is (contest, candidate, check)."""
     # Value fixes first, renames last, so every row can name the contest /
@@ -297,9 +306,13 @@ def apply_corrections(shot: Screenshot, snap: Snapshot,
                 contest.total_votes, hit = int(fix.corrected_value), True
             elif fix.field == "add_row":
                 name, votes, pct = fix.corrected_value.split("|")
-                contest.candidates.append({
-                    "raw": name.strip(), "votes": _int_or_none(votes),
-                    "percent": float(pct) if pct.strip() else None})
+                contest.candidates.append(
+                    {
+                        "raw": name.strip(),
+                        "votes": _int_or_none(votes),
+                        "percent": float(pct) if pct.strip() else None,
+                    }
+                )
                 hit = True
             elif fix.field == "drop_row":
                 keep = [c for c in contest.candidates if c["raw"] != fix.ocr_value]
@@ -334,12 +347,20 @@ def snapshot_rows(shot: Screenshot, snap: Snapshot) -> list[dict]:
         parsed = [(c, *split_candidate(c["raw"])) for c in contest.candidates]
         ctype = _contest_type(title, [p[1] for p in parsed])
         for cand, name, party, write_in in parsed:
-            rows.append({
-                "contest": title, "vote_for": vote_for, "contest_type": ctype,
-                "candidate_or_option": name, "party": party, "is_write_in": write_in,
-                "votes": cand["votes"], "percent": cand["percent"],
-                "contest_total_votes": contest.total_votes, "_raw_candidate": cand["raw"],
-            })
+            rows.append(
+                {
+                    "contest": title,
+                    "vote_for": vote_for,
+                    "contest_type": ctype,
+                    "candidate_or_option": name,
+                    "party": party,
+                    "is_write_in": write_in,
+                    "votes": cand["votes"],
+                    "percent": cand["percent"],
+                    "contest_total_votes": contest.total_votes,
+                    "_raw_candidate": cand["raw"],
+                }
+            )
     return rows
 
 
@@ -348,9 +369,16 @@ def qa_snapshot(shot: Screenshot, snap: Snapshot) -> list[dict]:
     issues: list[dict] = []
 
     def issue(check: str, contest: str = "", candidate: str = "", detail: str = "") -> None:
-        issues.append({"source_file": shot.source_file, "last_updated": snap.last_updated,
-                       "contest": contest, "candidate": candidate,
-                       "check": check, "detail": detail})
+        issues.append(
+            {
+                "source_file": shot.source_file,
+                "last_updated": snap.last_updated,
+                "contest": contest,
+                "candidate": candidate,
+                "check": check,
+                "detail": detail,
+            }
+        )
 
     if snap.last_updated is None:
         issue("missing_last_updated")
@@ -370,17 +398,24 @@ def qa_snapshot(shot: Screenshot, snap: Snapshot) -> list[dict]:
             continue
         total = sum(c["votes"] for c in contest.candidates if c["votes"] is not None)
         if total != contest.total_votes:
-            issue("sum_mismatch", title,
-                  detail=f"candidates sum {total:,} vs TOTAL VOTES {contest.total_votes:,} "
-                         f"(delta {total - contest.total_votes:+,})")
+            issue(
+                "sum_mismatch",
+                title,
+                detail=f"candidates sum {total:,} vs TOTAL VOTES {contest.total_votes:,} "
+                f"(delta {total - contest.total_votes:+,})",
+            )
         for c in contest.candidates:
             if c["votes"] is None or c["percent"] is None:
                 continue
             expected = 100 * c["votes"] / contest.total_votes if contest.total_votes else 0.0
             if abs(expected - c["percent"]) > PCT_TOLERANCE:
-                issue("percent_mismatch", title, c["raw"],
-                      detail=f"published {c['percent']:.2f}% vs computed {expected:.2f}% "
-                             f"({c['votes']:,} / {contest.total_votes:,})")
+                issue(
+                    "percent_mismatch",
+                    title,
+                    c["raw"],
+                    detail=f"published {c['percent']:.2f}% vs computed {expected:.2f}% "
+                    f"({c['votes']:,} / {contest.total_votes:,})",
+                )
     return issues
 
 
@@ -392,15 +427,25 @@ def _rcv_frame() -> pd.DataFrame:
         for r in recs:
             suffix = [f"Round {r['round']}"] + (["Final"] if r["final"] else [])
             for sfx in suffix:
-                rows.append({
-                    "election_key": pdf.election_key, "election_year": pdf.election_year,
-                    "election_type": pdf.election_type, "last_updated": stamp,
-                    "results_label": "RCV Short Report", "contest": RCV_CONTEST,
-                    "vote_for": 1, "contest_type": "ranked_choice",
-                    "candidate_or_option": f"{r['raw']} | {sfx}", "party": pd.NA,
-                    "is_write_in": False, "votes": r["votes"], "percent": r["percent"],
-                    "contest_total_votes": pd.NA, "source_file": pdf.source_file,
-                })
+                rows.append(
+                    {
+                        "election_key": pdf.election_key,
+                        "election_year": pdf.election_year,
+                        "election_type": pdf.election_type,
+                        "last_updated": stamp,
+                        "results_label": "RCV Short Report",
+                        "contest": RCV_CONTEST,
+                        "vote_for": 1,
+                        "contest_type": "ranked_choice",
+                        "candidate_or_option": f"{r['raw']} | {sfx}",
+                        "party": pd.NA,
+                        "is_write_in": False,
+                        "votes": r["votes"],
+                        "percent": r["percent"],
+                        "contest_total_votes": pd.NA,
+                        "source_file": pdf.source_file,
+                    }
+                )
     return pd.DataFrame(rows)
 
 
@@ -414,8 +459,13 @@ def build(shots: list[Screenshot]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataF
     for shot in shots:
         rec = load_cached(shot)
         if rec is None:
-            qa_rows.append({"source_file": shot.source_file, "check": "not_ocred",
-                            "detail": "no cached Datalab response; run with --ocr"})
+            qa_rows.append(
+                {
+                    "source_file": shot.source_file,
+                    "check": "not_ocred",
+                    "detail": "no cached Datalab response; run with --ocr",
+                }
+            )
             continue
         snap = parse_snapshot(rec["markdown"])
         applied, accepted = apply_corrections(shot, snap, fixes)
@@ -424,24 +474,40 @@ def build(shots: list[Screenshot]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataF
             key = (row["contest"], row["candidate"], row["check"])
             row["status"] = "accepted" if key in accepted else "open"
             qa_rows.append(row)
-        base = {"election_key": shot.election_key, "election_year": shot.election_year,
-                "election_type": shot.election_type, "last_updated": snap.last_updated,
-                "results_label": snap.results_label, "source_file": shot.source_file}
+        base = {
+            "election_key": shot.election_key,
+            "election_year": shot.election_year,
+            "election_type": shot.election_type,
+            "last_updated": snap.last_updated,
+            "results_label": snap.results_label,
+            "source_file": shot.source_file,
+        }
         for r in snapshot_rows(shot, snap):
             contest_rows.append({**base, **r})
-        summary_rows.append({
-            **base, **snap.summary,
-            "n_contests": len(snap.contests),
-            "summary_notes": " | ".join(snap.summary_notes) or pd.NA,
-            "source_sha256": rec["source_sha256"],
-            "ocr_retrieved_at": rec["retrieved_at"],
-            "extraction_quality": "datalab_ocr",
-        })
+        summary_rows.append(
+            {
+                **base,
+                **snap.summary,
+                "n_contests": len(snap.contests),
+                "summary_notes": " | ".join(snap.summary_notes) or pd.NA,
+                "source_sha256": rec["source_sha256"],
+                "ocr_retrieved_at": rec["retrieved_at"],
+                "extraction_quality": "datalab_ocr",
+            }
+        )
         for label, value in snap.other_fields.items():
-            qa_rows.append({"source_file": shot.source_file, "last_updated": snap.last_updated,
-                            "check": "unmapped_summary_field", "detail": f"{label} = {value}"})
-    print(f"parsed {len(summary_rows)} snapshots, {len(contest_rows):,} rows; "
-          f"applied {n_fixes} corrections")
+            qa_rows.append(
+                {
+                    "source_file": shot.source_file,
+                    "last_updated": snap.last_updated,
+                    "check": "unmapped_summary_field",
+                    "detail": f"{label} = {value}",
+                }
+            )
+    print(
+        f"parsed {len(summary_rows)} snapshots, {len(contest_rows):,} rows; "
+        f"applied {n_fixes} corrections"
+    )
 
     contests = pd.DataFrame(contest_rows)
     summary = pd.DataFrame(summary_rows)
@@ -456,7 +522,8 @@ def build(shots: list[Screenshot]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataF
     contests["_order"] = range(len(contests))  # page order within a snapshot
     summary = _sequence(summary)
     contests = contests.merge(
-        summary[["source_file", "snapshot_seq"]], on="source_file", how="left")
+        summary[["source_file", "snapshot_seq"]], on="source_file", how="left"
+    )
     contests = _finalize_contests(contests)
     summary = _finalize_summary(summary)
     qa = pd.DataFrame(qa_rows, columns=QA_COLUMNS)
@@ -485,14 +552,28 @@ def _dedupe(contests: pd.DataFrame, summary: pd.DataFrame):
             cmp = contests.loc[contests["source_file"] == other, value_cols].reset_index(drop=True)
             if ref.equals(cmp):
                 drop.add(other)
-                qa.append({"source_file": other, "last_updated": ts, "check": "duplicate_dropped",
-                           "detail": f"identical to {keep}"})
+                qa.append(
+                    {
+                        "source_file": other,
+                        "last_updated": ts,
+                        "check": "duplicate_dropped",
+                        "detail": f"identical to {keep}",
+                    }
+                )
             else:
-                qa.append({"source_file": other, "last_updated": ts,
-                           "check": "duplicate_timestamp_conflict",
-                           "detail": f"same Last Updated as {keep} but different numbers"})
-    return (contests[~contests["source_file"].isin(drop)],
-            summary[~summary["source_file"].isin(drop)], qa)
+                qa.append(
+                    {
+                        "source_file": other,
+                        "last_updated": ts,
+                        "check": "duplicate_timestamp_conflict",
+                        "detail": f"same Last Updated as {keep} but different numbers",
+                    }
+                )
+    return (
+        contests[~contests["source_file"].isin(drop)],
+        summary[~summary["source_file"].isin(drop)],
+        qa,
+    )
 
 
 def _dedupe_rcv(rcv: pd.DataFrame) -> tuple[pd.DataFrame, list[dict]]:
@@ -516,10 +597,19 @@ def _dedupe_rcv(rcv: pd.DataFrame) -> tuple[pd.DataFrame, list[dict]]:
             drop.add(other)
             cmp = rcv.loc[rcv["source_file"] == other, value_cols].reset_index(drop=True)
             same = ref.equals(cmp)
-            qa.append({"source_file": other, "last_updated": ts, "contest": RCV_CONTEST,
-                       "check": "duplicate_dropped" if same else "duplicate_timestamp_conflict",
-                       "detail": (f"identical to {keep}" if same else
-                                  f"same report time as {keep} but different numbers; kept {keep}")})
+            qa.append(
+                {
+                    "source_file": other,
+                    "last_updated": ts,
+                    "contest": RCV_CONTEST,
+                    "check": "duplicate_dropped" if same else "duplicate_timestamp_conflict",
+                    "detail": (
+                        f"identical to {keep}"
+                        if same
+                        else f"same report time as {keep} but different numbers; kept {keep}"
+                    ),
+                }
+            )
     return rcv[~rcv["source_file"].isin(drop)].reset_index(drop=True), qa
 
 
@@ -528,8 +618,9 @@ def _sequence(summary: pd.DataFrame) -> pd.DataFrame:
     summary["snapshot_seq"] = summary.groupby("election_key").cumcount() + 1
     last = summary.groupby("election_key")["snapshot_seq"].transform("max")
     summary["is_final_snapshot"] = summary["snapshot_seq"] == last
-    summary["ballots_counted_change"] = (
-        summary.groupby("election_key")["total_ballots_counted"].diff())
+    summary["ballots_counted_change"] = summary.groupby("election_key")[
+        "total_ballots_counted"
+    ].diff()
     first = summary["snapshot_seq"] == 1
     summary.loc[first, "ballots_counted_change"] = summary.loc[first, "total_ballots_counted"]
     return summary
@@ -537,14 +628,11 @@ def _sequence(summary: pd.DataFrame) -> pd.DataFrame:
 
 def _finalize_contests(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    df["election_date"] = df["election_year"].map(
-        lambda y: ELECTION_DATES.get(int(y), pd.NA))
+    df["election_date"] = df["election_year"].map(lambda y: ELECTION_DATES.get(int(y), pd.NA))
     # A "series" is one contest's published sequence: the web snapshots, or
     # the RCV short reports (which carry their own report timestamps).
-    df["_series"] = df["results_label"].eq("RCV Short Report").map(
-        {True: "rcv", False: "web"})
-    df = df.sort_values(["election_year", "_series", "last_updated", "source_file"],
-                        kind="stable")
+    df["_series"] = df["results_label"].eq("RCV Short Report").map({True: "rcv", False: "web"})
+    df = df.sort_values(["election_year", "_series", "last_updated", "source_file"], kind="stable")
     series_last = df.groupby(["election_key", "_series"])["last_updated"].transform("max")
     df["is_final_snapshot"] = df["last_updated"] == series_last
 
@@ -553,8 +641,11 @@ def _finalize_contests(df: pd.DataFrame) -> pd.DataFrame:
     # zero (nothing is reported before polls close); a candidate missing from
     # the previous snapshot gets NA rather than a misleading jump.
     key = ["election_key", "_series", "contest", "candidate_or_option"]
-    snap_order = (df[["election_key", "_series", "last_updated"]].drop_duplicates()
-                    .assign(_k=lambda d: d.groupby(["election_key", "_series"]).cumcount()))
+    snap_order = (
+        df[["election_key", "_series", "last_updated"]]
+        .drop_duplicates()
+        .assign(_k=lambda d: d.groupby(["election_key", "_series"]).cumcount())
+    )
     df = df.merge(snap_order, on=["election_key", "_series", "last_updated"], how="left")
     df = df.sort_values(key + ["_k"], kind="stable")
     prev_votes = df.groupby(key)["votes"].shift()
@@ -567,8 +658,7 @@ def _finalize_contests(df: pd.DataFrame) -> pd.DataFrame:
 
 def _finalize_summary(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    df["election_date"] = df["election_year"].map(
-        lambda y: ELECTION_DATES.get(int(y), pd.NA))
+    df["election_date"] = df["election_year"].map(lambda y: ELECTION_DATES.get(int(y), pd.NA))
     return coerce_to(df, VOTE_COUNTING_SUMMARY_COLUMNS, VOTE_COUNTING_SUMMARY_DTYPES)
 
 
@@ -577,13 +667,20 @@ def _monotonic_qa(df: pd.DataFrame) -> pd.DataFrame:
     real adjustment (recount, canvass correction) or an OCR misread that
     happened to pass the sum check — worth a look either way."""
     neg = df[(df["vote_change"] < 0) & (df["contest_type"] != "ranked_choice")]
-    return pd.DataFrame({
-        "source_file": neg["source_file"], "last_updated": neg["last_updated"],
-        "contest": neg["contest"], "candidate": neg["candidate_or_option"],
-        "check": "votes_decreased",
-        "detail": neg.apply(lambda r: f"{r['votes'] - r['vote_change']:,} → {r['votes']:,}",
-                            axis=1) if len(neg) else pd.Series(dtype="string"),
-    })
+    return pd.DataFrame(
+        {
+            "source_file": neg["source_file"],
+            "last_updated": neg["last_updated"],
+            "contest": neg["contest"],
+            "candidate": neg["candidate_or_option"],
+            "check": "votes_decreased",
+            "detail": neg.apply(
+                lambda r: f"{r['votes'] - r['vote_change']:,} → {r['votes']:,}", axis=1
+            )
+            if len(neg)
+            else pd.Series(dtype="string"),
+        }
+    )
 
 
 def write_outputs(contests: pd.DataFrame, summary: pd.DataFrame, qa: pd.DataFrame) -> None:
@@ -612,40 +709,62 @@ def write_outputs(contests: pd.DataFrame, summary: pd.DataFrame, qa: pd.DataFram
     ]
     counts = qa.groupby(["check", "status"]).size().unstack(fill_value=0)
     for check, r in counts.iterrows():
-        lines.append(f"| `{check}` | {r.get('open', 0)} | {r.get('accepted', 0)} | "
-                     f"{r.get('info', 0)} |")
-    lines += ["", "## Snapshots per election", "",
-              "| election | snapshots | first update | final update | final label |",
-              "|---|---|---|---|---|"]
+        lines.append(
+            f"| `{check}` | {r.get('open', 0)} | {r.get('accepted', 0)} | {r.get('info', 0)} |"
+        )
+    lines += [
+        "",
+        "## Snapshots per election",
+        "",
+        "| election | snapshots | first update | final update | final label |",
+        "|---|---|---|---|---|",
+    ]
     for (year, etype), g in summary.groupby(["election_year", "election_type"]):
         final = g[g["is_final_snapshot"]].iloc[0]
-        lines.append(f"| {year} {etype} | {len(g)} | {g['last_updated'].min()} | "
-                     f"{final['last_updated']} | {final['results_label']} |")
+        lines.append(
+            f"| {year} {etype} | {len(g)} | {g['last_updated'].min()} | "
+            f"{final['last_updated']} | {final['results_label']} |"
+        )
     if len(qa):
-        lines += ["", "## Issues", "",
-                  "| file | check | status | contest | candidate | detail |",
-                  "|---|---|---|---|---|---|"]
+        lines += [
+            "",
+            "## Issues",
+            "",
+            "| file | check | status | contest | candidate | detail |",
+            "|---|---|---|---|---|---|",
+        ]
         order = qa.assign(_s=qa["status"].map({"open": 0, "accepted": 1, "info": 2}))
         for r in order.sort_values(["_s", "source_file"]).fillna("").itertuples(index=False):
-            lines.append(f"| {r.source_file} | `{r.check}` | {r.status} | {r.contest} | "
-                         f"{r.candidate} | {r.detail} |")
+            lines.append(
+                f"| {r.source_file} | `{r.check}` | {r.status} | {r.contest} | "
+                f"{r.candidate} | {r.detail} |"
+            )
     QA_MD.write_text("\n".join(lines) + "\n")
 
     for path in (CONTESTS_CSV, SUMMARY_CSV, QA_CSV, QA_MD):
         print(f"wrote {display_path(path)}")
-    print(f"QA: {len(blocking)} open issue(s), {(qa['status'] == 'accepted').sum()} accepted, "
-          f"{(qa['status'] == 'info').sum()} informational")
+    print(
+        f"QA: {len(blocking)} open issue(s), {(qa['status'] == 'accepted').sum()} accepted, "
+        f"{(qa['status'] == 'info').sum()} informational"
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("-e", "--election",
-                    help="Only OCR this election, as an election key, e.g. 2016-general. "
-                         "The dataset is always rebuilt from every cached snapshot, so the "
-                         "other elections stay put.")
-    ap.add_argument("--ocr", action="store_true",
-                    help="Send uncached screenshots to Datalab (needs DATALAB_API_KEY)")
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    ap.add_argument(
+        "-e",
+        "--election",
+        help="Only OCR this election, as an election key, e.g. 2016-general. "
+        "The dataset is always rebuilt from every cached snapshot, so the "
+        "other elections stay put.",
+    )
+    ap.add_argument(
+        "--ocr",
+        action="store_true",
+        help="Send uncached screenshots to Datalab (needs DATALAB_API_KEY)",
+    )
     ap.add_argument("--workers", type=int, default=4)
     args = ap.parse_args(argv)
 

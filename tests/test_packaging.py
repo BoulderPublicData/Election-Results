@@ -32,6 +32,7 @@ def test_every_entry_point_resolves():
 
 def test_pipeline_help_lists_every_subcommand():
     from scripts.pipeline import SUBCOMMANDS, _epilog
+
     for name in SUBCOMMANDS:
         assert f"  {name}" in _epilog()
 
@@ -52,6 +53,7 @@ def test_every_cli_takes_an_election_key():
     import argparse
 
     import pytest
+
     for name in ("clean", "fetch", "pipeline", "reconcile", "discover"):
         mod = importlib.import_module(f"scripts.{name}")
         assert mod._election_arg("2024-general") == (2024, "general")
@@ -63,5 +65,7 @@ def test_every_cli_takes_an_election_key():
 def test_changelog_and_glossary_are_shared_pages():
     assert (ROOT / "docs" / "changelog.md").exists()
     assert (ROOT / "docs" / "glossary.md").exists()
-    assert "docs/changelog.md" in (ROOT / "docs" / "data-dictionary.md").read_text() \
+    assert (
+        "docs/changelog.md" in (ROOT / "docs" / "data-dictionary.md").read_text()
         or "(changelog.md)" in (ROOT / "docs" / "data-dictionary.md").read_text()
+    )
