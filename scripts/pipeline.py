@@ -18,11 +18,11 @@ import pandas as pd
 from .clean import BOCO_PDF_YEARS, _output_path, clean_source, write_csv
 from .config import (
     BOULDER_COUNTY,
+    COMBINED_CSV,
+    PROVENANCE_CSV,
     REPO_ROOT,
     SECRETARY_OF_STATE,
-)
-from .config import (
-    PROCESSED as PROCESSED_DATA,
+    STATEMENTS_OF_VOTES,
 )
 from .config import (
     SOURCES as ALL_SOURCES,
@@ -51,7 +51,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
                     help="Also scrape upstream landing pages for sources not in "
                          "the static registry (e.g. a newly published year)")
     ap.add_argument("--combined-out", type=Path,
-                    default=PROCESSED_DATA / "all-elections-tidy.csv")
+                    default=COMBINED_CSV)
     args = ap.parse_args(argv)
 
     if args.source == "boulder_county":
@@ -89,7 +89,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
             print(f"WARN: {fetch_errors} fetch error(s); continuing with files on disk",
                   file=sys.stderr)
 
-    PROCESSED_DATA.mkdir(parents=True, exist_ok=True)
+    STATEMENTS_OF_VOTES.mkdir(parents=True, exist_ok=True)
     per_year: list[pd.DataFrame] = []
     errors = 0
     for s in pool:
@@ -121,7 +121,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
         # nothing's lost.
         prov_rows = [provenance_record(df) for df in per_year]
         prov_df = pd.DataFrame(prov_rows)
-        prov_path = PROCESSED_DATA / "provenance.csv"
+        prov_path = PROVENANCE_CSV
         prov_df.to_csv(prov_path, index=False)
         print(f"wrote {prov_path.relative_to(REPO_ROOT)} "
               f"({len(prov_df)} source files; provenance for the slim per-year CSVs)")

@@ -130,7 +130,7 @@ def _build_csv_schema() -> pa.DataFrameSchema:
     )
     return pa.DataFrameSchema(
         cols, strict=False, ordered=False, name="ElectionResults_CSV",
-        description="Slim 15-column view written to data/processed/*.csv.",
+        description="Slim 15-column view written to data/processed/statements-of-votes/*.csv.",
     )
 
 

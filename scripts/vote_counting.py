@@ -43,7 +43,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .config import AUDIT, ELECTION_DATES, ORIGINAL, PROCESSED, REPO_ROOT
+from .config import AUDIT, ELECTION_DATES, ORIGINAL, REPO_ROOT, VOTE_COUNTING
 from .logging_setup import get_logger
 from .parsers.boco_vote_counting import (
     Snapshot,
@@ -64,7 +64,7 @@ from .schema import (
 log = get_logger(__name__)
 
 INPUT_DIR = ORIGINAL / "boulder-county" / "vote-counting"
-OUTPUT_DIR = PROCESSED / "vote-counting"
+OUTPUT_DIR = VOTE_COUNTING
 CACHE_DIR = OUTPUT_DIR / "datalab"
 
 DATALAB_MODE = "accurate"

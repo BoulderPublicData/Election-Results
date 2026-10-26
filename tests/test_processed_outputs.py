@@ -5,20 +5,16 @@ that hasn't run the pipeline yet). They validate the schema contract end-to-end
 against real data rather than synthetic fixtures.
 
 The per-year CSVs hold the slim schema (no provenance columns); the provenance
-sidecar lives at `data/processed/provenance.csv`.
+sidecar lives at `data/processed/statements-of-votes/provenance.csv`.
 """
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pandas as pd
 import pytest
 
+from scripts.config import STATEMENTS_OF_VOTES as PROCESSED
 from scripts.schema import CSV_COLUMNS, PROVENANCE_COLUMNS
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-PROCESSED = REPO_ROOT / "data" / "processed"
 
 # A handful of representative years that cover every parser branch.
 SAMPLE_FILES = [

@@ -69,7 +69,7 @@ DTYPES: dict[str, str] = {
 # Provenance columns that are constant per (year × source × election_type) — i.e.
 # they repeat the same value on every row from one source file. We drop them
 # from the per-row CSVs to keep file sizes manageable and write a sidecar
-# `data/processed/provenance.csv` with one row per source file instead.
+# `data/processed/statements-of-votes/provenance.csv` with one row per source file instead.
 # The columns still live in the in-memory schema; coerce() / validate() / the
 # audit module all use them upstream of CSV writes.
 PROVENANCE_COLUMNS: list[str] = [

@@ -10,7 +10,7 @@ For each (year, source) source file produces:
 - extraction_quality + extraction_notes summary
 
 The provenance columns (source_file, source_url, retrieved_at,
-extraction_quality, extraction_notes) live in `data/processed/provenance.csv`
+extraction_quality, extraction_notes) live in `statements-of-votes/provenance.csv`
 rather than in the per-row CSVs. ``audit_file`` joins them back in by
 (election_year, election_type, data_source) before formatting.
 """
@@ -24,7 +24,7 @@ from pathlib import Path
 import pandas as pd
 
 from .config import AUDIT as AUDIT_DIR  # noqa: F401
-from .config import PROCESSED, PROVENANCE_CSV, REPO_ROOT
+from .config import PROVENANCE_CSV, REPO_ROOT, STATEMENTS_OF_VOTES
 
 
 def _md_table(rows: list[dict], cols: list[str]) -> str:
@@ -136,17 +136,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=Path, default=AUDIT_DIR / "summary.md",
                     help="Concatenated audit output (default: data/audit/summary.md)")
     ap.add_argument("csv", nargs="*", type=Path,
-                    help="Specific CSVs (default: every CSV in data/processed/ "
+                    help="Specific CSVs (default: every per-year CSV in "
+                         "data/processed/statements-of-votes/ "
                          "except provenance.csv and all-elections-tidy.csv)")
     args = ap.parse_args(argv)
 
     if args.csv:
         csvs = args.csv
     else:
-        csvs = [p for p in sorted(PROCESSED.glob("[0-9]*.csv"))
+        csvs = [p for p in sorted(STATEMENTS_OF_VOTES.glob("[0-9]*.csv"))
                 if p.name != "provenance.csv"]
     if not csvs:
-        print(f"No CSVs found under {PROCESSED}", file=sys.stderr)
+        print(f"No CSVs found under {STATEMENTS_OF_VOTES}", file=sys.stderr)
         return 2
 
     lookup = _provenance_lookup()

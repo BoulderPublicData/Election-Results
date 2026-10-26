@@ -58,10 +58,24 @@ def original_path(data_source: str, local_filename: str) -> Path:
     return ORIGINAL / ORIGINAL_SUBDIRS[data_source] / local_filename
 
 
+# Each dataset under PROCESSED gets its own subfolder, mirroring data/original/:
+# the harmonized Statement of Votes CSVs (with their provenance sidecar and the
+# combined CSV) and the election-night snapshots. Cross-dataset publishing
+# artifacts (elections.db, metadata.yaml) stay at the top of PROCESSED.
+STATEMENTS_OF_VOTES = PROCESSED / "statements-of-votes"
+VOTE_COUNTING = PROCESSED / "vote-counting"
+
+
+def sov_csv_path(year: int, election_type: str, data_source: str) -> Path:
+    """Harmonized per-year CSV: statements-of-votes/{year}-{type}-{source}.csv."""
+    ds = data_source.replace("_", "-")
+    return STATEMENTS_OF_VOTES / f"{year}-{election_type}-{ds}.csv"
+
+
 # Specific files used in several places.
 MANIFEST_PATH = ORIGINAL / "manifest.json"
-PROVENANCE_CSV = PROCESSED / "provenance.csv"
-COMBINED_CSV = PROCESSED / "all-elections-tidy.csv"
+PROVENANCE_CSV = STATEMENTS_OF_VOTES / "provenance.csv"
+COMBINED_CSV = STATEMENTS_OF_VOTES / "all-elections-tidy.csv"
 RECONCILIATION_CSV = AUDIT / "reconciliation.csv"
 RECONCILIATION_MD = AUDIT / "reconciliation.md"
 REJECTED_CSV = AUDIT / "rejected.csv"

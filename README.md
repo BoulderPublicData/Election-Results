@@ -60,7 +60,7 @@ uv run python -m scripts.pipeline --skip-fetch --no-pdf
 uv run pytest
 ```
 
-Output lands in [`data/processed/`](data/processed/):
+Output lands in [`data/processed/statements-of-votes/`](data/processed/statements-of-votes/):
 - `{year}-{election_type}-{source}.csv` — per source file (slim 15-column schema)
 - `all-elections-tidy.csv` — everything concatenated
 - `provenance.csv` — one row per source file with `source_url`, `retrieved_at`,
@@ -81,9 +81,9 @@ Output lands in [`data/processed/`](data/processed/):
 │   │   ├── secretary-of-state/
 │   │   └── manifest.json      # sha256 + retrieved_at per file
 │   ├── processed/             # tidy CSVs (pipeline output) — the ONLY output dir
-│   │                          #   per-year .csv + all-elections-tidy.csv
-│   │                          #   + provenance.csv sidecar
-│   │                          #   + vote-counting/ (election-night snapshots)
+│   │   ├── statements-of-votes/ # per-year .csv + all-elections-tidy.csv
+│   │   │                        #   + provenance.csv sidecar
+│   │   └── vote-counting/       # election-night snapshots
 │   ├── audit/                 # auto-generated audits + reconciliation report
 │   └── lookups/               # JSON lookups — party codes, election dates,
 │                              #   source registry, schema, contest aliases,

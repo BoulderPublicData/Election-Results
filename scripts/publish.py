@@ -1,8 +1,9 @@
 """
 Build a SQLite database from the processed CSVs for Datasette publishing.
 
-This implements the **Publish** phase of the data-liberation workflow. Two
-artifacts are produced under ``data/processed/``:
+This implements the **Publish** phase of the data-liberation workflow. It reads
+``data/processed/statements-of-votes/`` and ``data/processed/vote-counting/``,
+and writes two cross-dataset artifacts to the top of ``data/processed/``:
 
 - ``elections.db`` — single SQLite file with these tables:
   - ``elections`` — the long-form tidy data (one row per precinct × contest × candidate).
@@ -33,7 +34,7 @@ import pandas as pd
 import yaml
 
 from .concepts import CONCEPTS
-from .config import PROCESSED, REPO_ROOT
+from .config import COMBINED_CSV, PROCESSED, PROVENANCE_CSV, REPO_ROOT, VOTE_COUNTING
 from .logging_setup import get_logger
 from .schema import CSV_COLUMNS, DTYPES, VOTE_COUNTING_DTYPES, VOTE_COUNTING_SUMMARY_DTYPES
 
@@ -48,7 +49,7 @@ METADATA_PATH = PROCESSED / "metadata.yaml"
 # ---------------------------------------------------------------------------
 
 def _load_combined() -> pd.DataFrame:
-    combined = PROCESSED / "all-elections-tidy.csv"
+    combined = COMBINED_CSV
     if not combined.exists():
         raise FileNotFoundError(
             f"{combined} missing — run `python -m scripts.pipeline run` first"
@@ -57,7 +58,7 @@ def _load_combined() -> pd.DataFrame:
 
 
 def _load_provenance() -> pd.DataFrame:
-    prov = PROCESSED / "provenance.csv"
+    prov = PROVENANCE_CSV
     if not prov.exists():
         raise FileNotFoundError(
             f"{prov} missing — run `python -m scripts.pipeline run` first"
@@ -66,8 +67,8 @@ def _load_provenance() -> pd.DataFrame:
 
 
 VOTE_COUNTING_TABLES = {
-    "vote_counting_contests": PROCESSED / "vote-counting" / "vote-counting-contests.csv",
-    "vote_counting_summary": PROCESSED / "vote-counting" / "vote-counting-summary.csv",
+    "vote_counting_contests": VOTE_COUNTING / "vote-counting-contests.csv",
+    "vote_counting_summary": VOTE_COUNTING / "vote-counting-summary.csv",
 }
 
 

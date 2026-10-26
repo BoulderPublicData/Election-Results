@@ -30,7 +30,7 @@ Tier 1 closes the easy gaps in a single afternoon. Tier 2 is a week's work and y
 | Six-phase workflow (Survey → … → Publish) | 4 of 6 phases implemented end-to-end |
 | Immutable originals under `data/original/` | ✅ Codified with `manifest.json` + sha256 |
 | Tidy long format as primary storage | ✅ 15-column slim CSV; combined `all-elections-tidy.csv` |
-| Per-extract (not per-row) provenance | ✅ `data/processed/provenance.csv` sidecar |
+| Per-extract (not per-row) provenance | ✅ `data/processed/statements-of-votes/provenance.csv` sidecar |
 | Per-vintage parsers under `scripts/parsers/` | ✅ `boco_tidy.py`, `boco_panel.py`, `boco_pdf.py`, `sos.py` |
 | `Source` dataclass + registry | ✅ `scripts/sources.py:Source` + `ALL_SOURCES` |
 | Discovery scraper | ✅ `scripts/discover.py` for new vintages on upstream pages |
@@ -188,7 +188,7 @@ Notable: the existing Cleaning.ipynb (the rewritten public-data-oped notebook) b
 
 ```
 *.pdf filter=lfs diff=lfs merge=lfs -text
-data/processed/all-elections-tidy.csv filter=lfs diff=lfs merge=lfs -text
+data/processed/statements-of-votes/all-elections-tidy.csv filter=lfs diff=lfs merge=lfs -text
 ```
 
 **Architectural constraint** (the skill flags this): LFS does NOT work with GitHub Pages. So the Quarto site links out to Datasette + to GitHub Releases for full-file downloads; it does not directly embed LFS-tracked files. This is fine — readers query via Datasette, download via Releases.

@@ -2,11 +2,12 @@
 Cleaning orchestrator. Reads one raw file and routes it to the appropriate parser.
 
 Output: a DataFrame coerced to scripts.schema.COLUMNS / DTYPES, written (as the
-slim 15-column view) to data/processed/{year}-{election_type}-{data-source}.csv.
+slim 15-column view) to
+data/processed/statements-of-votes/{year}-{election_type}-{data-source}.csv.
 
 The five provenance fields (source_url, retrieved_at, ...) travel on the
 in-memory frame and are written once per source file to
-data/processed/provenance.csv by pipeline.py.
+data/processed/statements-of-votes/provenance.csv by pipeline.py.
 """
 
 from __future__ import annotations
@@ -25,13 +26,14 @@ from .config import (
     ELECTION_DATES,
     MANIFEST_PATH,
     ORIGINAL,
-    PROCESSED,
     PROVENANCE_CSV,
     REPO_ROOT,
     SECRETARY_OF_STATE,
     SOURCES,
+    STATEMENTS_OF_VOTES,
     Source,
     original_path,
+    sov_csv_path,
 )
 from .logging_setup import get_logger
 from .parsers import boco_panel, boco_pdf, boco_tidy, sos
@@ -42,7 +44,7 @@ log = get_logger(__name__)
 # Backwards-compatible aliases — keep these so any external code that imported
 # from scripts.clean keeps working through a deprecation cycle.
 ORIGINAL_DATA = ORIGINAL
-PROCESSED_DATA = PROCESSED
+PROCESSED_DATA = STATEMENTS_OF_VOTES
 ALL_SOURCES = SOURCES
 
 # Year-by-year routing for Boulder County.
@@ -68,7 +70,7 @@ def _retrieved_at_for(source_file: str, data_source: str) -> str:
     """When was this raw file downloaded? In order of preference:
 
     1. data/original/manifest.json — written by fetch.py at download time.
-    2. The value already recorded in data/processed/provenance.csv. Files
+    2. The value already recorded in statements-of-votes/provenance.csv. Files
        added by hand have no manifest entry; reusing the published value keeps
        re-runs reproducible instead of re-dating every file whenever a fresh
        clone or a `git mv` changes its mtime.
@@ -128,15 +130,14 @@ def clean_source(s: Source) -> pd.DataFrame:
 
 
 def _output_path(s: Source) -> Path:
-    ds = s.data_source.replace("_", "-")
-    return PROCESSED_DATA / f"{s.year}-{s.election_type}-{ds}.csv"
+    return sov_csv_path(s.year, s.election_type, s.data_source)
 
 
 def write_csv(df: pd.DataFrame, dest: Path) -> None:
     """Write the slim CSV view (provenance columns excluded).
 
     See scripts.schema.to_csv_frame — the 5 provenance columns are constant
-    per source file and live in the sidecar `data/processed/provenance.csv`
+    per source file and live in the sidecar `statements-of-votes/provenance.csv`
     instead, which the pipeline regenerates from the in-memory frames.
     """
     from .schema import to_csv_frame
