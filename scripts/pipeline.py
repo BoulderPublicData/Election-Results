@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from .clean import BOCO_PDF_YEARS, _output_path, clean_source, write_csv
+from .clean import BOCO_PDF_YEARS, _meta_for, _output_path, clean_source, write_csv
 from .config import (
     BOULDER_COUNTY,
     COMBINED_CSV,
@@ -91,6 +91,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
 
     STATEMENTS_OF_VOTES.mkdir(parents=True, exist_ok=True)
     per_year: list[pd.DataFrame] = []
+    prov_rows: list[dict] = []
     errors = 0
     for s in pool:
         label = f"{s.year}-{s.election_type}-{s.data_source}"
@@ -106,6 +107,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
         write_csv(df, _output_path(s))
         print(f"OK   {label}  rows={len(df):>6}")
         per_year.append(df)
+        prov_rows.append(provenance_record(df, _meta_for(s)))
 
     if per_year:
         combined = pd.concat(per_year, ignore_index=True)
@@ -119,7 +121,6 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
         # drop these 5 columns to keep file sizes down (they're constant for
         # every row from a given file); the sidecar preserves the info so
         # nothing's lost.
-        prov_rows = [provenance_record(df) for df in per_year]
         prov_df = pd.DataFrame(prov_rows)
         prov_path = PROVENANCE_CSV
         prov_df.to_csv(prov_path, index=False)
@@ -158,40 +159,14 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
             print(f"  vote-counting FAIL: {type(e).__name__}: {e}", file=sys.stderr)
             errors += 1
 
-    # Reconciliation audit — compares top-line contest totals between the raw
-    # source files and the processed CSVs. Caught regressions in earlier passes.
+    # Reconciliation audit — top-line and contest × candidate totals between
+    # the raw source files and the processed CSVs. Always run over every
+    # source on disk (not just this run's subset) so the shared report covers
+    # the whole dataset.
     print("\n--- reconcile ---")
-    try:
-        from .reconcile import _load_patterns, reconcile_source
-        patterns = _load_patterns()
-        recon_frames = []
-        for s in pool:
-            try:
-                r = reconcile_source(s, patterns)
-            except Exception as e:
-                print(f"  reconcile FAIL {s.year}-{s.data_source}: {e}", file=sys.stderr)
-                continue
-            if not r.empty:
-                recon_frames.append(r)
-        if recon_frames:
-            all_recon = pd.concat(recon_frames, ignore_index=True)
-            from .reconcile import AUDIT as _AUDIT_DIR
-            _AUDIT_DIR.mkdir(parents=True, exist_ok=True)
-            all_recon.to_csv(_AUDIT_DIR / "reconciliation.csv", index=False)
-            from .reconcile import VOTE_COUNTING_VS_SOV_CSV, reconcile_vote_counting
-            vc_recon = reconcile_vote_counting()
-            if not vc_recon.empty:
-                vc_recon.to_csv(VOTE_COUNTING_VS_SOV_CSV, index=False)
-            mismatches = (all_recon["status"] == "mismatch").sum()
-            print(f"reconciled {len(all_recon)} contest-source rows; mismatches={mismatches}")
-            if mismatches:
-                print(
-                    "  WARN: top-line totals diverged from the source — "
-                    "run `uv run python -m scripts.reconcile` for the Markdown report",
-                    file=sys.stderr,
-                )
-    except ImportError as e:
-        print(f"  reconcile skipped: {e}", file=sys.stderr)
+    from . import reconcile
+    if reconcile.main([]) != 0:
+        errors += 1
 
     # Audit — runs on the IN-MEMORY frames (which still carry provenance)
     # so we don't have to re-read the slim CSVs + join the sidecar.

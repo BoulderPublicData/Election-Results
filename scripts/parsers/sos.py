@@ -24,6 +24,7 @@ from ..reject import Rejector
 from ..reject import register as register_rejector
 from ..schema import SourceMeta
 from .common import (
+    RETENTION_RE,
     add_provenance,
     clean_cols,
     infer_contest_type,
@@ -77,7 +78,25 @@ def _parse_unified(df: pd.DataFrame, target_county: str, rejector: Rejector | No
 
 
 def _parse_split(df: pd.DataFrame, target_county: str, rejector: Rejector | None = None) -> pd.DataFrame:
-    """2012-2020 schema: candidate votes vs. yes/no votes in separate columns."""
+    """2012-2020 schema: candidate votes vs. yes/no votes in separate columns.
+
+    Every row in these files has all three vote columns filled, with ``0``
+    where a column doesn't apply, so "not null" can't tell a candidate row
+    from a Yes/No row (#17). Instead each row is classified by what it is:
+
+    - ``Candidate`` null → a ballot measure: emit ``Yes`` / ``No`` rows.
+    - ``Candidate`` set → classify the (contest, candidate) pair across the
+      whole county: Yes/No votes anywhere → a judge up for retention;
+      candidate votes anywhere → a candidate race. A pair with zero votes in
+      every column falls back to the party (candidates have one, judges
+      don't) and then to the retention regex.
+
+    Several judges share one contest title ("Court of Appeals") and the
+    judge's name sits in ``Candidate`` (#16), so retention rows are written as
+    ``contest = "{office} - {judge}"`` with ``Yes`` / ``No`` options — the same
+    shape the Boulder County files and the 2004-2010 SOS files use — and every
+    judge's votes survive.
+    """
     rename = {}
     for c in df.columns:
         lo = c.lower().strip()
@@ -101,69 +120,79 @@ def _parse_split(df: pd.DataFrame, target_county: str, rejector: Rejector | None
 
     mask = _normalize_county(df["_county"]) == target_county.upper()
     sub = df[mask].copy()
+    for col in ("_candidate", "_party"):
+        if col not in sub.columns:
+            sub[col] = pd.NA
+    for col in ("_cand_votes", "_yes_votes", "_no_votes"):
+        sub[col] = pd.to_numeric(sub[col], errors="coerce") if col in sub.columns else pd.NA
+    sub["_contest"] = sub["_contest"].astype("string").str.strip()
+    sub["_candidate"] = sub["_candidate"].astype("string").str.strip().replace("", pd.NA)
+
+    yesno_total = sub["_yes_votes"].fillna(0) + sub["_no_votes"].fillna(0)
+    sub["_yn_total"] = yesno_total
+    sub["_cv_total"] = sub["_cand_votes"].fillna(0)
+    named = sub["_candidate"].notna()
+
+    # Per-(contest, candidate) classification over the whole county, so a
+    # judge's 0-vote precinct is still a retention row and a candidate's
+    # 0-vote precinct is still a candidate row.
+    pair = (
+        sub[named]
+        .groupby(["_contest", "_candidate"], dropna=False)
+        .agg(yn=("_yn_total", "sum"), cv=("_cv_total", "sum"),
+             has_party=("_party", lambda s: s.notna().any()))
+    )
+
+    def _is_yesno(r) -> bool:
+        if r.yn > 0:
+            return True
+        if r.cv > 0 or r.has_party:
+            return False
+        return bool(RETENTION_RE.search(str(r.name[0])))
+
+    yesno_pairs = {k for k, r in pair.iterrows() if _is_yesno(r)}
+    pair_key = pd.Series(list(zip(sub["_contest"], sub["_candidate"], strict=True)), index=sub.index)
+    is_yesno_row = ~named | pair_key.map(lambda k: k in yesno_pairs)
 
     rows: list[pd.DataFrame] = []
 
-    # Candidate rows: where _cand_votes AND _candidate are both non-null.
-    # (Some SOS files put a "0" in the candidate-votes column for measure rows,
-    # so masking on candidate-votes alone would emit candidate rows for
-    # ballot measures.)
-    if "_cand_votes" in sub.columns:
-        cand_mask = sub["_cand_votes"].notna() & sub.get("_candidate", pd.Series(dtype="object")).notna()
-        cand = pd.DataFrame()
-        cand["precinct_id"] = sub.loc[cand_mask, "_precinct"].map(precinct_id_str)
+    cand_rows = sub[~is_yesno_row]
+    if not cand_rows.empty:
+        cand = pd.DataFrame(index=cand_rows.index)
+        cand["precinct_id"] = cand_rows["_precinct"].map(precinct_id_str)
         cand["precinct_name"] = pd.NA
-        cand["contest"] = sub.loc[cand_mask, "_contest"].astype("string").str.strip()
-        cand["candidate_or_option"] = (
-            sub.loc[cand_mask, "_candidate"].astype("string").str.strip().map(normalize_choice)
-        )
-        cand["party"] = (
-            sub.loc[cand_mask, "_party"].map(normalize_party)
-            if "_party" in sub.columns else pd.NA
-        )
-        cand["votes"] = pd.to_numeric(sub.loc[cand_mask, "_cand_votes"], errors="coerce")
-        cand["active_voters"] = pd.NA
-        cand["ballots_cast"] = pd.NA
-        cand["contest_type"] = [
-            infer_contest_type(c, ch) for c, ch in zip(cand["contest"], cand["candidate_or_option"], strict=True)
-        ]
+        cand["contest"] = cand_rows["_contest"]
+        cand["candidate_or_option"] = cand_rows["_candidate"].map(normalize_choice)
+        cand["party"] = cand_rows["_party"].map(normalize_party)
+        cand["votes"] = cand_rows["_cand_votes"]
         rows.append(cand)
 
-    # Yes/No rows: split into two long records each.
-    if "_yes_votes" in sub.columns:
-        measure_mask = sub["_yes_votes"].notna() | sub.get("_no_votes", pd.Series(dtype="float64")).notna()
-        measure_base = sub[measure_mask]
-        # Deduplicate at (precinct, contest) — many rows repeat the same Yes/No.
-        keys = ["_precinct", "_contest"]
-        measure_dedup = measure_base.drop_duplicates(subset=keys)
+    yn_rows = sub[is_yesno_row]
+    if not yn_rows.empty:
+        contest = yn_rows["_contest"].where(
+            yn_rows["_candidate"].isna(),
+            yn_rows["_contest"] + " - " + yn_rows["_candidate"],
+        )
         for vote_col, choice_label in [("_yes_votes", "Yes"), ("_no_votes", "No")]:
-            if vote_col not in measure_dedup.columns:
-                continue
-            # Only emit rows where THIS choice's vote count is non-null. The
-            # previous version emitted a placeholder NaN row whenever the
-            # OTHER choice had a value, generating ~55k artificial "rejections"
-            # downstream.
-            sub_dedup = measure_dedup[measure_dedup[vote_col].notna()]
-            if sub_dedup.empty:
-                continue
-            block = pd.DataFrame()
-            block["precinct_id"] = sub_dedup["_precinct"].map(precinct_id_str)
+            block = pd.DataFrame(index=yn_rows.index)
+            block["precinct_id"] = yn_rows["_precinct"].map(precinct_id_str)
             block["precinct_name"] = pd.NA
-            block["contest"] = sub_dedup["_contest"].astype("string").str.strip()
+            block["contest"] = contest
             block["candidate_or_option"] = choice_label
             block["party"] = pd.NA
-            block["votes"] = pd.to_numeric(sub_dedup[vote_col], errors="coerce")
-            block["active_voters"] = pd.NA
-            block["ballots_cast"] = pd.NA
-            block["contest_type"] = [
-                infer_contest_type(c, choice_label) for c in block["contest"]
-            ]
+            block["votes"] = yn_rows[vote_col]
             rows.append(block)
 
     if not rows:
         return pd.DataFrame()
 
     out = pd.concat(rows, ignore_index=True)
+    out["active_voters"] = pd.NA
+    out["ballots_cast"] = pd.NA
+    out["contest_type"] = [
+        infer_contest_type(c, ch)
+        for c, ch in zip(out["contest"], out["candidate_or_option"], strict=True)
+    ]
     if rejector is not None:
         out = rejector.drop_na_with_reject(
             out,

@@ -57,18 +57,21 @@ CONCEPTS: tuple[Concept, ...] = (
     Concept(
         name="presidential_electors",
         description="Electors for President and Vice President of the United States.",
-        boulder_county_patterns=("Presidential Electors", "President.*Vice President"),
+        boulder_county_patterns=(r"^Presidential Electors", r"^President.*Vice President"),
         secretary_of_state_patterns=(
-            "President.*United States.*Vice President",
-            "President of the United States",
+            r"^Presidential Electors",          # 2004, 2008 ("…/ PRESIDENTIAL ELECTORS (VICE)")
+            r"^President\s*/\s*Vice President",  # 2012-2020
+            r"^President of the United States",
         ),
         caveats=(
-            "Boulder presents the elector slate as a single candidate "
-            "(`Joseph R. Biden / Kamala D. Harris`); SOS lists the "
-            "presidential candidate alone (`Joseph R. Biden`). Vote totals "
-            "match exactly when aggregated to the candidate level, but the "
-            "candidate strings cannot be joined directly — strip the running-"
-            "mate suffix from Boulder rows before joining."
+            "Both sources list the ticket as one candidate string from 2008 on "
+            "(`Joseph R. Biden / Kamala D. Harris`), but the spacing around the "
+            "slash differs: SOS 2008 writes `Barack Obama/ Joe Biden`. SOS 2004 "
+            "lists the presidential candidate alone (`John F. Kerry`). Vote totals "
+            "agree exactly; normalize whitespace around `/` (2008) or match on the "
+            "presidential candidate's name (2004) before joining candidate strings. "
+            "The patterns are anchored so measures about electors (2004 SOS "
+            "`Amend 36 Selection of Presidential Electors`) don't match."
         ),
         tier="federal",
     ),
@@ -85,12 +88,15 @@ CONCEPTS: tuple[Concept, ...] = (
         description="United States Representative — Boulder is mostly in CO-2, "
                     "with a small piece historically in CO-4.",
         boulder_county_patterns=(
-            r"Representative to the \d+th Congress",
-            "United States Representative",
+            # "Representative to the 113th United States Congress - District 2",
+            # "Representative to the United States Congress - District 4",
+            # "REPRESENTATIVE TO THE US CONGRESS - DISTRICT 2"
+            r"^Representative to the .*Congress",
+            r"^United States Representative",
         ),
         secretary_of_state_patterns=(
-            r"Representative to the \d+th Congress",
-            "United States Representative",
+            r"^Representative to the .*Congress",
+            r"^United States Representative",  # 2012-2020: "United States Representative - District 2"
         ),
         caveats=(
             "District numbers (`113th Congress`, `114th Congress`, etc.) change "
@@ -167,8 +173,10 @@ CONCEPTS: tuple[Concept, ...] = (
     Concept(
         name="district_attorney",
         description="Boulder County District Attorney (20th Judicial District).",
-        boulder_county_patterns=("District Attorney",),
-        secretary_of_state_patterns=("District Attorney",),
+        # Anchored: 2005's "County Question 1D (District Attorney Term Limit …)"
+        # is a measure, not the office.
+        boulder_county_patterns=(r"^District Attorney",),
+        secretary_of_state_patterns=(r"^District Attorney",),
         caveats="Cleanly comparable.",
         tier="county",
     ),

@@ -143,6 +143,21 @@ ELECTION_DATES: dict[int, str] = {
 }
 
 
+# Colorado's June primaries (last Tuesday in June). Not ingested yet (AGENTS
+# §5 item 3), but discovery can now classify a primary file (#29), so keep its
+# date separate from the November general's.
+PRIMARY_ELECTION_DATES: dict[int, str] = {
+    2026: "2026-06-30",
+}
+
+
+def election_date_for(year: int, election_type: str) -> str:
+    """Election day for (year, election_type); a placeholder when unknown."""
+    if election_type == "primary":
+        return PRIMARY_ELECTION_DATES.get(year, f"{year}-06-XX")
+    return ELECTION_DATES.get(year, f"{year}-11-XX")
+
+
 def sources_for_year(year: int) -> list[Source]:
     return [s for s in ALL_SOURCES if s.year == year]
 

@@ -36,7 +36,13 @@ import yaml
 from .concepts import CONCEPTS
 from .config import COMBINED_CSV, PROCESSED, PROVENANCE_CSV, REPO_ROOT, VOTE_COUNTING
 from .logging_setup import get_logger
-from .schema import CSV_COLUMNS, DTYPES, VOTE_COUNTING_DTYPES, VOTE_COUNTING_SUMMARY_DTYPES
+from .schema import (
+    CSV_COLUMNS,
+    DTYPES,
+    PROVENANCE_DTYPES,
+    VOTE_COUNTING_DTYPES,
+    VOTE_COUNTING_SUMMARY_DTYPES,
+)
 
 log = get_logger(__name__)
 
@@ -63,7 +69,7 @@ def _load_provenance() -> pd.DataFrame:
         raise FileNotFoundError(
             f"{prov} missing — run `python -m scripts.pipeline run` first"
         )
-    return pd.read_csv(prov, dtype=str)
+    return pd.read_csv(prov, dtype=PROVENANCE_DTYPES)
 
 
 VOTE_COUNTING_TABLES = {
@@ -115,7 +121,7 @@ def build(db_path: Path = DB_PATH) -> Path:
     # `provenance` — small enough that no index is needed, but a composite
     # primary key makes the join from `elections` deterministic.
     db["provenance"].insert_all(
-        provenance.to_dict(orient="records"),
+        _records(provenance),
         pk=("election_year", "election_type", "data_source"),
     )
 

@@ -75,30 +75,40 @@ The published files use several Yes/No variants. We canonicalize:
 
 | Source value | Canonical |
 |---|---|
-| `Yes`, `yes`, `YES`, `Y`, `Yes/Sí`, `Yes/For`, `For` | `Yes` |
-| `No`, `no`, `NO`, `N`, `No/Against`, `Against` | `No` |
+| `Yes`, `Y`, `Yes/Sí`, `Yes/For`, `For`, `For the Measure`, `For the Issue` | `Yes` |
+| `No`, `N`, `No/Against`, `Against`, `Against the Measure`, `Against the Issue` | `No` |
+
+Matching ignores case and extra spaces (`YES`, `FOR THE MEASURE`, `For The Measure` all match). Rows with these options get `contest_type = measure` (or `retention` / `recall`).
 
 Candidate names are stripped of whitespace but otherwise left as-published. Future cleanups (e.g., `John McCain / Sarah Palin` ↔ `McCain/Palin`) are out of scope.
 
 ### 2.3 Party normalization
 
-The SOS uses full names in 2012+ (`Democratic Party`, `Republican Party`) and 3-letter codes in 2004-2010 (`DEM`, `REP`). Boulder mixes both. We canonicalize to the SOS codes where the mapping is unambiguous:
+The SOS uses full names in 2012+ (`Democratic Party`, `Republican Party`) and 3-letter codes in 2004-2010 (`DEM`, `REP`, with `LIB`/`UNA` in 2010). Boulder mixes full names with its own codes (`UNI`, `APV`, `AMS`, …). We canonicalize to one code per party — the SOS code where there is one, otherwise Boulder's — so a party has the same `party` value in every year and source:
 
 | Canonical | Common source variants |
 |---|---|
 | `DEM` | `Democratic`, `Democrat`, `Democratic Party`, `Dem` |
 | `REP` | `Republican`, `Republican Party`, `Rep` |
-| `LBR` | `Libertarian`, `Libertarian Party`, `Lib` |
+| `LBR` | `Libertarian`, `Libertarian Party`, `Lib`, `LIB` |
 | `GRN` | `Green`, `Green Party` |
-| `UAF` | `Unaffiliated` |
+| `UAF` | `Unaffiliated`, `UNA` |
+| `UTY` | `Unity`, `UNI`, `Unity Party of Colorado` |
 | `ACN` | `American Constitution`, `American Constitution Party` |
-| `AVP` | `Approval Voting Party` |
+| `AVP` | `Approval Voting Party`, `Approval Voting`, `APV` |
+| `ASP` | `American Solidarity Party`, `AMS` |
+| `ALP` | `Alliance Party`, `ALL` |
 | `AIP` | `American Independent`, `American Independent Party` |
+| `IAM` | `Independent American Party` |
 | `CON` | `Constitution`, `Constitution Party` |
 | `BTP` | `Boston Tea`, `Boston Tea Party` |
+| `PRB` / `PRO` / `SLB` / `SOE` / `SWP` / `SPU` | Prohibition / Progressive / Socialism and Liberation / Socialist Equality / Socialist Workers / Socialist Party USA |
 | `WI`  | `Write-In`, `Write In`, `Write-in` |
-| `IND` | `Independent`, `Independent / Republican` |
+| `IND` | `Independent` |
 | `NP`  | `Non Partisan`, `Non-Partisan`, `Nonpartisan` |
+| `UAF / REP`, `DEM / REP`, `IND / REP`, … | two-party labels keep both codes |
+
+`0` (one 2022 write-in row) means no party and becomes null. The full list, including the rarer one-cycle parties, is in [`data/lookups/party-codes.json`](../data/lookups/party-codes.json).
 
 Parties not in the map pass through verbatim — never silently dropped. Add new mappings in [`scripts/parsers/common.py`](../scripts/parsers/common.py) (`PARTY_MAP`).
 
@@ -111,9 +121,11 @@ Parties not in the map pass through verbatim — never silently dropped. Add new
 | Rule | contest_type |
 |---|---|
 | Title contains `Recall` | `recall` |
-| Choice ∈ {`Yes`, `No`} AND title matches a retention/judicial cue (`Retention`, `Justice of the`, `District Judge`, `Supreme Court`, etc.) | `retention` |
+| Choice ∈ {`Yes`, `No`} AND title matches a judicial cue (`Justice of the`, `Supreme Court`, `Court of Appeals`, `District Judge`, `District Court`, `County Judge`, `County Court`, `Municipal Judge`, `retained in office`, …) | `retention` |
 | Choice ∈ {`Yes`, `No`} | `measure` |
 | Otherwise | `candidate` |
+
+A bare "retention" / "retain" is not a judicial cue: TABOR questions such as `Authorize Retention of All Sugar-Sweetened Beverages Tax Revenue` are measures.
 
 The 2023 Boulder coordinated election has a dedicated RCV sheet for Boulder Mayor (the first instant-runoff election in city history). RCV rows are flagged `ranked_choice` and the candidate is suffixed with the round number — e.g. `Aaron Brockett | Round 1`, `Aaron Brockett | Round 2`, `Aaron Brockett | Final` — so each round is its own row but groups cleanly when filtering on the candidate prefix.
 
@@ -141,9 +153,13 @@ Columns not used: `ContestSeqNbr`, `CandSeqNbr`, `PctSeqNbr`, `Sequence`, `Conte
 
 ### 4.2 Boulder County panel years (2008, 2010, 2011, 2012)
 
-These XLS files predate the modern tidy export. Results are reported as repeating "panels": a contest title row, a header row whose first cell is `Precinct`, then per-precinct rows with vote counts spread across candidate columns. The parser walks the sheet, finds each panel, and melts wide → long. See [`scripts/parsers/boco_panel.py`](../scripts/parsers/boco_panel.py).
+These XLS files predate the modern tidy export. Results are reported as repeating "panels": a contest title row, a header row whose first cell is `Precinct`, then per-precinct rows with vote counts spread across candidate columns, and on a contest's last page a `Totals` row. 2008 and 2010 print one page per panel (a contest spans seven or more), 2011 and 2012 one panel per contest. The parser walks the sheet, finds each panel, and melts wide → long. See [`scripts/parsers/boco_panel.py`](../scripts/parsers/boco_panel.py).
 
-**Known limitation:** 2008 and 2010 use merged header cells where each candidate's column header spans multiple data columns. The resulting alignment between header positions (15, 17, 19, …) and data positions (12, 13, 14, …) is irregular and not reliably extractable with a generic walker. The pipeline emits the major contests with reduced row counts (~2,500-3,000 rows vs ~75,000 expected); analyses needing precinct × candidate detail for 2008/2010 should consult the original XLS until this is improved. Tracked as a follow-up.
+**Column alignment.** The header labels don't sit over their values: in 2008 the `Total Ballots Cast` header is in spreadsheet column 10 and its values in column 8, and several value columns have no header above them. The parser therefore maps each data row's non-empty cells, in order, to the header's non-empty labels, in order (the original `Cleaning.ipynb` did the same per contest with hand-picked `iloc` positions). A row whose width doesn't fit its header goes to `data/audit/rejected.csv`; a precinct printed alone with its values on the row below is joined back up. Before 2026-10 the parser read values by spreadsheet column, which left 2008/2010 misaligned (e.g. 2008 Presidential Electors summed to 1,005 votes; `active_voters < ballots_cast` in every precinct).
+
+**Checks.** Every (contest, candidate) total matches the file's own `Totals` row in all four years, and every contest titled the same way in the SOS file for 2008/2010/2012 matches it exactly (see `data/audit/reconciliation.md`).
+
+**Candidate labels.** Party is printed in the label — `REP\nKen Buck` (2010), `Bruce E. Lohmiller - GRN` (2010), `Mark Udall Democratic` (2008), `Jared Polis    Democratic` (2012). Only known party codes and names are split into `party`; labels the export truncated (`America's`, `Socialism and`, …) are resolved per year against the SOS file. `FOR THE MEASURE` / `AGAINST THE MEASURE` are Yes/No options. Precinct IDs are the 3-digit codes of those years (`073`), not the 10-digit IDs used from 2013.
 
 ### 4.3 Composite precinct IDs
 
@@ -160,7 +176,7 @@ Vote tallies are for the **combined** unit. To match these against single-precin
 
 ### 4.3a Property-owner / landowner pseudo-precincts
 
-Special-district contests can include ballots from non-resident property owners. The SoV reports them on a row whose precinct code is `Property Owner` (2023, 2025) or `Landowner` (2015) instead of a real precinct. They count toward the certified totals, so they are kept with `precinct_id = "Property Owner"` (or `Landowner`) and flagged in `extraction_notes`. They have no precinct geography — exclude them before a spatial join, but keep them when summing contest totals. (Before 2026-10 the 2023/2025 rows were rejected for a missing `precinct_id`, which undercounted e.g. 2023 Nederland Eco Pass 6A by 101 Yes / 43 No.)
+Special-district contests can include ballots from non-resident property owners. The SoV reports them on a row whose precinct code is `Property Owner` (2023, 2025), `Landowner` (2007, 2008, 2012, 2015; `Landowner CCCPR` etc. in 2011) or a district code such as `FMFPD` / `SLFPD` (2010) or `RMFPD` / `NCLD` (2009) instead of a real precinct. They count toward the certified totals, so they are kept with `precinct_id = "Property Owner"` (or `Landowner`) and flagged in `extraction_notes`. They have no precinct geography — exclude them before a spatial join, but keep them when summing contest totals. (Before 2026-10 the 2023/2025 rows were rejected for a missing `precinct_id`, which undercounted e.g. 2023 Nederland Eco Pass 6A by 101 Yes / 43 No.)
 
 ### 4.4 PDF years (2005, 2007, 2009)
 
@@ -171,7 +187,9 @@ Rows from PDF years carry:
 - `contest = "<actual title from page>"` (e.g., `City of Boulder Council Candidates`, `Referendum C`)
 - `extraction_notes` summarizing pages parsed/skipped and reminding analysts to spot-check against the source PDF.
 
-These years remain **provisional**: while contest names, candidate names, and per-precinct vote counts now extract reliably, the PDF layout is irregular page-to-page, so verify any precinct-level claim against the source before publishing.
+A contest with more candidates than fit across a page prints its precinct run once per group of candidates, so the parser reads the candidate header on every page; the vote-method block before the candidates is 4 columns in 2007 and 6 in 2005/2009, so rows are split at the Percent Turnout (`%`) token. Every candidate's precinct rows now sum exactly to the `Totals:` line the PDF prints for it, and no (precinct, contest, candidate) key appears twice. (Before 2026-10 continuation pages reused the first page's candidate names and 2007 rows were split at the wrong column, which produced 1,448 / 1,365 / 1,154 duplicate keys with conflicting votes in 2005 / 2007 / 2009.)
+
+These years remain **provisional** (`pdf_text_layer`): the vote counts reconcile, but candidate names are rebuilt from rotated text — verify names against the source before publishing precinct-level claims.
 
 ### 4.5 Colorado SOS files (2004-2020)
 
@@ -196,13 +214,16 @@ Two generations of file:
 |---|---|
 | `precinct_id` | `Precinct` |
 | `contest` | `Office/Issue/Judgeship` |
+| `contest` (retention row) | `{Office/Issue/Judgeship} - {Candidate}`, e.g. `Court of Appeals - Anthony J. Navarro` |
 | `candidate_or_option` (candidate row) | `Candidate` |
-| `candidate_or_option` (measure row) | `Yes` or `No` (synthesized from column name) |
+| `candidate_or_option` (measure / retention row) | `Yes` or `No` (synthesized from column name) |
 | `party` | `Party` |
 | `votes` (candidate row) | `Candidate Votes` |
 | `votes` (measure Yes row) | `Yes Votes` |
 | `votes` (measure No row) | `No Votes` |
 | (filter) | `County == "BOULDER"` (after strip+upper) |
+
+Every 2012-2020 row carries all three vote columns, with `0` where a column doesn't apply, so the parser classifies rows instead of testing for nulls: `Candidate` empty → a ballot measure (Yes/No rows); otherwise a judge up for retention if that (office, name) has Yes/No votes anywhere in the county, else a candidate. Several judges share one office title (`Court of Appeals`) with the judge named in `Candidate`, so retention rows put the judge in `contest` — the same shape the Boulder files and the 2004-2010 SOS files use. (Before 2026-10 only the first judge per office survived in each precinct — e.g. 2016 Court of Appeals summed to 134,320 votes instead of 1,306,890 — and every candidate contest carried 0-vote `Yes`/`No` rows, which made recipe 5 count offices such as Governor as failed measures.)
 
 The SOS publishes **only candidate vote totals**, never ballots-cast or active-voter counts. `active_voters` and `ballots_cast` are null on every SOS row.
 
@@ -216,32 +237,32 @@ The SOS publishes **only candidate vote totals**, never ballots-cast or active-v
 
 The audit is generated by [`scripts/audit.py`](../scripts/audit.py) and refreshed on every pipeline run. The full per-year summary lives at [`data/audit/summary.md`](../data/audit/summary.md) and per-file fragments at `data/audit/{stem}.md`.
 
-Quick reference (post-pipeline run, 2026-10-25):
+Quick reference (post-pipeline run, 2026-10-26). Contests count distinct titles; SOS 2012-2020 retention contests are one per judge (§4.5):
 
 | Year | Source | Election | Rows | Contests | Precincts | Quality |
 |---|---|---|---|---|---|---|
-| 2005 | Boulder | coordinated | _PDF — see audit_ | _PDF_ | _PDF_ | `pdf_text_layer` |
-| 2007 | Boulder | coordinated | _PDF — see audit_ | _PDF_ | _PDF_ | `pdf_text_layer` |
-| 2008 | Boulder | general | 2,528 | 6 | 236 | `machine_readable` ⚠ partial |
+| 2005 | Boulder | coordinated | 7,307 | 43 | 228 | `pdf_text_layer` |
+| 2007 | Boulder | coordinated | 6,866 | 45 | 235 | `pdf_text_layer` |
+| 2008 | Boulder | general | 27,934 | 71 | 237 | `machine_readable` |
 | 2008 | SOS | general | 24,856 | 43 | 239 | `machine_readable` |
-| 2009 | Boulder | coordinated | _PDF — see audit_ | _PDF_ | _PDF_ | `pdf_text_layer` |
-| 2010 | Boulder | general | 2,868 | 8 | 236 | `machine_readable` ⚠ partial |
-| 2010 | SOS | general | 18,196 | 27 | 240 | `machine_readable` |
-| 2011 | Boulder | coordinated | 6,279 | 49 | 241 | `machine_readable` |
-| 2012 | Boulder | general | 16,771 | 46 | 242 | `machine_readable` |
-| 2012 | SOS | general | 17,252 | 22 | 234 | `machine_readable` |
+| 2009 | Boulder | coordinated | 6,654 | 41 | 236 | `pdf_text_layer` |
+| 2010 | Boulder | general | 23,078 | 57 | 247 | `machine_readable` |
+| 2010 | SOS | general | 18,196 | 37 | 236 | `machine_readable` |
+| 2011 | Boulder | coordinated | 6,291 | 49 | 246 | `machine_readable` |
+| 2012 | Boulder | general | 16,775 | 46 | 243 | `machine_readable` |
+| 2012 | SOS | general | 14,290 | 28 | 234 | `machine_readable` |
 | 2013 | Boulder | coordinated | 4,783 | 103 | 246 | `machine_readable` |
 | 2014 | Boulder | general | 20,307 | 58 | 234 | `machine_readable` |
-| 2014 | SOS | general | 18,404 | 23 | 233 | `machine_readable` |
+| 2014 | SOS | general | 15,617 | 32 | 233 | `machine_readable` |
 | 2015 | Boulder | coordinated | 5,235 | 39 | 237 | `machine_readable` (composite precincts) |
 | 2016 | Boulder | general | 26,051 | 62 | 235 | `machine_readable` |
-| 2016 | SOS | general | 23,496 | 28 | 233 | `machine_readable` |
+| 2016 | SOS | general | 21,623 | 38 | 233 | `machine_readable` |
 | 2017 | Boulder | coordinated | 6,047 | 38 | 237 | `machine_readable` |
 | 2018 | Boulder | general | 22,025 | 70 | 240 | `machine_readable` |
-| 2018 | SOS | general | 21,422 | 34 | 235 | `machine_readable` |
+| 2018 | SOS | general | 17,085 | 39 | 235 | `machine_readable` |
 | 2019 | Boulder | coordinated | 5,529 | 32 | 246 | `machine_readable` |
 | 2020 | Boulder | general | 22,990 | 50 | 245 | `machine_readable` |
-| 2020 | SOS | general | 23,320 | 28 | 240 | `machine_readable` |
+| 2020 | SOS | general | 20,584 | 34 | 240 | `machine_readable` |
 | 2021 | Boulder | coordinated | 6,241 | 40 | 243 | `machine_readable` |
 | 2022 | Boulder | general | 22,144 | 76 | 201 | `machine_readable` (composite precincts) |
 | 2023 | Boulder | coordinated | 5,695 | 38 | 198 | `machine_readable` (Plurality + RCV sheets) |
@@ -251,7 +272,7 @@ Quick reference (post-pipeline run, 2026-10-25):
 
 **Notes on row counts:**
 
-- 2008/2010 Boulder: only major statewide and Boulder-specific contests captured cleanly — see [§4.2](#42-boulder-county-panel-years-2008-2010-2011-2012).
+- 2008-2012 Boulder: panel files; every candidate reconciles to the file's printed `Totals` — see [§4.2](#42-boulder-county-panel-years-2008-2010-2011-2012).
 - 2024 Boulder: the upstream "Amended Statement of Votes" file contains only 66 rows of local races (Town of Superior, etc.), and the 2024 SOS file is turnout-only. County-wide totals for all 65 contests are in the election-night dataset's final 2024 snapshot (§8).
 - 2023 / 2025 Boulder: precinct counts include the `Property Owner` pseudo-precinct (§4.3a).
 - 2008-2014 SOS: ~3-5 fewer precincts than Boulder — SOS reports precinct subset that voted; Boulder reports every registered precinct.
@@ -317,7 +338,7 @@ data/processed/vote-counting/
 | `contest` | string | Card title as published, with any "Vote for no more than N" line removed. |
 | `vote_for` | Int16 | N from "Vote for (no/not more than) N", when shown. |
 | `contest_type` | string | As in §3 (inferred the same way). RCV report rows are `ranked_choice` with `\| Round N` / `\| Final` suffixes, matching the 2023 SoV convention. |
-| `candidate_or_option` | string | Candidate name with party and write-in suffix removed; Yes/No choices canonicalized (§2.2). Other measure labels (e.g. `For the Measure`) pass through. |
+| `candidate_or_option` | string | Candidate name with party and write-in suffix removed; Yes/No choices canonicalized (§2.2), including `For/Against the Measure`. |
 | `party` | string | Text after the last ` - ` in the published name, normalized via `PARTY_MAP` (§2.3); unknown parties verbatim. |
 | `is_write_in` | boolean | Name carried `- Write-in Candidate`, `- Write-In`, or `- Certified Write-in Candidate`. |
 | `votes` | Int64 | Cumulative votes as of `last_updated`. Null only where the source image is illegible. |
@@ -371,3 +392,10 @@ hold; 2025's final snapshot is pre-certification ("Unofficial Results").
 - **2026-05** — Schema bumped to **1.1.0**. Per-row CSVs now hold a slim 15-column view; the 5 provenance columns (`source_file`, `source_url`, `retrieved_at`, `extraction_quality`, `extraction_notes`) moved to `data/processed/statements-of-votes/provenance.csv`. Combined-CSV size dropped from 152 MB to 49 MB; per-year files shrank by ~60%.
 - **2026-10** — Added the election-night incremental results dataset (§8, vote-counting schema 1.0.0), OCR'd from results-site screenshots via Datalab. Boulder SoV raw files moved to `data/original/boulder-county/statement-of-votes/`; paths now resolve through `config.original_path()`.
 - **2026-10** — Boulder tidy parser keeps `Property Owner` pseudo-precinct rows (2023, 2025) instead of rejecting them (§4.3a).
+- **2026-10** — Accuracy fixes (data changes; schema unchanged):
+  - SOS 2012-2020: every judge's retention votes kept, one contest per judge (`Court of Appeals - {judge}`); no more 0-vote `Yes`/`No` rows on candidate contests or 0-vote judge "candidate" rows (§4.5). Boulder retention votes per year now equal the raw file's (e.g. 2016: 400,831 → 1,701,522).
+  - Boulder 2008/2010 panel files re-parsed with positional alignment; 2008 grows from 2,528 to 27,934 rows and every candidate reconciles to the file's `Totals` row (§4.2). 2011/2012 gain their `Landowner` rows.
+  - PDF years: candidate headers read per page; no duplicate keys; every candidate reconciles to the PDF's printed totals (§4.4).
+  - `For/Against the Measure`, `FOR THE ISSUE`, `FOR`/`AGAINST` → `Yes`/`No` (contest type `measure`); county/district court judges typed `retention`, TABOR revenue-retention questions typed `measure`.
+  - Party codes unified across sources (`UNI`/`Unity Party of Colorado` → `UTY`, `LIB` → `LBR`, `UNA` → `UAF`, `APV` → `AVP`, full names → codes; see `data/lookups/party-codes.json`).
+  - `provenance.csv` has a row for every source file, including the PDF years and the turnout-only 2024 SOS file; `reconcile.py` adds a contest × candidate check.

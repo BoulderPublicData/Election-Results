@@ -90,6 +90,44 @@ def test_merge_with_registry_filters_existing(boco_results_html, sos_archives_ht
         + discover_secretary_of_state(html=sos_archives_html)
     )
     new = merge_with_registry(found, only_new=True)
-    existing_keys = {(s.year, s.data_source) for s in ALL_SOURCES}
+    existing_keys = {(s.year, s.election_type, s.data_source) for s in ALL_SOURCES}
     for s in new:
-        assert (s.year, s.data_source) not in existing_keys
+        assert (s.year, s.election_type, s.data_source) not in existing_keys
+
+
+class TestPrimariesAndRecounts:
+    """#29."""
+
+    def test_boulder_primary_by_prefix(self):
+        url = ("https://assets.bouldercounty.gov/wp-content/uploads/2026/07/"
+               "2026P-Boulder-County-Primary-Official-Statement-of-Votes.xlsx")
+        assert _classify_boco_url(url) == (2026, "primary")
+
+    def test_sos_primary(self):
+        url = ("https://www.coloradosos.gov/pubs/elections/Results/2026/"
+               "2026PrimaryPrecinctLevelResults.xlsx")
+        assert _classify_sos_url(url) == (2026, "primary")
+
+    def test_recount_sov_is_not_rejected(self):
+        url = ("https://assets.bouldercounty.gov/wp-content/uploads/2023/12/"
+               "2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx")
+        assert _classify_boco_url(url) == (2023, "coordinated")
+
+    def test_recount_preferred_over_original(self):
+        base = "https://assets.bouldercounty.gov/wp-content/uploads/2023/12/"
+        html = (f"<a href='{base}2023C-Boulder-County-Official-Statement-of-Votes.xlsx'>a</a>"
+                f"<a href='{base}2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx'>b</a>"
+                )
+        found = discover_boulder_county(html=html)
+        assert len(found) == 1 and found[0].url.endswith("Recount.xlsx")
+
+    def test_primary_is_new_even_when_the_general_is_registered(self):
+        from scripts.sources import Source
+        primary = Source(2024, "primary", "boulder_county", "https://x/2024P.xlsx",
+                         "2024-primary-sov.xlsx")
+        assert merge_with_registry([primary], only_new=True) == [primary]
+
+    def test_primary_election_date(self):
+        from scripts.sources import election_date_for
+        assert election_date_for(2026, "primary") == "2026-06-30"
+        assert election_date_for(2026, "general") == "2026-11-03"

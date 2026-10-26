@@ -80,7 +80,7 @@ To recover row-level provenance, join on `(election_year, election_type, data_so
 ### 2.4 Three audit layers, not one
 
 - **`scripts/audit.py`** — per-file summary stats (row counts, contests, parties, top-N).
-- **`scripts/reconcile.py`** — top-line contest reconciliation between original files and processed CSVs (the strongest correctness check).
+- **`scripts/reconcile.py`** — reconciliation between original files and processed CSVs, at two levels: top-line contests, and every contest × candidate key (the strongest correctness check), plus structural checks for duplicate keys and contests that mix Yes/No with candidates.
 - **`Cleaning.ipynb` § 5** — narrative reconciliation in the methodology notebook.
 
 **Why three:** The audit catches null-rate regressions and shape changes. The reconciliation catches vote-count regressions (the thing that would actually mislead an analyst). The notebook is the human-readable doc that explains both.
@@ -115,8 +115,8 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at). Anyt
 | **Composite precinct IDs (2015, 2022)** | Joining to precinct geography on `precinct_id` silently drops these rows. | Split on `,` before joins; `extraction_notes` flags these years. |
 | **Property-owner pseudo-precincts (2015, 2023, 2025)** | Rows with `precinct_id` `Property Owner` / `Landowner` have no geography; dropping them undercounts special-district contests. | Keep them for totals, exclude them before spatial joins. See `docs/data-dictionary.md` §4.3a. |
 | **RCV expansion (2023)** | Summing `votes` for RCV contests double-counts (Round 1 + Round 2 + Final). | Filter to `candidate_or_option.str.endswith("| Final")` before summing totals. Reconcile already handles this — see `reconcile.py:reconcile_source`. |
-| **2008/2010 Boulder panel format** | Header column positions don't align with data column positions due to merged cells; the parser captures the major statewide contests but loses some down-ballot detail. Don't claim full precinct-level coverage for these years. | Annotate analyses with this caveat; cross-check against the SOS file when possible. |
-| **2005/2007/2009 PDF years** | Contest titles, candidates, and counts are extracted with pdfplumber, but the page layout is irregular page-to-page. | Treat as provisional (`extraction_quality = pdf_text_layer`); spot-check precinct-level claims against the source PDF before publishing. |
+| **2008-2012 Boulder panel format** | Header labels don't sit over their values (merged cells), so `boco_panel` maps each row's non-empty cells to the header's non-empty labels by position — never by spreadsheet column. Rows that don't fit go to the reject port. | Keep `reconcile.py`'s contest × candidate check at 0 mismatches: it compares against the file's own `Totals` row. |
+| **2005/2007/2009 PDF years** | Candidate columns change page to page within one contest, and the vote-method block is 4 columns (2007) or 6 (2005/2009). | `boco_pdf` re-reads the header on every page and splits rows at the `%` token. Rows still carry `extraction_quality = pdf_text_layer`; spot-check names against the source PDF. |
 | **2024 Boulder file** | The upstream "Amended SoV" file contains only 66 rows of local races (Town of Superior, etc.). Federal/state-level Boulder results may have a separate file or appear via SOS once published. | Verify the file's scope before drawing conclusions. |
 | **negative `votes` values** | Legitimately appear in RCV intermediate rounds (ballots transferring away from eliminated candidates). | `validate()` skips this check for `contest_type == "ranked_choice"` rows. Don't "fix" it by taking absolute values — you lose information. |
 | **Election-night snapshots** (`data/processed/vote-counting/`) | Rows are cumulative county-wide totals per snapshot; summing `votes` across snapshots multiplies them, and concatenating with precinct data double-counts. | Use `vote_change` or filter `is_final_snapshot`. Keep the dataset separate (own schema in `schema.py:VOTE_COUNTING_*`). |
@@ -136,8 +136,7 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at). Anyt
 
 ### Open uncertainties (do not "fix" without evidence)
 
-- **2008/2010 panel-header alignment.** The merged-cell layout means column N in the header doesn't reliably correspond to column N in the data row. A correct fix requires per-contest column-position mapping (the original `Cleaning.ipynb` did this manually via `iloc[:,[0,7,8,9]]`-style indexing). Until someone ports those mappings, the parser uses a generic walker that captures the major statewide contests but not all down-ballot detail.
-- **PDF contest titles.** Now extracted via pdfplumber (the parser clusters rotated candidate words by x-coordinate and reads contest titles from the page text). Spot-check a sample of precincts in the source PDF before publishing — extraction is reliable but the source layout is irregular page-to-page.
+- **PDF candidate labels.** Vote counts reconcile exactly to each PDF's printed totals, but candidate names are rebuilt from rotated text (clustered by x-coordinate, char-reversed). A misspelled or truncated label would still reconcile — spot-check names against the source PDF before publishing.
 - **Party-name normalization is best-effort.** The `PARTY_MAP` in `parsers/common.py` is exhaustive for the parties I've seen, but new parties (especially small / single-cycle ones) pass through verbatim. Check `data/lookups/party-codes.json:by_canonical` to see the current coverage.
 - **`election_date` is election day, not certification day.** The SoV file is usually published 2-4 weeks later. We don't track certification date as a separate field.
 
@@ -154,8 +153,8 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at). Anyt
 
 In rough order of value:
 
-1. **Fix the 2008/2010 panel-header alignment** by porting the per-contest `iloc` mappings from the original `Cleaning.ipynb`. The original notebook is gone but the git history (`git log --all --source -- Cleaning.ipynb`) has it. Target: restore the ~75k-row coverage observed before the rewrite.
-2. **Spot-check 2005/2007/2009 PDF extraction** against the source PDFs. Contest titles are now extracted with pdfplumber; what's missing is a sampled precinct-by-precinct verification (and a golden-output test per PDF year).
+1. ~~Fix the 2008/2010 panel-header alignment~~ — done (2026-10): `boco_panel` aligns by position and every candidate reconciles to the file's `Totals` row.
+2. **Spot-check 2005/2007/2009 PDF candidate names** against the source PDFs. Vote counts now reconcile to the printed totals and `tests/test_pdf_parser.py` pins golden values per year; names from rotated text still deserve a sampled read.
 3. **Add Colorado primary elections** to the source registry. Boulder publishes primary SoVs in even-year June; the SOS publishes statewide primary precinct files too.
 4. **Add precinct geographies** as a separate `data/geography/` directory (GeoJSON or shapefile) with a year column so changing precinct boundaries can be joined to historical results.
 5. **Golden-output tests per parser.** The `tests/` suite (~115 tests) covers helpers, schema, discovery, and the election-night pipeline; small checked-in fixture workbooks per parser generation would catch silent regressions in the parsers themselves.
@@ -172,7 +171,7 @@ In rough order of value:
 2. Add the election day to `ELECTION_DATES` in the same file (use the absolute date — `2026-11-03`, not "next November").
 3. Pick a parser route in [`scripts/clean.py`](scripts/clean.py). If the new year is a Boulder XLS/XLSX, it should "just work" via `boco_tidy`. If it's a new file format, add a parser under `scripts/parsers/`.
 4. Run `uv run python -m scripts.pipeline --skip-fetch --year <year>`.
-5. Check `data/audit/reconciliation.md` — every top-line contest should be `match` or `near_match`. If anything is `mismatch`, find why before publishing.
+5. Check `data/audit/reconciliation.md` — every top-line contest and every contest × candidate key should be `match` or `near_match`, and the structural checks 0. If anything is `mismatch`, find why before publishing.
 6. Run `uv run python -m scripts.export_lookups` to refresh the JSON lookups.
 7. Update the year row in `docs/data-dictionary.md` § 5 and the README availability table.
 
@@ -215,7 +214,7 @@ In rough order of value:
 | Source URL registry (JSON) | [`data/lookups/sources.json`](data/lookups/sources.json) |
 | Schema (JSON) | [`data/lookups/schema.json`](data/lookups/schema.json) |
 | Top-line contest patterns | [`data/lookups/contest-aliases.json`](data/lookups/contest-aliases.json) |
-| Reconciliation report | [`data/audit/reconciliation.md`](data/audit/reconciliation.md) |
+| Reconciliation report | [`data/audit/reconciliation.md`](data/audit/reconciliation.md) (top-line rows in `reconciliation.csv`, contest × candidate rows in `reconciliation-candidates.csv`) |
 | Election-night vote counting | [`scripts/vote_counting.py`](scripts/vote_counting.py), parser [`scripts/parsers/boco_vote_counting.py`](scripts/parsers/boco_vote_counting.py), OCR client [`scripts/datalab.py`](scripts/datalab.py) |
 | Vote-counting OCR corrections | [`scripts/corrections/vote-counting.csv`](scripts/corrections/vote-counting.csv) |
 | Vote-counting QA | [`data/audit/vote-counting.md`](data/audit/vote-counting.md) |

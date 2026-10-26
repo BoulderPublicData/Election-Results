@@ -90,18 +90,34 @@ def to_csv_frame(df: pd.DataFrame) -> pd.DataFrame:
     return df[keep].copy()
 
 
-def provenance_record(df: pd.DataFrame) -> dict[str, object]:
-    """Distil the constant provenance fields from a parser-output frame into a
-    single dict. All non-grouping columns are expected to hold one value across
-    every row from this source — the first non-null wins."""
+def provenance_record(df: pd.DataFrame, meta: SourceMeta | None = None) -> dict[str, object]:
+    """Distil the constant provenance fields of one source file into a dict.
+
+    With `meta` (the parser's SourceMeta), the key and provenance fields come
+    from it, so a source whose parser returns no rows — e.g. the turnout-only
+    2024 SOS file — still gets a complete record (#31). `extraction_notes`
+    come from the frame: the first non-null value in the column, else
+    ``df.attrs["extraction_notes"]`` (set by add_provenance, which survives an
+    empty frame). Without `meta`, every field is read from the rows (first
+    non-null wins)."""
     out: dict[str, object] = {}
     for col in ["election_year", "election_type", "data_source"] + PROVENANCE_COLUMNS:
-        if col not in df.columns:
-            out[col] = pd.NA
+        if meta is not None and hasattr(meta, col):
+            out[col] = getattr(meta, col)
             continue
-        s = df[col].dropna()
+        s = df[col].dropna() if col in df.columns else pd.Series(dtype=object)
         out[col] = s.iloc[0] if len(s) else pd.NA
+    if pd.isna(out.get("extraction_notes")) and df.attrs.get("extraction_notes"):
+        out["extraction_notes"] = df.attrs["extraction_notes"]
     return out
+
+
+# dtypes for reading provenance.csv back (election_year matches the
+# `elections` table's integer type so the two join without a cast).
+PROVENANCE_DTYPES: dict[str, str] = {
+    "election_year": "Int16",
+    **{c: "string" for c in ["election_type", "data_source"] + PROVENANCE_COLUMNS},
+}
 
 ElectionType = Literal["general", "primary", "coordinated"]
 ContestType = Literal[
@@ -159,7 +175,9 @@ def coerce(df: pd.DataFrame) -> pd.DataFrame:
         except (ValueError, TypeError) as e:
             raise ValueError(f"coerce({col!r}): {e}") from e
         out[col] = series
-    return out[COLUMNS]
+    out = out[COLUMNS]
+    out.attrs.update(df.attrs)
+    return out
 
 
 def validate(df: pd.DataFrame, source_label: str = "") -> list[str]:

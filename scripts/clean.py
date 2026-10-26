@@ -23,7 +23,6 @@ import pandas as pd
 
 from .config import (
     BOULDER_COUNTY,
-    ELECTION_DATES,
     MANIFEST_PATH,
     ORIGINAL,
     PROVENANCE_CSV,
@@ -38,6 +37,7 @@ from .config import (
 from .logging_setup import get_logger
 from .parsers import boco_panel, boco_pdf, boco_tidy, sos
 from .schema import SourceMeta, coerce, validate
+from .sources import election_date_for
 
 log = get_logger(__name__)
 
@@ -94,7 +94,7 @@ def _meta_for(s: Source) -> SourceMeta:
     quality = "pdf_text_layer" if s.year in BOCO_PDF_YEARS else "machine_readable"
     return SourceMeta(
         election_year=s.year,
-        election_date=ELECTION_DATES.get(s.year, f"{s.year}-11-XX"),
+        election_date=election_date_for(s.year, s.election_type),
         election_type=s.election_type,
         data_source=s.data_source,
         jurisdiction_level="county" if s.data_source == "boulder_county" else "state",
