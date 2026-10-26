@@ -728,6 +728,9 @@ def main(argv: list[str] | None = None) -> int:
                     help="Only this election, as an election key, e.g. 2024-general")
     ap.add_argument("--source", choices=["boulder_county", "secretary_of_state", "all"],
                     default="all")
+    ap.add_argument("--check", action="store_true",
+                    help="Write nothing; exit 1 if any top-line or contest × candidate "
+                         "`mismatch`, duplicate key or mixed contest is found (CI uses this)")
     args = ap.parse_args(argv)
 
     if args.source == "boulder_county":
@@ -746,6 +749,16 @@ def main(argv: list[str] | None = None) -> int:
     if all_recon.empty and cand.empty:
         print("No reconciliation rows generated.", file=sys.stderr)
         return 2
+    if args.check:
+        n_bad = int((all_recon["status"] == "mismatch").sum()) if len(all_recon) else 0
+        n_cand_bad = int((cand["status"] == "mismatch").sum())
+        n_struct = sum(int(c["duplicate_keys"]) + int(c["mixed_contests"]) for c in checks)
+        print(f"mismatches: top-line={n_bad} candidate={n_cand_bad} structural={n_struct}")
+        for r in cand[cand["status"] == "mismatch"].head(20).itertuples(index=False):
+            print(f"FAIL  {r.year} {r.election_type} {r.data_source}: {r.contest} / "
+                  f"{r.candidate_or_option}: {r.original_votes} → {r.processed_votes}",
+                  file=sys.stderr)
+        return 1 if (n_bad or n_cand_bad or n_struct) else 0
     if len(pool) < len(ALL_SOURCES):
         # A filtered run updates its own sources' rows and keeps everyone
         # else's, so the shared report always covers the whole dataset (#18).

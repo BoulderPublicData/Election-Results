@@ -176,7 +176,7 @@ In rough order of value:
 4. **Add precinct geographies** as a separate `data/geography/` directory (GeoJSON or shapefile) with a year column so changing precinct boundaries can be joined to historical results.
 5. **Golden-output tests per parser.** Done for `sos` (`tests/test_sos_parser.py`), `boco_panel` (synthetic sheet, `tests/test_boco_panel.py`) and `boco_pdf` (golden pages of each committed PDF, `tests/test_pdf_parser.py`); `boco_tidy` still has only helper-level tests and would benefit from a small fixture workbook.
 6. **Add primary-vs-general party-affiliation tracking** for partisan primaries (the schema already has `party`; needs the primary data to populate it).
-7. **Fail the annual-refresh PR on new reconcile mismatches.** The Action now runs `reconcile.py` and puts the mismatch count in the PR body; it doesn't yet fail the job when that count is above 0.
+7. **Fail the annual-refresh PR on new reconcile mismatches.** The tests workflow already runs `reconcile --check` on every push and PR (it fails on any mismatch); the annual refresh still only reports the counts in its PR body, because a new year may need parser work before it reconciles.
 8. **Repo / org setting prerequisite for the Action:** The Action opens a PR via `peter-evans/create-pull-request`. For that to work, the repo (and the org, if it enforces) must have **Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"** enabled. Without it, the scheduled run fails at the `Open PR` step with `"GitHub Actions is not permitted to create or approve pull requests"`. The workflow has a fallback step that opens an issue containing the same body in that case, but enabling the toggle is the proper fix.
 9. **Per-year contest-name canonicalization.** Right now `contest` carries the as-published title; `data/lookups/contest-aliases.json` has patterns but only for top-line offices. A full crosswalk would let analyses group, e.g., "Representative to the 113th Congress" and "Representative to the 114th Congress" without manual regex.
 
@@ -222,7 +222,7 @@ In rough order of value:
 | End-to-end driver | [`scripts/pipeline.py`](scripts/pipeline.py) |
 | JSON lookup exporter | [`scripts/export_lookups.py`](scripts/export_lookups.py) |
 | Doc counts/sizes generator | [`scripts/doc_stats.py`](scripts/doc_stats.py) (rewrites the `<!-- generated:… -->` spans) |
-| Test suite | [`tests/`](tests/) (pytest, <!-- generated:test-count -->435 tests<!-- /generated:test-count -->; hermetic — never writes into `data/`) |
+| Test suite | [`tests/`](tests/) (pytest, <!-- generated:test-count -->436 tests<!-- /generated:test-count -->; hermetic — never writes into `data/`) |
 | Shared Excel reader | [`scripts/parsers/common.py`](scripts/parsers/common.py) (`read_excel`, `excel_file`) |
 | Data dictionary | [`docs/data-dictionary.md`](docs/data-dictionary.md) |
 | Changelog | [`docs/changelog.md`](docs/changelog.md) |
@@ -276,7 +276,7 @@ uv run jupyter nbconvert --to notebook --execute \
     Cleaning.ipynb --output Cleaning.ipynb               # validates notebook
 ```
 
-If `ruff` or `pytest` fails, or `reconcile` reports any new `mismatch` rows, **stop and investigate** before committing. CI runs ruff and pytest on every push and PR; the annual-refresh workflow also runs reconcile and surfaces the mismatch counts in the PR body.
+If `ruff` or `pytest` fails, or `reconcile` reports any new `mismatch` rows, **stop and investigate** before committing. CI runs ruff, pytest (Python 3.11 and 3.13) and `reconcile --check` on every push and PR; the annual-refresh workflow also surfaces the mismatch counts in its PR body.
 
 Filtered runs (`--year`, `--since`, `--source`, `--no-pdf`, `clean`, `reconcile --year`, `vote_counting --election`) only re-parse their subset; the whole-dataset outputs (combined CSV, `provenance.csv`, `rejected.csv`, `summary.md`, the reconciliation report, the election-night CSVs) are rebuilt from every file on disk or upserted by key, so they never shrink to the subset. A full run before committing is still the safest check.
 

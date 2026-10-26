@@ -225,7 +225,7 @@ uv run python -m scripts.pipeline --discover            # full end-to-end with d
 The pytest suite and [ruff](https://docs.astral.sh/ruff/) lint run on every push and PR via [`.github/workflows/tests.yml`](.github/workflows/tests.yml). The tests cover schema contracts, per-parser helpers, the discovery classifier (with cached HTML fixtures so it works offline), source-registry shape, the election-night parser and QA, fixture or golden-page tests for the SOS, panel and PDF parsers, and every committed processed CSV. They never touch the network or rewrite committed files.
 
 ```bash
-uv run pytest                  # run everything (<!-- generated:test-count -->435 tests<!-- /generated:test-count -->)
+uv run pytest                  # run everything (<!-- generated:test-count -->436 tests<!-- /generated:test-count -->)
 uv run pytest tests/test_discover.py -v
 uv run ruff check .            # lint (rules in pyproject.toml)
 ```

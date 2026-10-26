@@ -44,3 +44,9 @@ jobs:
 
       - name: Run pytest
         run: uv run pytest -v --tb=short
+
+      - name: Reconcile committed CSVs against the originals
+        # Top-line and contest × candidate totals, plus duplicate-key and
+        # mixed-contest checks (#34, #35). Read-only; fails on any mismatch.
+        if: matrix.python-version == '3.11'
+        run: uv run python -m scripts.reconcile --check
