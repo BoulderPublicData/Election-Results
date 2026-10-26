@@ -8,7 +8,7 @@ This file is also a useful overview for human collaborators.
 
 ## 0. One-paragraph summary
 
-This repo harmonizes precinct-level election results from Boulder County (2005-2025) and the Colorado Secretary of State (2004-2024) into a single long-form CSV under `data/processed/`. Raw files in `data/original/` are immutable; everything else under `data/` is regenerable from them via `scripts/pipeline.py`. The schema is defined once in [`scripts/schema.py`](scripts/schema.py); every parser produces the same 20 columns. A reconciliation audit ([`scripts/reconcile.py`](scripts/reconcile.py)) compares top-line contest totals between the originals and the processed CSVs and would catch a regression. [`scripts/discover.py`](scripts/discover.py) scrapes the upstream Boulder County and SOS landing pages so the pipeline picks up newly-published years even before they're hand-added to the static registry. A GitHub Action runs every January 6 to refresh the prior calendar year; another runs pytest on every push and PR.
+This repo harmonizes precinct-level election results from Boulder County (2005-2025) and the Colorado Secretary of State (2004-2024) into a single long-form CSV under `data/processed/statements-of-votes/`. Raw files in `data/original/` are immutable; everything else under `data/` is regenerable from them via `scripts/pipeline.py`. The schema is defined once in [`scripts/schema.py`](scripts/schema.py); every parser produces the same 20 columns. A reconciliation audit ([`scripts/reconcile.py`](scripts/reconcile.py)) compares top-line contest totals between the originals and the processed CSVs and would catch a regression. [`scripts/discover.py`](scripts/discover.py) scrapes the upstream Boulder County and SOS landing pages so the pipeline picks up newly-published years even before they're hand-added to the static registry. A GitHub Action runs every January 6 to refresh the prior calendar year; another runs pytest on every push and PR.
 
 ---
 
@@ -36,7 +36,7 @@ This repo harmonizes precinct-level election results from Boulder County (2005-2
         └─────────────────┬───────────────────────────────┘
                           │ DataFrame matching scripts.schema.COLUMNS
                           ▼
-                  data/processed/{year}-{type}-{source}.csv
+          data/processed/statements-of-votes/{year}-{type}-{source}.csv
                           │
                 ┌─────────┼──────────────┐
                 ▼         ▼              ▼
@@ -47,7 +47,7 @@ This repo harmonizes precinct-level election results from Boulder County (2005-2
        data/audit/*.md    data/audit/reconciliation.{md,csv}
 ```
 
-All modules above sit under `scripts/` and are wired up so `uv run python -m scripts.pipeline` runs end-to-end. The dataset is `data/processed/`; provenance (`source_url`, `retrieved_at`, `extraction_quality`, …) is carried on the in-memory frames and written once per source file to `data/processed/provenance.csv` (§2.1a).
+All modules above sit under `scripts/` and are wired up so `uv run python -m scripts.pipeline` runs end-to-end. The dataset is `data/processed/statements-of-votes/`; provenance (`source_url`, `retrieved_at`, `extraction_quality`, …) is carried on the in-memory frames and written once per source file to `data/processed/statements-of-votes/provenance.csv` (§2.1a).
 
 A second, separate dataset rides alongside: **election-night snapshots** (`scripts/vote_counting.py` → `data/processed/vote-counting/`), OCR'd from results-site screenshots through Datalab with a committed response cache, its own schema (`schema.py:VOTE_COUNTING_*`), QA (`data/audit/vote-counting.md`), and a report-only comparison against the SoV in `reconcile.py`. The pipeline rebuilds it from the cache and never calls the API.
 
@@ -65,7 +65,7 @@ All Excel reads go through `parsers/common.py:read_excel` / `excel_file` (the ca
 
 ### 2.1a Provenance lives in a sidecar, not on every row
 
-**Why:** `source_file`, `source_url`, `retrieved_at`, `extraction_quality`, `extraction_notes` are constant per source file — repeating them on every row would inflate per-year CSVs by ~3×. They live in `data/processed/provenance.csv` (one row per source file) and the in-memory schema. `scripts.schema.to_csv_frame()` drops them before write; `pipeline.py` regenerates the sidecar from the in-memory frames so the two views stay synchronized.
+**Why:** `source_file`, `source_url`, `retrieved_at`, `extraction_quality`, `extraction_notes` are constant per source file — repeating them on every row would inflate per-year CSVs by ~3×. They live in `data/processed/statements-of-votes/provenance.csv` (one row per source file) and the in-memory schema. `scripts.schema.to_csv_frame()` drops them before write; `pipeline.py` regenerates the sidecar from the in-memory frames so the two views stay synchronized.
 
 To recover row-level provenance, join on `(election_year, election_type, data_source)` — see `docs/filter-pivot-recipes.md` § "Joining the provenance sidecar". `scripts.audit.audit_file` and `scripts.audit.audit_frame` both reconstruct provenance: the file-based variant reads the sidecar, the frame-based variant reads the in-memory columns directly.
 
@@ -227,7 +227,7 @@ In rough order of value:
 
 ## 9. Common agent failure modes (avoid these)
 
-- **Building a path to a raw SoV by hand.** Boulder SoVs live in `data/original/boulder-county/statement-of-votes/`; always go through `config.original_path(data_source, local_filename)`.
+- **Building a path to a raw SoV by hand.** Boulder SoVs live in `data/original/boulder-county/statement-of-votes/`; always go through `config.original_path(data_source, local_filename)`. The same goes for outputs: harmonized SoV CSVs live in `data/processed/statements-of-votes/` — use `config.sov_csv_path(year, election_type, data_source)`, and `config.STATEMENTS_OF_VOTES` / `config.VOTE_COUNTING` for the dataset folders.
 - **Editing `data/original/` instead of the parser.** The raw files are reference. Fix the parser.
 - **Adding a parser without updating `scripts/clean.py`'s router.** The orchestrator picks the parser by year; a new parser orphaned outside the router won't run.
 - **Hardcoding a path.** Everything should resolve from `REPO_ROOT = Path(__file__).resolve().parents[1]`.
@@ -236,7 +236,7 @@ In rough order of value:
 - **Inferring schema from the CSV files.** Per-year CSVs use `CSV_COLUMNS` (15 cols, no provenance); the canonical `COLUMNS` constant in `schema.py` has all 20. Use `CSV_COLUMNS` when validating a CSV; use `COLUMNS` when validating a parser-output frame.
 - **Pretending PDF years are machine-readable.** Their `extraction_quality` is intentionally `pdf_text_layer` so downstream filters can skip them.
 - **"Fixing" composite precinct IDs by splitting on comma.** Their vote tallies are reported jointly — splitting would multiply totals.
-- **Recreating a `data/cleaned/` or `data/original/output/` directory for "intermediate" outputs.** There are only two homes for data on disk: `data/original/` for immutable raw downloads and `data/processed/` for everything the pipeline produces. The `data/audit/` and `data/lookups/` siblings are read-only artifacts derived from `data/processed/`; do not invent new write targets.
+- **Recreating a `data/cleaned/` or `data/original/output/` directory for "intermediate" outputs.** There are only two homes for data on disk: `data/original/` for immutable raw downloads and `data/processed/` for everything the pipeline produces — one subfolder per dataset (`statements-of-votes/`, `vote-counting/`), with cross-dataset publishing artifacts (`elections.db`, `metadata.yaml`) at its top. The `data/audit/` and `data/lookups/` siblings are read-only artifacts derived from `data/processed/`; do not invent new write targets.
 
 ---
 

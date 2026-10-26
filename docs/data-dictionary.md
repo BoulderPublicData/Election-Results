@@ -1,9 +1,11 @@
 # Data dictionary
 
-This file is the authoritative description of every column in `data/processed/`.
+This file is the authoritative description of every column in `data/processed/`
+(the harmonized SoV dataset in `statements-of-votes/` and the election-night
+dataset in `vote-counting/`, §8).
 It also documents the cross-walks between Boulder County SoV files, Colorado
 Secretary of State precinct-results files, and the harmonized long-form schema
-used throughout `data/processed/`.
+used throughout `data/processed/statements-of-votes/`.
 
 Schema version: **1.1.0** (see [`scripts/schema.py`](../scripts/schema.py))
 
@@ -12,17 +14,19 @@ Schema version: **1.1.0** (see [`scripts/schema.py`](../scripts/schema.py))
 ## 1. Schema (canonical columns)
 
 The harmonized in-memory schema is **20 columns**. The **per-year CSV files** under
-`data/processed/` hold a slim 15-column view — the 5 provenance columns (#16-20
+`data/processed/statements-of-votes/` hold a slim 15-column view — the 5 provenance columns (#16-20
 in the table below) are redundant per-row (every row from a single source file
 has the same value) so they live in a sidecar:
 
 ```
 data/processed/
-├── 2020-general-boulder-county.csv     ← 15-column slim view
-├── …                                    ← one slim CSV per source file
-├── all-elections-tidy.csv              ← combined slim CSV
-└── provenance.csv                      ← one row per source file; carries
-                                          the 5 provenance columns
+├── statements-of-votes/
+│   ├── 2020-general-boulder-county.csv     ← 15-column slim view
+│   ├── …                                    ← one slim CSV per source file
+│   ├── all-elections-tidy.csv              ← combined slim CSV
+│   └── provenance.csv                      ← one row per source file; carries
+│                                             the 5 provenance columns
+└── vote-counting/                          ← election-night snapshots (§8)
 ```
 
 One row in a per-year CSV represents one
@@ -53,7 +57,7 @@ need the source URL or retrieved-at timestamp for a row.
 | 19 | `extraction_quality` | string | sidecar | **Provenance — sidecar only.** `machine_readable` (XLS/XLSX), `pdf_text_layer` (pdfplumber-extracted from text-layer PDF), `pdf_ocr` (reserved), `manual` (reserved). |
 | 20 | `extraction_notes` | string | sidecar | **Provenance — sidecar only.** Free-text caveats from the parser — composite-ID flags, RCV mechanics, skipped panels, etc. |
 
-Columns marked **sidecar** live in `data/processed/provenance.csv` rather than in every row of every per-year CSV. They're constant per source file, so duplicating them on every row would inflate file sizes ~3× for no information gain. The pipeline writes both files together so they stay in sync.
+Columns marked **sidecar** live in `data/processed/statements-of-votes/provenance.csv` rather than in every row of every per-year CSV. They're constant per source file, so duplicating them on every row would inflate file sizes ~3× for no information gain. The pipeline writes both files together so they stay in sync.
 
 ---
 
@@ -364,6 +368,6 @@ hold; 2025's final snapshot is pre-certification ("Unofficial Results").
 
 - **2026-05-23** — Schema 1.0.0 released alongside the new pipeline. Initial dictionary published.
 - **2026-05** — Added `discover.py` (BoCo + SOS upstream scraping), pytest suite under `tests/`, CI workflow at `.github/workflows/tests.yml`, plus 2025 Boulder coordinated + 2024 SOS general entries. `infer_contest_type` now handles `pd.NA` inputs.
-- **2026-05** — Schema bumped to **1.1.0**. Per-row CSVs now hold a slim 15-column view; the 5 provenance columns (`source_file`, `source_url`, `retrieved_at`, `extraction_quality`, `extraction_notes`) moved to `data/processed/provenance.csv`. Combined-CSV size dropped from 152 MB to 49 MB; per-year files shrank by ~60%.
+- **2026-05** — Schema bumped to **1.1.0**. Per-row CSVs now hold a slim 15-column view; the 5 provenance columns (`source_file`, `source_url`, `retrieved_at`, `extraction_quality`, `extraction_notes`) moved to `data/processed/statements-of-votes/provenance.csv`. Combined-CSV size dropped from 152 MB to 49 MB; per-year files shrank by ~60%.
 - **2026-10** — Added the election-night incremental results dataset (§8, vote-counting schema 1.0.0), OCR'd from results-site screenshots via Datalab. Boulder SoV raw files moved to `data/original/boulder-county/statement-of-votes/`; paths now resolve through `config.original_path()`.
 - **2026-10** — Boulder tidy parser keeps `Property Owner` pseudo-precinct rows (2023, 2025) instead of rejecting them (§4.3a).

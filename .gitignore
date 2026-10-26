@@ -131,7 +131,7 @@ dmypy.json
 
 # Combined tidy CSV is regenerable from per-year files and would exceed GitHub's
 # 100MB file limit; pipeline.py rebuilds it.
-data/processed/all-elections-tidy.csv
+data/processed/statements-of-votes/all-elections-tidy.csv
 
 # Datasette artifacts — built by `scripts/publish.py` and shipped via the
 # Datasette Lite link in README (released as GitHub Release artifacts on each

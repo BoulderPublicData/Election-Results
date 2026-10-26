@@ -16,27 +16,27 @@ Load the file first (DuckDB doesn't need a load — see its column):
 **pandas**
 ```python
 import pandas as pd
-df = pd.read_csv("data/processed/all-elections-tidy.csv", dtype={"precinct_id": "string"})
+df = pd.read_csv("data/processed/statements-of-votes/all-elections-tidy.csv", dtype={"precinct_id": "string"})
 ```
 
 **tidyverse**
 ```r
 library(readr); library(dplyr); library(tidyr)
-df <- read_csv("data/processed/all-elections-tidy.csv",
+df <- read_csv("data/processed/statements-of-votes/all-elections-tidy.csv",
                col_types = cols(precinct_id = col_character()))
 ```
 
 **DuckDB** (Python, R, CLI, or paste into Datasette's SQL editor)
 ```sql
 -- DuckDB reads CSV directly — no load step. From the CLI:
-duckdb -c "FROM 'data/processed/all-elections-tidy.csv' LIMIT 5"
+duckdb -c "FROM 'data/processed/statements-of-votes/all-elections-tidy.csv' LIMIT 5"
 -- From Python: `import duckdb; con = duckdb.connect()` then `con.sql(...)`.
 -- From the Datasette web UI: paste any of the queries below into the SQL editor.
 ```
 
 **Excel**
 1. Import, don't double-click: **Data → From Text/CSV**, choose
-   `data/processed/all-elections-tidy.csv`, set **File Origin** to
+   `data/processed/statements-of-votes/all-elections-tidy.csv`, set **File Origin** to
    **65001: Unicode (UTF-8)** so accented names (e.g. *Gilbert M. Román*,
    *Paul Noël Fiorino*) aren't garbled, then **Transform Data** and set
    `precinct_id` and `precinct_name` to **Text** before **Close & Load**.
@@ -75,7 +75,7 @@ pres20 <- df |>
 **DuckDB**
 ```sql
 PIVOT (
-    FROM 'data/processed/all-elections-tidy.csv'
+    FROM 'data/processed/statements-of-votes/all-elections-tidy.csv'
     WHERE election_year = 2020
       AND data_source = 'boulder_county'
       AND contest = 'Presidential Electors'
@@ -121,7 +121,7 @@ turnout <- df |>
 ```sql
 PIVOT (
     SELECT DISTINCT precinct_id, election_year, ballots_cast
-    FROM 'data/processed/all-elections-tidy.csv'
+    FROM 'data/processed/statements-of-votes/all-elections-tidy.csv'
     WHERE data_source = 'boulder_county'
 )
 ON election_year
@@ -177,7 +177,7 @@ WITH cob AS (
     FROM read_json_auto('data/lookups/city-of-boulder-precincts-2023.json')
 )
 SELECT contest, candidate_or_option, SUM(votes) AS votes
-FROM 'data/processed/all-elections-tidy.csv'
+FROM 'data/processed/statements-of-votes/all-elections-tidy.csv'
 WHERE precinct_id IN (SELECT precinct_id FROM cob)
   AND election_year = 2023
   AND contest LIKE '%Council%'
@@ -223,7 +223,7 @@ sen20 <- df |>
 ```sql
 WITH base AS (
     SELECT data_source, candidate_or_option, SUM(votes) AS votes
-    FROM 'data/processed/all-elections-tidy.csv'
+    FROM 'data/processed/statements-of-votes/all-elections-tidy.csv'
     WHERE election_year = 2020
       AND LOWER(contest) LIKE '%united states senator%'
     GROUP BY data_source, candidate_or_option
@@ -280,7 +280,7 @@ WITH measures AS (
     SELECT election_year, contest,
            SUM(CASE WHEN candidate_or_option = 'Yes' THEN votes END) AS yes,
            SUM(CASE WHEN candidate_or_option = 'No' THEN votes END) AS no
-    FROM 'data/processed/all-elections-tidy.csv'
+    FROM 'data/processed/statements-of-votes/all-elections-tidy.csv'
     WHERE contest_type = 'measure' AND election_year >= 2014
     GROUP BY election_year, contest
 )
@@ -333,7 +333,7 @@ PIVOT (
     SELECT TRIM(SPLIT_PART(candidate_or_option, '|', 1)) AS candidate,
            TRIM(SPLIT_PART(candidate_or_option, '|', 2)) AS round_label,
            votes
-    FROM 'data/processed/all-elections-tidy.csv'
+    FROM 'data/processed/statements-of-votes/all-elections-tidy.csv'
     WHERE election_year = 2023
       AND contest_type = 'ranked_choice'
       AND LOWER(contest) LIKE '%mayor%'
@@ -352,19 +352,19 @@ GROUP BY candidate;
 
 ## Joining the provenance sidecar
 
-The per-year CSVs hold the slim schema (no `source_url`/`retrieved_at`/etc.). If you need provenance for a row, join against `data/processed/provenance.csv`:
+The per-year CSVs hold the slim schema (no `source_url`/`retrieved_at`/etc.). If you need provenance for a row, join against `data/processed/statements-of-votes/provenance.csv`:
 
 **pandas**
 ```python
-df = pd.read_csv("data/processed/all-elections-tidy.csv",
+df = pd.read_csv("data/processed/statements-of-votes/all-elections-tidy.csv",
                  dtype={"precinct_id": "string"})
-prov = pd.read_csv("data/processed/provenance.csv", dtype=str)
+prov = pd.read_csv("data/processed/statements-of-votes/provenance.csv", dtype=str)
 df = df.merge(prov, on=["election_year", "election_type", "data_source"], how="left")
 ```
 
 **tidyverse**
 ```r
-prov <- read_csv("data/processed/provenance.csv",
+prov <- read_csv("data/processed/statements-of-votes/provenance.csv",
                  col_types = cols(election_year = col_integer()))
 df <- df |> left_join(prov, by = c("election_year", "election_type", "data_source"))
 ```
@@ -372,8 +372,8 @@ df <- df |> left_join(prov, by = c("election_year", "election_type", "data_sourc
 **DuckDB**
 ```sql
 SELECT e.*, p.source_url, p.retrieved_at, p.extraction_quality
-FROM 'data/processed/all-elections-tidy.csv' e
-LEFT JOIN 'data/processed/provenance.csv' p
+FROM 'data/processed/statements-of-votes/all-elections-tidy.csv' e
+LEFT JOIN 'data/processed/statements-of-votes/provenance.csv' p
   ON  e.election_year = CAST(p.election_year AS INTEGER)
   AND e.election_type = p.election_type
   AND e.data_source   = p.data_source;

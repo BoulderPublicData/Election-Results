@@ -16,7 +16,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "data/processed/*.csv"
+      - "data/processed/statements-of-votes/*.csv"
       - "data/processed/vote-counting/*.csv"
       - "scripts/publish.py"
       - "scripts/concepts.py"
