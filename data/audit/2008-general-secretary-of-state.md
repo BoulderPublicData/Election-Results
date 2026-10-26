@@ -11,8 +11,8 @@
 - **Distinct precincts:** 239
 - **Total votes summed:** 4,744,062
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 11472, 'measure': 7648, 'retention': 5736}
-- **Party breakdown (top 8):** {'(none)': 13623, 'DEM': 3346, 'REP': 2868, 'GRN': 956, 'UAF': 956, 'CON': 239, 'LBR': 239, "HeartQuake '08": 239}
+- **Contest type breakdown:** {'candidate': 11472, 'retention': 6692, 'measure': 6692}
+- **Party breakdown (top 8):** {'(none)': 13623, 'DEM': 3346, 'REP': 2868, 'GRN': 956, 'UAF': 956, 'CON': 239, 'LBR': 239, 'HQE': 239}
 
 **Top 10 contests by vote total** (sanity check):
 

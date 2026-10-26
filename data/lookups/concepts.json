@@ -2,20 +2,21 @@
   "$schema_version": "1.1.0",
   "$description": "Source-neutral concept catalog. Each entry maps a snake_case canonical concept name to the literal contest-title patterns that identify it in each source's files, plus a `caveats` field spelling out what is and is NOT comparable across sources. Use scripts/concepts.py:concept_for(contest, source) for row-by-row lookup.",
   "$generated_by": "scripts/export_lookups.py from scripts/concepts.py:CONCEPTS",
-  "$generated_at": "2026-10-25T22:37:47+00:00",
+  "$generated_at": "2026-10-26T04:32:34+00:00",
   "concepts": [
     {
       "name": "presidential_electors",
       "description": "Electors for President and Vice President of the United States.",
       "boulder_county_patterns": [
-        "Presidential Electors",
-        "President.*Vice President"
+        "^Presidential Electors",
+        "^President.*Vice President"
       ],
       "secretary_of_state_patterns": [
-        "President.*United States.*Vice President",
-        "President of the United States"
+        "^Presidential Electors",
+        "^President\\s*/\\s*Vice President",
+        "^President of the United States"
       ],
-      "caveats": "Boulder presents the elector slate as a single candidate (`Joseph R. Biden / Kamala D. Harris`); SOS lists the presidential candidate alone (`Joseph R. Biden`). Vote totals match exactly when aggregated to the candidate level, but the candidate strings cannot be joined directly \u2014 strip the running-mate suffix from Boulder rows before joining.",
+      "caveats": "Both sources list the ticket as one candidate string from 2008 on (`Joseph R. Biden / Kamala D. Harris`), but the spacing around the slash differs: SOS 2008 writes `Barack Obama/ Joe Biden`. SOS 2004 lists the presidential candidate alone (`John F. Kerry`). Vote totals agree exactly; normalize whitespace around `/` (2008) or match on the presidential candidate's name (2004) before joining candidate strings. The patterns are anchored so measures about electors (2004 SOS `Amend 36 Selection of Presidential Electors`) don't match.",
       "tier": "federal"
     },
     {
@@ -36,12 +37,12 @@
       "name": "us_representative",
       "description": "United States Representative \u2014 Boulder is mostly in CO-2, with a small piece historically in CO-4.",
       "boulder_county_patterns": [
-        "Representative to the \\d+th Congress",
-        "United States Representative"
+        "^Representative to the .*Congress",
+        "^United States Representative"
       ],
       "secretary_of_state_patterns": [
-        "Representative to the \\d+th Congress",
-        "United States Representative"
+        "^Representative to the .*Congress",
+        "^United States Representative"
       ],
       "caveats": "District numbers (`113th Congress`, `114th Congress`, etc.) change by election; group on this concept to avoid having to enumerate every Congress. District boundaries also shift after each census (2010, 2020) so historical comparisons across boundary years are geographic-area comparisons, not constituency comparisons.",
       "tier": "federal"
@@ -139,10 +140,10 @@
       "name": "district_attorney",
       "description": "Boulder County District Attorney (20th Judicial District).",
       "boulder_county_patterns": [
-        "District Attorney"
+        "^District Attorney"
       ],
       "secretary_of_state_patterns": [
-        "District Attorney"
+        "^District Attorney"
       ],
       "caveats": "Cleanly comparable.",
       "tier": "county"

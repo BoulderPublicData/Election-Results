@@ -11,7 +11,7 @@
 - **Distinct precincts:** 246
 - **Total votes summed:** 814,976
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 3115, 'measure': 1668}
+- **Contest type breakdown:** {'measure': 3234, 'candidate': 1549}
 - **Party breakdown (top 8):** {'(none)': 4783}
 
 **Top 10 contests by vote total** (sanity check):

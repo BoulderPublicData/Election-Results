@@ -1,29 +1,126 @@
+### 2005 coordinated — boulder_county
+
+- **Source file:** `2005-coordinated-sov.pdf`
+- **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2005-election-sov.pdf
+- **Retrieved at:** 2023-08-30T18:13:27+00:00
+- **Extraction quality:** pdf_text_layer
+- **Extraction notes:** pdfplumber: parsed 121 pages, skipped 0, 0 pages had no recognizable candidate header (skipped); Candidate names recovered from rotated PDF text via _unrotate(); spot-check a sample of precincts against the source PDF before publishing
+
+- **Rows:** 7,307
+- **Distinct contests:** 43
+- **Distinct precincts:** 228
+- **Total votes summed:** 1,060,621
+- **Rows with null votes:** 0
+- **Contest type breakdown:** {'measure': 4280, 'candidate': 3027}
+- **Party breakdown (top 8):** {'(none)': 7307}
+
+**Top 10 contests by vote total** (sanity check):
+
+| contest | total_votes |
+|---|---|
+| CITY OF BOULDER COUNCIL | 88,767 |
+| Referendum C | 86,208 |
+| Referendum D | 86,020 |
+| COUNTY ISSUE 1A: | 82,884 |
+| COUNTY QUESTION 1B: | 82,656 |
+| COUNTY QUESTION 1D: | 82,532 |
+| COUNTY QUESTION 1C: | 82,457 |
+| BOULDER VALLEY SCHOOL DISTRICT RE-2 QUESTION 3A: | 51,199 |
+| BOULDER VALLEY SCHOOL DISTRICT RE-2 QUESTION 3B: | 50,340 |
+| Director District B (4 years): - BOULDER VALLEY SCHOOL DISTRICT RE-2 | 35,003 |
+
+### 2007 coordinated — boulder_county
+
+- **Source file:** `2007-coordinated-sov.pdf`
+- **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2007-election-sov.pdf
+- **Retrieved at:** 2023-08-30T18:13:27+00:00
+- **Extraction quality:** pdf_text_layer
+- **Extraction notes:** pdfplumber: parsed 108 pages, skipped 0, 0 pages had no recognizable candidate header (skipped); Candidate names recovered from rotated PDF text via _unrotate(); spot-check a sample of precincts against the source PDF before publishing
+
+- **Rows:** 6,866
+- **Distinct contests:** 45
+- **Distinct precincts:** 235
+- **Total votes summed:** 561,237
+- **Rows with null votes:** 0
+- **Contest type breakdown:** {'candidate': 4364, 'measure': 2502}
+- **Party breakdown (top 8):** {'(none)': 6866}
+
+**Top 10 contests by vote total** (sanity check):
+
+| contest | total_votes |
+|---|---|
+| City of Boulder Council Candidates | 94,549 |
+| County Issue 1B (Transportation Sales and Use Tax Extension and Revenue Change): | 57,153 |
+| County Issue 1A (Open Space Bond Authorization, Sales and Use Tax Extension, and Revenue Change): | 56,607 |
+| Boulder Valley School District Director District C (4 Years) | 22,507 |
+| Boulder Valley School District Director District G (4 Years) | 21,899 |
+| Boulder Valley School District Director District A (4 Years) | 19,990 |
+| Boulder Valley School District Director District D (4 Years) | 18,372 |
+| City of Longmont Ballot Issue 2A | 16,402 |
+| City of Longmont Ballot Issue 2C | 16,369 |
+| City of Boulder Ballot Question 2B City Council Compensation | 16,273 |
+
 ### 2008 general — boulder_county
 
 - **Source file:** `2008-general-sov.xls`
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/12/2008-general-election-sov.xls
 - **Retrieved at:** 2026-05-23T18:13:44+00:00
 - **Extraction quality:** machine_readable
-- **Extraction notes:** —
+- **Extraction notes:** includes 'Landowner' pseudo-precinct rows (property-owner ballots in special-district contests; no precinct geography)
 
-- **Rows:** 2,528
-- **Distinct contests:** 6
-- **Distinct precincts:** 236
-- **Total votes summed:** 447,341
+- **Rows:** 27,934
+- **Distinct contests:** 71
+- **Distinct precincts:** 237
+- **Total votes summed:** 6,617,620
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 2528}
-- **Party breakdown (top 8):** {'(none)': 2528}
+- **Contest type breakdown:** {'measure': 11300, 'candidate': 10082, 'retention': 6552}
+- **Party breakdown (top 8):** {'(none)': 17939, 'DEM': 2519, 'REP': 1942, 'LBR': 938, 'GRN': 882, 'UTY': 646, 'UAF': 472, 'CON': 236}
 
 **Top 10 contests by vote total** (sanity check):
 
 | contest | total_votes |
 |---|---|
-| COUNTY COMMISSIONER - DISTRICT 1 | 148,775 |
-| COUNTY COMMISSIONER - DISTRICT 2 | 147,781 |
-| COUNTY COMMISSIONER - DISTRICT 3 | 146,992 |
-| UNITED STATES SENATOR | 2,229 |
-| PRESIDENTIAL ELECTORS | 1,005 |
-| REPRESENTATIVE TO THE 111TH UNITED STATES CONGRESS - DISTRICT 2 | 559 |
+| PRESIDENTIAL ELECTORS | 171,763 |
+| UNITED STATES SENATOR | 166,096 |
+| AMENDMENT 48 | 164,829 |
+| AMENDMENT 47 | 159,811 |
+| AMENDMENT 51 | 158,937 |
+| AMENDMENT 46 | 158,417 |
+| AMENDMENT 50 | 157,999 |
+| AMENDMENT 58 | 157,880 |
+| AMENDMENT 49 | 155,675 |
+| AMENDMENT 59 | 155,014 |
+
+### 2009 coordinated — boulder_county
+
+- **Source file:** `2009-coordinated-sov.pdf`
+- **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2009-election-sov.pdf
+- **Retrieved at:** 2023-08-30T18:13:27+00:00
+- **Extraction quality:** pdf_text_layer
+- **Extraction notes:** pdfplumber: parsed 105 pages, skipped 0, 0 pages had no recognizable candidate header (skipped); Candidate names recovered from rotated PDF text via _unrotate(); spot-check a sample of precincts against the source PDF before publishing
+
+- **Rows:** 6,654
+- **Distinct contests:** 41
+- **Distinct precincts:** 236
+- **Total votes summed:** 687,760
+- **Rows with null votes:** 0
+- **Contest type breakdown:** {'candidate': 3372, 'measure': 3282}
+- **Party breakdown (top 8):** {'(none)': 6654}
+
+**Top 10 contests by vote total** (sanity check):
+
+| contest | total_votes |
+|---|---|
+| City of Boulder Council Candidates | 75,758 |
+| County Ballot Issue 1A | 62,018 |
+| County Ballot Issue 1B | 61,623 |
+| County Ballot Issue 1C | 61,379 |
+| County Ballot Question 1D | 59,928 |
+| City of Longmont Council Member At-Large | 30,408 |
+| Boulder Valley School District Director District B (4 Years) | 23,000 |
+| Boulder Valley School District Director District E (4 Years) | 22,366 |
+| Boulder Valley School District Director District F (4 Years) | 21,968 |
+| City of Longmont Ballot Issue 2A | 18,522 |
 
 ### 2010 general — boulder_county
 
@@ -33,26 +130,28 @@
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 
-- **Rows:** 2,868
-- **Distinct contests:** 8
-- **Distinct precincts:** 236
-- **Total votes summed:** 665,359
+- **Rows:** 23,078
+- **Distinct contests:** 57
+- **Distinct precincts:** 247
+- **Total votes summed:** 4,243,259
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 2868}
-- **Party breakdown (top 8):** {'REP': 878, 'DEM': 580, 'GRN': 472, 'UAF': 470, 'LBR': 234, '(none)': 234}
+- **Contest type breakdown:** {'candidate': 12338, 'measure': 6060, 'retention': 4680}
+- **Party breakdown (top 8):** {'(none)': 11131, 'DEM': 3715, 'REP': 3252, 'UAF': 2174, 'LBR': 1162, 'ACN': 704, 'GRN': 472, 'DEM / REP': 234}
 
 **Top 10 contests by vote total** (sanity check):
 
 | contest | total_votes |
 |---|---|
-| GOVERNOR/LIEUTENANT GOVERNOR | 154,854 |
-| UNITED STATES SENATOR | 127,423 |
+| GOVERNOR/LIEUTENANT GOVERNOR | 125,486 |
+| UNITED STATES SENATOR | 125,265 |
+| Amendment 61 (CONSTITUTIONAL) | 121,416 |
+| Amendment 62 (CONSTITUTIONAL) | 121,217 |
+| COUNTY ISSUE 1B [Countywide Open Space Sales and Use Tax Increase and Bond Authorization] | 120,317 |
+| Amendment 60 (CONSTITUTIONAL) | 120,100 |
+| Proposition 101 (STATUTORY) | 119,955 |
 | SECRETARY OF STATE | 119,678 |
-| REGENT OF THE UNIVERSITY OF COLORADO - AT LARGE | 117,523 |
-| COUNTY COMMISSIONER - DISTRICT 3 | 116,922 |
-| STATE REPRESENTATIVE - DISTRICT 12 | 27,389 |
-| REPRESENTATIVE TO THE US CONGRESS - DISTRICT 2 | 1,148 |
-| REPRESENTATIVE TO THE US CONGRESS - DISTRICT 4 | 422 |
+| STATE TREASURER | 119,490 |
+| ATTORNEY GENERAL | 119,436 |
 
 ### 2011 coordinated — boulder_county
 
@@ -60,15 +159,15 @@
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2011-election-sov.xls
 - **Retrieved at:** 2026-05-23T18:13:44+00:00
 - **Extraction quality:** machine_readable
-- **Extraction notes:** —
+- **Extraction notes:** includes 'Landowner' pseudo-precinct rows (property-owner ballots in special-district contests; no precinct geography)
 
-- **Rows:** 6,279
+- **Rows:** 6,291
 - **Distinct contests:** 49
-- **Distinct precincts:** 241
-- **Total votes summed:** 790,055
+- **Distinct precincts:** 246
+- **Total votes summed:** 791,157
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 4825, 'measure': 1454}
-- **Party breakdown (top 8):** {'(none)': 6097, 'FOR': 182}
+- **Contest type breakdown:** {'candidate': 3369, 'measure': 2922}
+- **Party breakdown (top 8):** {'(none)': 6291}
 
 **Top 10 contests by vote total** (sanity check):
 
@@ -77,12 +176,12 @@
 | City of Boulder Council Candidates | 95,502 |
 | Proposition 103 (STATUTORY) | 81,126 |
 | County Question 1A: | 77,227 |
-| Boulder Valley School District  Director District D  (4 Years) | 31,037 |
-| Boulder Valley School District  Director District C  (4 Years) | 29,856 |
+| Boulder Valley School District Director District D (4 Years) | 31,037 |
+| Boulder Valley School District Director District C (4 Years) | 29,856 |
 | City of Boulder Ballot Question No. 2C | 26,541 |
-| CITY OF BOULDER  BALLOT ISSUE NO. 2B | 26,494 |
-| CITY OF BOULDER  BALLOT ISSUE NO. 2A | 25,861 |
-| Boulder Valley School District  Director District A  (4 Years) | 25,494 |
+| CITY OF BOULDER BALLOT ISSUE NO. 2B | 26,494 |
+| CITY OF BOULDER BALLOT ISSUE NO. 2A | 25,861 |
+| Boulder Valley School District Director District A (4 Years) | 25,494 |
 | City of Boulder Ballot Question No. 2H | 25,294 |
 
 ### 2012 general — boulder_county
@@ -91,15 +190,15 @@
 - **Source URL:** https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2012-general-election-sov.xls
 - **Retrieved at:** 2026-05-23T18:13:44+00:00
 - **Extraction quality:** machine_readable
-- **Extraction notes:** —
+- **Extraction notes:** includes 'Landowner' pseudo-precinct rows (property-owner ballots in special-district contests; no precinct geography)
 
-- **Rows:** 16,771
+- **Rows:** 16,775
 - **Distinct contests:** 46
-- **Distinct precincts:** 242
-- **Total votes summed:** 3,623,025
+- **Distinct precincts:** 243
+- **Total votes summed:** 3,623,109
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 10217, 'retention': 4176, 'measure': 2378}
-- **Party breakdown (top 8):** {'(none)': 16365, 'USA': 232, 'FOR': 174}
+- **Contest type breakdown:** {'candidate': 9521, 'retention': 4640, 'measure': 2614}
+- **Party breakdown (top 8):** {'(none)': 7595, 'DEM': 2252, 'REP': 1613, 'LBR': 1603, 'ACN': 521, 'GRN': 407, 'SPU': 232, 'JUS': 232}
 
 **Top 10 contests by vote total** (sanity check):
 
@@ -108,13 +207,13 @@
 | PRESIDENTIAL ELECTORS | 179,499 |
 | Amendment 64 (CONSTITUTIONAL) | 175,158 |
 | Amendment 65 (CONSTITUTIONAL) | 165,630 |
-| REGENT OF THE UNIVERSITY OF COLORADO -  AT LARGE | 159,816 |
+| REGENT OF THE UNIVERSITY OF COLORADO - AT LARGE | 159,816 |
 | COUNTY COMMISSIONER - DISTRICT 2 | 159,308 |
 | Amendment S (CONSTITUTIONAL) | 154,756 |
 | COUNTY COMMISSIONER - DISTRICT 1 | 146,621 |
 | REPRESENTATIVE TO THE 113TH UNITED STATES CONGRESS - DISTRICT 2 | 128,237 |
-| JUSTICE OF THE COLORADO SUPREME COURT   - Nathan B. Coats | 127,463 |
-| COUNTY JUDGE - BOULDER   - John F. Stavely | 125,630 |
+| JUSTICE OF THE COLORADO SUPREME COURT - Nathan B. Coats | 127,463 |
+| COUNTY JUDGE - BOULDER - John F. Stavely | 125,630 |
 
 ### 2013 coordinated — boulder_county
 
@@ -129,7 +228,7 @@
 - **Distinct precincts:** 246
 - **Total votes summed:** 814,976
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 3115, 'measure': 1668}
+- **Contest type breakdown:** {'measure': 3234, 'candidate': 1549}
 - **Party breakdown (top 8):** {'(none)': 4783}
 
 **Top 10 contests by vote total** (sanity check):
@@ -160,8 +259,8 @@
 - **Distinct precincts:** 234
 - **Total votes summed:** 4,238,679
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 10869, 'measure': 5244, 'retention': 4194}
-- **Party breakdown (top 8):** {'NP': 10367, 'DEM': 3448, 'REP': 1936, 'LBR': 1935, 'UAF': 1689, 'UNI': 233, 'GRN': 233, 'UAF / REP': 233}
+- **Contest type breakdown:** {'candidate': 10335, 'retention': 6058, 'measure': 3914}
+- **Party breakdown (top 8):** {'NP': 10367, 'DEM': 3448, 'REP': 1936, 'LBR': 1935, 'UAF': 1689, 'UTY': 233, 'GRN': 233, 'UAF / REP': 233}
 
 **Top 10 contests by vote total** (sanity check):
 
@@ -191,7 +290,7 @@
 - **Distinct precincts:** 237
 - **Total votes summed:** 700,788
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 4185, 'measure': 1050}
+- **Contest type breakdown:** {'candidate': 2953, 'measure': 2282}
 - **Party breakdown (top 8):** {'(none)': 5235}
 
 **Top 10 contests by vote total** (sanity check):
@@ -222,7 +321,7 @@
 - **Distinct precincts:** 235
 - **Total votes summed:** 6,307,823
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 12605, 'measure': 8320, 'retention': 5126}
+- **Contest type breakdown:** {'candidate': 11909, 'measure': 8084, 'retention': 6058}
 - **Party breakdown (top 8):** {'(none)': 26051}
 
 **Top 10 contests by vote total** (sanity check):
@@ -253,7 +352,7 @@
 - **Distinct precincts:** 237
 - **Total votes summed:** 957,029
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 3958, 'measure': 2089}
+- **Contest type breakdown:** {'measure': 3133, 'candidate': 2914}
 - **Party breakdown (top 8):** {'(none)': 6047}
 
 **Top 10 contests by vote total** (sanity check):
@@ -284,8 +383,8 @@
 - **Distinct precincts:** 240
 - **Total votes summed:** 6,762,589
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 10211, 'measure': 8350, 'retention': 3290, 'recall': 174}
-- **Party breakdown (top 8):** {'(none)': 13383, 'DEM': 3771, 'REP': 2305, 'LBR': 908, 'UNI': 470, 'ACN': 470, 'APV': 235, 'GRN': 235}
+- **Contest type breakdown:** {'candidate': 9167, 'measure': 8454, 'retention': 4230, 'recall': 174}
+- **Party breakdown (top 8):** {'(none)': 13383, 'DEM': 3771, 'REP': 2305, 'LBR': 908, 'UTY': 470, 'ACN': 470, 'AVP': 235, 'GRN': 235}
 
 **Top 10 contests by vote total** (sanity check):
 
@@ -346,8 +445,8 @@
 - **Distinct precincts:** 245
 - **Total votes summed:** 5,875,202
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 11598, 'measure': 8992, 'retention': 2400}
-- **Party breakdown (top 8):** {'(none)': 13066, 'DEM': 2088, 'REP': 1848, 'UAF': 1440, 'LBR': 948, 'UNI': 720, 'APV': 480, 'ACN': 240}
+- **Contest type breakdown:** {'candidate': 11598, 'measure': 6592, 'retention': 4800}
+- **Party breakdown (top 8):** {'(none)': 13066, 'DEM': 2088, 'REP': 1848, 'UAF': 1440, 'LBR': 948, 'UTY': 720, 'AVP': 480, 'ACN': 240}
 
 **Top 10 contests by vote total** (sanity check):
 
@@ -408,8 +507,8 @@
 - **Distinct precincts:** 201
 - **Total votes summed:** 6,689,275
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 9954, 'measure': 7606, 'retention': 4584}
-- **Party breakdown (top 8):** {'(none)': 12871, 'DEM': 2889, 'LBR': 1578, 'REP': 1552, 'UAF': 1146, 'UNI': 955, 'ACN': 573, 'APV': 382}
+- **Contest type breakdown:** {'candidate': 9954, 'measure': 6842, 'retention': 5348}
+- **Party breakdown (top 8):** {'(none)': 12878, 'DEM': 2889, 'LBR': 1578, 'REP': 1552, 'UAF': 1146, 'UTY': 955, 'ACN': 573, 'AVP': 382}
 
 **Top 10 contests by vote total** (sanity check):
 
@@ -524,7 +623,7 @@
 - **Distinct precincts:** 229
 - **Total votes summed:** 3,219,506
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'measure': 5902, 'candidate': 5414, 'retention': 2270}
+- **Contest type breakdown:** {'candidate': 5414, 'measure': 4994, 'retention': 3178}
 - **Party breakdown (top 8):** {'(none)': 8172, 'DEM': 1569, 'REP': 1230, 'LBR': 1031, 'CRP': 406, 'UAF': 329, 'ACN': 316, 'IND': 173}
 
 **Top 10 contests by vote total** (sanity check):
@@ -555,7 +654,7 @@
 - **Distinct precincts:** 237
 - **Total votes summed:** 3,356,492
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'measure': 8930, 'candidate': 6019, 'retention': 2350}
+- **Contest type breakdown:** {'measure': 7520, 'candidate': 6019, 'retention': 3760}
 - **Party breakdown (top 8):** {'(none)': 11280, 'DEM': 1916, 'REP': 1813, 'LBR': 935, 'ACN': 498, 'UAF': 470, 'GRN': 175, 'NP': 149}
 
 **Top 10 contests by vote total** (sanity check):
@@ -586,8 +685,8 @@
 - **Distinct precincts:** 239
 - **Total votes summed:** 4,744,062
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 11472, 'measure': 7648, 'retention': 5736}
-- **Party breakdown (top 8):** {'(none)': 13623, 'DEM': 3346, 'REP': 2868, 'GRN': 956, 'UAF': 956, 'CON': 239, 'LBR': 239, "HeartQuake '08": 239}
+- **Contest type breakdown:** {'candidate': 11472, 'retention': 6692, 'measure': 6692}
+- **Party breakdown (top 8):** {'(none)': 13623, 'DEM': 3346, 'REP': 2868, 'GRN': 956, 'UAF': 956, 'CON': 239, 'LBR': 239, 'HQE': 239}
 
 **Top 10 contests by vote total** (sanity check):
 
@@ -617,8 +716,8 @@
 - **Distinct precincts:** 236
 - **Total votes summed:** 3,078,004
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 9304, 'measure': 5616, 'retention': 3276}
-- **Party breakdown (top 8):** {'(none)': 9047, 'REP': 2316, 'DEM': 2311, 'UNA': 1710, 'LIB': 928, 'ACN': 704, 'GRN': 472, 'NR': 236}
+- **Contest type breakdown:** {'candidate': 9304, 'measure': 4680, 'retention': 4212}
+- **Party breakdown (top 8):** {'(none)': 9047, 'REP': 2316, 'DEM': 2311, 'UAF': 1710, 'LBR': 928, 'ACN': 704, 'GRN': 472, 'NR': 236}
 
 **Top 10 contests by vote total** (sanity check):
 
@@ -643,13 +742,13 @@
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 
-- **Rows:** 17,252
-- **Distinct contests:** 22
+- **Rows:** 14,290
+- **Distinct contests:** 28
 - **Distinct precincts:** 234
-- **Total votes summed:** 2,153,645
+- **Total votes summed:** 2,892,576
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 10546, 'measure': 5770, 'retention': 936}
-- **Party breakdown (top 8):** {'(none)': 9398, 'DEM': 1569, 'REP': 1393, 'LBR': 1148, 'ACN': 526, 'GRN': 410, 'Socialist Party USA': 234, 'Justice Party': 234}
+- **Contest type breakdown:** {'candidate': 8206, 'retention': 4680, 'measure': 1404}
+- **Party breakdown (top 8):** {'(none)': 6436, 'DEM': 1569, 'REP': 1393, 'LBR': 1148, 'ACN': 526, 'GRN': 410, 'SPU': 234, 'JUS': 234}
 
 **Top 10 contests by vote total** (sanity check):
 
@@ -661,9 +760,9 @@
 | Regent Of The University Of Colorado - At Large | 159,816 |
 | Amendment S (CONSTITUTIONAL) | 154,756 |
 | United States Representative - District 2 | 128,237 |
-| Supreme Court | 127,463 |
-| County Court, Boulder | 125,630 |
-| Court of Appeals | 125,393 |
+| Supreme Court - Nathan B. Coats | 127,463 |
+| County Court, Boulder - John F. Stavely | 125,630 |
+| Court of Appeals - Laurie A. Booras | 125,393 |
 | District Attorney - District 20 | 124,797 |
 
 ### 2014 general — secretary_of_state
@@ -674,13 +773,13 @@
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 
-- **Rows:** 18,404
-- **Distinct contests:** 23
+- **Rows:** 15,617
+- **Distinct contests:** 32
 - **Distinct precincts:** 233
-- **Total votes summed:** 2,042,814
+- **Total votes summed:** 2,920,692
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 10724, 'measure': 6748, 'retention': 932}
-- **Party breakdown (top 8):** {'(none)': 11027, 'REP': 1936, 'DEM': 1817, 'LBR': 1469, 'UAF': 1223, 'GRN': 233, 'Unaffiliated / Republican': 233, 'ACN': 233}
+- **Contest type breakdown:** {'candidate': 7695, 'retention': 6058, 'measure': 1864}
+- **Party breakdown (top 8):** {'(none)': 8240, 'REP': 1936, 'DEM': 1817, 'LBR': 1469, 'UAF': 1223, 'GRN': 233, 'UAF / REP': 233, 'ACN': 233}
 
 **Top 10 contests by vote total** (sanity check):
 
@@ -705,13 +804,13 @@
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 
-- **Rows:** 23,496
-- **Distinct contests:** 28
+- **Rows:** 21,623
+- **Distinct contests:** 38
 - **Distinct precincts:** 233
-- **Total votes summed:** 3,413,849
+- **Total votes summed:** 4,714,540
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 13934, 'measure': 8630, 'retention': 932}
-- **Party breakdown (top 8):** {'(none)': 12813, 'UAF': 1864, 'DEM': 1678, 'REP': 1535, 'LBR': 713, 'GRN': 466, 'ACN': 233, 'AVP': 233}
+- **Contest type breakdown:** {'candidate': 10905, 'retention': 6058, 'measure': 4660}
+- **Party breakdown (top 8):** {'(none)': 10940, 'UAF': 1864, 'DEM': 1678, 'REP': 1535, 'LBR': 713, 'GRN': 466, 'ACN': 233, 'AVP': 233}
 
 **Top 10 contests by vote total** (sanity check):
 
@@ -736,13 +835,13 @@
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 
-- **Rows:** 21,422
-- **Distinct contests:** 34
+- **Rows:** 17,085
+- **Distinct contests:** 39
 - **Distinct precincts:** 235
-- **Total votes summed:** 4,288,865
+- **Total votes summed:** 4,946,502
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'measure': 11622, 'candidate': 8860, 'retention': 940}
-- **Party breakdown (top 8):** {'(none)': 14837, 'DEM': 2184, 'REP': 1835, 'LBR': 908, 'Unity Party of Colorado': 470, 'ACN': 470, 'GRN': 235, 'AVP': 235}
+- **Contest type breakdown:** {'candidate': 6745, 'measure': 6110, 'retention': 4230}
+- **Party breakdown (top 8):** {'(none)': 10500, 'DEM': 2184, 'REP': 1835, 'LBR': 908, 'UTY': 470, 'ACN': 470, 'GRN': 235, 'AVP': 235}
 
 **Top 10 contests by vote total** (sanity check):
 
@@ -767,13 +866,13 @@
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 
-- **Rows:** 23,320
-- **Distinct contests:** 28
+- **Rows:** 20,584
+- **Distinct contests:** 34
 - **Distinct precincts:** 240
-- **Total votes summed:** 4,068,596
+- **Total votes summed:** 5,015,575
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 12904, 'measure': 9456, 'retention': 960}
-- **Party breakdown (top 8):** {'(none)': 12816, 'UAF': 2020, 'DEM': 1608, 'REP': 1368, 'LBR': 948, 'Unity Party of Colorado': 720, 'GRN': 480, 'AVP': 480}
+- **Contest type breakdown:** {'candidate': 10504, 'measure': 5280, 'retention': 4800}
+- **Party breakdown (top 8):** {'(none)': 10080, 'UAF': 2020, 'DEM': 1608, 'REP': 1368, 'LBR': 948, 'UTY': 720, 'GRN': 480, 'AVP': 480}
 
 **Top 10 contests by vote total** (sanity check):
 

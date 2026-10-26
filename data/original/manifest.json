@@ -1,5 +1,195 @@
 {
   "files": {
+    "boulder_county/2005-coordinated-sov.pdf": {
+      "bytes": 334787,
+      "data_source": "boulder_county",
+      "election_type": "coordinated",
+      "filename": "2005-coordinated-sov.pdf",
+      "retrieved_at": "2023-08-30T18:13:27+00:00",
+      "sha256": "daffab2b8f39e3504ea5463c0393092ccf6f4725cbf8cedf12644c9b6f1b50e5",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2005-election-sov.pdf",
+      "year": 2005
+    },
+    "boulder_county/2007-coordinated-sov.pdf": {
+      "bytes": 282421,
+      "data_source": "boulder_county",
+      "election_type": "coordinated",
+      "filename": "2007-coordinated-sov.pdf",
+      "retrieved_at": "2023-08-30T18:13:27+00:00",
+      "sha256": "0c537ed9f080a8f69922a2d6e951caa8431eb89ac55345bdf615d1ec29fcd577",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2007-election-sov.pdf",
+      "year": 2007
+    },
+    "boulder_county/2008-general-sov.xls": {
+      "bytes": 2833408,
+      "data_source": "boulder_county",
+      "election_type": "general",
+      "filename": "2008-general-sov.xls",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "4c6c96377e4de042900ffb4ea341f64906db216104831de26289e66cf2f52baa",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2017/12/2008-general-election-sov.xls",
+      "year": 2008
+    },
+    "boulder_county/2009-coordinated-sov.pdf": {
+      "bytes": 323752,
+      "data_source": "boulder_county",
+      "election_type": "coordinated",
+      "filename": "2009-coordinated-sov.pdf",
+      "retrieved_at": "2023-08-30T18:13:27+00:00",
+      "sha256": "73fbb26680eb19abe110a40e43a224659d8818b57ff77f803a449455c121be32",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2009-election-sov.pdf",
+      "year": 2009
+    },
+    "boulder_county/2010-general-sov.xls": {
+      "bytes": 2990080,
+      "data_source": "boulder_county",
+      "election_type": "general",
+      "filename": "2010-general-sov.xls",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "91518a3711db25e3aaaa3a33b11c3c56e5f3901b51d4a6fbe7f56f7d99fb6cb2",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2017/09/2010-general-sov.xls",
+      "year": 2010
+    },
+    "boulder_county/2011-coordinated-sov.xls": {
+      "bytes": 410624,
+      "data_source": "boulder_county",
+      "election_type": "coordinated",
+      "filename": "2011-coordinated-sov.xls",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "f953937c6c835d88ee0008553eea5bb510c7aaea579b4b5889ca4c63bb6a1995",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2011-election-sov.xls",
+      "year": 2011
+    },
+    "boulder_county/2012-general-sov.xls": {
+      "bytes": 926208,
+      "data_source": "boulder_county",
+      "election_type": "general",
+      "filename": "2012-general-sov.xls",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "7345d61dcf3cbae68870f272049e3cea81656bfb963afd939706f855b06331ec",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2012-general-election-sov.xls",
+      "year": 2012
+    },
+    "boulder_county/2013-coordinated-sov.xls": {
+      "bytes": 358165,
+      "data_source": "boulder_county",
+      "election_type": "coordinated",
+      "filename": "2013-coordinated-sov.xls",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "2ee8af4d952a33474422c46f4aaac2180dc3b55b327eaed3958f36ddc70dde34",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2013-election-sov.xls",
+      "year": 2013
+    },
+    "boulder_county/2014-general-sov.xls": {
+      "bytes": 2652160,
+      "data_source": "boulder_county",
+      "election_type": "general",
+      "filename": "2014-general-sov.xls",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "5254d1797e63a8933772eb887e416d1e31f36c6c3a64a7cef1fbdc7402ffea6a",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2014-general-election-sov.xls",
+      "year": 2014
+    },
+    "boulder_county/2015-coordinated-sov.xls": {
+      "bytes": 978944,
+      "data_source": "boulder_county",
+      "election_type": "coordinated",
+      "filename": "2015-coordinated-sov.xls",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "33dabc0e4ac0c93bffea4809bb33d2a1ea7398f2c9f5408104b3eec33a989b34",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2015-election-sov.xls",
+      "year": 2015
+    },
+    "boulder_county/2016-general-sov.xls": {
+      "bytes": 3470336,
+      "data_source": "boulder_county",
+      "election_type": "general",
+      "filename": "2016-general-sov.xls",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "f761ed726faed76ab808fcba9d49bb4863d91e669957f4ec159e8cc01eef41de",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2017/03/2016-general-election-results-final-sov.xls",
+      "year": 2016
+    },
+    "boulder_county/2017-coordinated-sov.xlsx": {
+      "bytes": 404125,
+      "data_source": "boulder_county",
+      "election_type": "coordinated",
+      "filename": "2017-coordinated-sov.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "2a3a4e4f84b0995bcde473ff0193090f2c9b532a9cf689ca10ce0d13bed65756",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2017/11/Results_SOV_Final.xlsx",
+      "year": 2017
+    },
+    "boulder_county/2018-general-sov.xlsx": {
+      "bytes": 1144514,
+      "data_source": "boulder_county",
+      "election_type": "general",
+      "filename": "2018-general-sov.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "b3c957ee9da85b417fd13d95d289b340f72f18999909c46d65402183d900e127",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2018/11/2018-General-Election-Official-Statement-Of-Votes.xlsx",
+      "year": 2018
+    },
+    "boulder_county/2019-coordinated-sov.xls": {
+      "bytes": 739328,
+      "data_source": "boulder_county",
+      "election_type": "coordinated",
+      "filename": "2019-coordinated-sov.xls",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "5c436f3643435f374bb74817cbfa0be51efaca83c7dd51c0be7adf7b7815c429",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2019/11/2019C-Official-Statement-Of-Votes-SOV.xls",
+      "year": 2019
+    },
+    "boulder_county/2020-general-sov.xlsx": {
+      "bytes": 3765143,
+      "data_source": "boulder_county",
+      "election_type": "general",
+      "filename": "2020-general-sov.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "c4a79113a271f59d0278b430ec1cbee645705eb32a45c4a1b23d751c493acaf8",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2020/11/2020-Boulder-County-General-Election-Official-Statement-of-Votes.xlsx",
+      "year": 2020
+    },
+    "boulder_county/2021-coordinated-sov.xlsx": {
+      "bytes": 305605,
+      "data_source": "boulder_county",
+      "election_type": "coordinated",
+      "filename": "2021-coordinated-sov.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "71074103510174ab72116ff8567f889eafb06f32d7030c01ab198b02bddf5d86",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2021/11/2021-Boulder-County-Coordinated-Election-Official-Statement-of-Votes-1.xlsx",
+      "year": 2021
+    },
+    "boulder_county/2022-general-sov.xlsx": {
+      "bytes": 1292453,
+      "data_source": "boulder_county",
+      "election_type": "general",
+      "filename": "2022-general-sov.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "a5fb097fd057deb22df574232a531883dc0ffeb0e5b44259ad8bfb230e40bbcd",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2022/12/2022G-Boulder-County-Official-Statement-of-Votes.xlsx",
+      "year": 2022
+    },
+    "boulder_county/2023-coordinated-sov.xlsx": {
+      "bytes": 248737,
+      "data_source": "boulder_county",
+      "election_type": "coordinated",
+      "filename": "2023-coordinated-sov.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "64caac078d86bafb871c0837b8f556ffc7c4393239000b61cfbb61975b73b8ba",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx",
+      "year": 2023
+    },
+    "boulder_county/2024-general-sov.xlsx": {
+      "bytes": 17082,
+      "data_source": "boulder_county",
+      "election_type": "general",
+      "filename": "2024-general-sov.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "59e11786461f0e92a13bbf9dfd7dfb106da28fe3e9f5381982a0d644481d31dd",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx",
+      "year": 2024
+    },
     "boulder_county/2025-coordinated-sov.xlsx": {
       "bytes": 208487,
       "data_source": "boulder_county",
@@ -9,6 +199,96 @@
       "sha256": "770b9a4ee12a480b6926dd218eccedd4b86fa1670d4224bb00b8a429cfe82966",
       "url": "https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx",
       "year": 2025
+    },
+    "secretary_of_state/2004-general-precinct-results.xlsx": {
+      "bytes": 7013174,
+      "data_source": "secretary_of_state",
+      "election_type": "general",
+      "filename": "2004-general-precinct-results.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "b4493eb699e7481c94c93de2f55dea810e2dd2edc35eea49b2ea9e0c884a13b0",
+      "url": "https://www.coloradosos.gov/pubs/elections/Results/2004/2004GeneralPrecinctBallotsCast.xlsx",
+      "year": 2004
+    },
+    "secretary_of_state/2006-general-precinct-results.xlsx": {
+      "bytes": 8275108,
+      "data_source": "secretary_of_state",
+      "election_type": "general",
+      "filename": "2006-general-precinct-results.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "a78557a30ee43266a7a0520a9c3c0b7b5792f19e8c23b7e9b434cbd7d0887e02",
+      "url": "https://www.coloradosos.gov/pubs/elections/Results/2006/2006GeneralPrecinctBallotsCast.xlsx",
+      "year": 2006
+    },
+    "secretary_of_state/2008-general-precinct-results.xlsx": {
+      "bytes": 13321471,
+      "data_source": "secretary_of_state",
+      "election_type": "general",
+      "filename": "2008-general-precinct-results.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "f16ca52cde70444de25fd1661d912add0ffbc40e713d6b87fdad25ae6885d97d",
+      "url": "https://www.coloradosos.gov/pubs/elections/Results/2008/2008GeneralPrecinctTurnout.xlsx",
+      "year": 2008
+    },
+    "secretary_of_state/2010-general-precinct-results.xlsx": {
+      "bytes": 15960609,
+      "data_source": "secretary_of_state",
+      "election_type": "general",
+      "filename": "2010-general-precinct-results.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "6c498325dbaacd191321aa0cef69fe1f661e5fd357d0433259d7316ea8f847d4",
+      "url": "https://www.coloradosos.gov/pubs/elections/Results/2010/general/2010GeneralPrecinctTurnout.xlsx",
+      "year": 2010
+    },
+    "secretary_of_state/2012-general-precinct-results.xlsx": {
+      "bytes": 6625356,
+      "data_source": "secretary_of_state",
+      "election_type": "general",
+      "filename": "2012-general-precinct-results.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "38042b2fa7eb43339d4de7b8708bfd8f7e67f98ddfb1416c1187bcd9c5d301ca",
+      "url": "https://www.coloradosos.gov/pubs/elections/Results/2012/2012GeneralPrecinctLevelTurnout.xlsx",
+      "year": 2012
+    },
+    "secretary_of_state/2014-general-precinct-results.xlsx": {
+      "bytes": 6594874,
+      "data_source": "secretary_of_state",
+      "election_type": "general",
+      "filename": "2014-general-precinct-results.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "d9693dd1c8fc89edd75ab199548e3c055c1f896a211609187de3f44557d46e0e",
+      "url": "https://www.coloradosos.gov/pubs/elections/Results/2014/2014GeneralPrecinctTurnout.xlsx",
+      "year": 2014
+    },
+    "secretary_of_state/2016-general-precinct-results.xlsx": {
+      "bytes": 10338106,
+      "data_source": "secretary_of_state",
+      "election_type": "general",
+      "filename": "2016-general-precinct-results.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "f217882d0afabc40b0670aa7b186e4aac221ea1939fc0224236704f9e38b3f32",
+      "url": "https://www.coloradosos.gov/pubs/elections/Results/2016/General/2016GeneralTurnoutPrecinctLevel.xlsx",
+      "year": 2016
+    },
+    "secretary_of_state/2018-general-precinct-results.xlsx": {
+      "bytes": 7770321,
+      "data_source": "secretary_of_state",
+      "election_type": "general",
+      "filename": "2018-general-precinct-results.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "a3c0ddb2cced528684d2b8cf723f747134e8938c0007fe1493b6e4304d7e96c7",
+      "url": "https://www.coloradosos.gov/pubs/elections/Results/2018/2018GEPrecinctLevelResults.xlsx",
+      "year": 2018
+    },
+    "secretary_of_state/2020-general-precinct-results.xlsx": {
+      "bytes": 9975484,
+      "data_source": "secretary_of_state",
+      "election_type": "general",
+      "filename": "2020-general-precinct-results.xlsx",
+      "retrieved_at": "2026-05-23T18:13:44+00:00",
+      "sha256": "3d52a2aeb9701f4b39ce900bdf04c335883e71f3e41ad72dd0bda24bf58807b9",
+      "url": "https://www.coloradosos.gov/pubs/elections/Results/2020/2020GEPrecinctLevelResultsPosted.xlsx",
+      "year": 2020
     },
     "secretary_of_state/2024-general-precinct-results.xlsx": {
       "bytes": 9504284,

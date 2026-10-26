@@ -11,8 +11,8 @@
 - **Distinct precincts:** 201
 - **Total votes summed:** 6,689,275
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 9954, 'measure': 7606, 'retention': 4584}
-- **Party breakdown (top 8):** {'(none)': 12871, 'DEM': 2889, 'LBR': 1578, 'REP': 1552, 'UAF': 1146, 'UNI': 955, 'ACN': 573, 'APV': 382}
+- **Contest type breakdown:** {'candidate': 9954, 'measure': 6842, 'retention': 5348}
+- **Party breakdown (top 8):** {'(none)': 12878, 'DEM': 2889, 'LBR': 1578, 'REP': 1552, 'UAF': 1146, 'UTY': 955, 'ACN': 573, 'AVP': 382}
 
 **Top 10 contests by vote total** (sanity check):
 

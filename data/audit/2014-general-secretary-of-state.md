@@ -6,13 +6,13 @@
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 
-- **Rows:** 18,404
-- **Distinct contests:** 23
+- **Rows:** 15,617
+- **Distinct contests:** 32
 - **Distinct precincts:** 233
-- **Total votes summed:** 2,042,814
+- **Total votes summed:** 2,920,692
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 10724, 'measure': 6748, 'retention': 932}
-- **Party breakdown (top 8):** {'(none)': 11027, 'REP': 1936, 'DEM': 1817, 'LBR': 1469, 'UAF': 1223, 'GRN': 233, 'Unaffiliated / Republican': 233, 'ACN': 233}
+- **Contest type breakdown:** {'candidate': 7695, 'retention': 6058, 'measure': 1864}
+- **Party breakdown (top 8):** {'(none)': 8240, 'REP': 1936, 'DEM': 1817, 'LBR': 1469, 'UAF': 1223, 'GRN': 233, 'UAF / REP': 233, 'ACN': 233}
 
 **Top 10 contests by vote total** (sanity check):
 

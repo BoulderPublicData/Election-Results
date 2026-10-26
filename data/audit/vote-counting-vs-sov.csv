@@ -106,12 +106,12 @@ year,election_type,final_snapshot,contest,sov_contest,candidate_or_option,snapsh
 2014,general,2014-11-20T17:32:00,BOULDER COUNTY BALLOT ISSUE 1A County-wide Flood Recovery Sales and Use Tax,BOULDER COUNTY BALLOT ISSUE 1A,No,53063,53063,0,match
 2014,general,2014-11-20T17:32:00,BOULDER COUNTY BALLOT ISSUE 1B Human Services Safety Net Mill Levy Extension,BOULDER COUNTY BALLOT ISSUE 1B,Yes,84151,84151,0,match
 2014,general,2014-11-20T17:32:00,BOULDER COUNTY BALLOT ISSUE 1B Human Services Safety Net Mill Levy Extension,BOULDER COUNTY BALLOT ISSUE 1B,No,49471,49471,0,match
-2014,general,2014-11-20T17:32:00,"CITY OF BOULDER BALLOT ISSUE NO. 2A TEMPORARY TAX INCREASE FOR COMMUNITY, CULTURE AND SAFETY",CITY OF BOULDER BALLOT ISSUE NO. 2A,FOR THE ISSUE,27366,27366,0,match
-2014,general,2014-11-20T17:32:00,"CITY OF BOULDER BALLOT ISSUE NO. 2A TEMPORARY TAX INCREASE FOR COMMUNITY, CULTURE AND SAFETY",CITY OF BOULDER BALLOT ISSUE NO. 2A,AGAINST THE ISSUE,15636,15636,0,match
-2014,general,2014-11-20T17:32:00,City of Boulder Ballot Question No. 2B City Council Executive Sessions Related to Boulder's Electric Utility,City of Boulder Ballot Question No. 2B,For the Measure,22118,22118,0,match
-2014,general,2014-11-20T17:32:00,City of Boulder Ballot Question No. 2B City Council Executive Sessions Related to Boulder's Electric Utility,City of Boulder Ballot Question No. 2B,Against the Measure,17382,17382,0,match
-2014,general,2014-11-20T17:32:00,City of Boulder Ballot Question No. 2C Affirming the City's Right to Provide Telecommunication Services,City of Boulder Ballot Question No. 2C,For the Measure,35215,35215,0,match
-2014,general,2014-11-20T17:32:00,City of Boulder Ballot Question No. 2C Affirming the City's Right to Provide Telecommunication Services,City of Boulder Ballot Question No. 2C,Against the Measure,6340,6340,0,match
+2014,general,2014-11-20T17:32:00,"CITY OF BOULDER BALLOT ISSUE NO. 2A TEMPORARY TAX INCREASE FOR COMMUNITY, CULTURE AND SAFETY",CITY OF BOULDER BALLOT ISSUE NO. 2A,Yes,27366,27366,0,match
+2014,general,2014-11-20T17:32:00,"CITY OF BOULDER BALLOT ISSUE NO. 2A TEMPORARY TAX INCREASE FOR COMMUNITY, CULTURE AND SAFETY",CITY OF BOULDER BALLOT ISSUE NO. 2A,No,15636,15636,0,match
+2014,general,2014-11-20T17:32:00,City of Boulder Ballot Question No. 2B City Council Executive Sessions Related to Boulder's Electric Utility,City of Boulder Ballot Question No. 2B,Yes,22118,22118,0,match
+2014,general,2014-11-20T17:32:00,City of Boulder Ballot Question No. 2B City Council Executive Sessions Related to Boulder's Electric Utility,City of Boulder Ballot Question No. 2B,No,17382,17382,0,match
+2014,general,2014-11-20T17:32:00,City of Boulder Ballot Question No. 2C Affirming the City's Right to Provide Telecommunication Services,City of Boulder Ballot Question No. 2C,Yes,35215,35215,0,match
+2014,general,2014-11-20T17:32:00,City of Boulder Ballot Question No. 2C Affirming the City's Right to Provide Telecommunication Services,City of Boulder Ballot Question No. 2C,No,6340,6340,0,match
 2014,general,2014-11-20T17:32:00,CITY OF LAFAYETTE BALLOT ISSUE NO. 2A CITY OF LAFAYETTE PUBLIC SAFETY MILL LEVY,CITY OF LAFAYETTE BALLOT ISSUE NO. 2A,Yes,6697,6697,0,match
 2014,general,2014-11-20T17:32:00,CITY OF LAFAYETTE BALLOT ISSUE NO. 2A CITY OF LAFAYETTE PUBLIC SAFETY MILL LEVY,CITY OF LAFAYETTE BALLOT ISSUE NO. 2A,No,5180,5180,0,match
 2014,general,2014-11-20T17:32:00,CITY OF LAFAYETTE BALLOT ISSUE NO. 2B CITY OF LAFAYETTE RECREATION BOND AND MILL LEVY,CITY OF LAFAYETTE BALLOT ISSUE NO. 2B,Yes,6102,6102,0,match
@@ -130,8 +130,8 @@ year,election_type,final_snapshot,contest,sov_contest,candidate_or_option,snapsh
 2014,general,2014-11-20T17:32:00,NORTH METRO FIRE RESCUE DISTRICT BALLOT ISSUE 4A,NORTH METRO FIRE RESCUE DISTRICT  BALLOT ISSUE 4A,No,49,49,0,match
 2014,general,2014-11-20T17:32:00,COAL CREEK CANYON FIRE PROTECTION DISTRICT BALLOT ISSUE 4B,COAL CREEK CANYON FIRE PROTECTION DISTRICT BALLOT ISSUE 4B:,Yes,397,397,0,match
 2014,general,2014-11-20T17:32:00,COAL CREEK CANYON FIRE PROTECTION DISTRICT BALLOT ISSUE 4B,COAL CREEK CANYON FIRE PROTECTION DISTRICT BALLOT ISSUE 4B:,No,119,119,0,match
-2014,general,2014-11-20T17:32:00,LYONS REGIONAL LIBRARY DISTRICT BALLOT ISSUE 4C,LYONS REGIONAL LIBRARY DISTRICT  BALLOT ISSUE 4C:,FOR,944,944,0,match
-2014,general,2014-11-20T17:32:00,LYONS REGIONAL LIBRARY DISTRICT BALLOT ISSUE 4C,LYONS REGIONAL LIBRARY DISTRICT  BALLOT ISSUE 4C:,AGAINST,763,763,0,match
+2014,general,2014-11-20T17:32:00,LYONS REGIONAL LIBRARY DISTRICT BALLOT ISSUE 4C,LYONS REGIONAL LIBRARY DISTRICT  BALLOT ISSUE 4C:,Yes,944,944,0,match
+2014,general,2014-11-20T17:32:00,LYONS REGIONAL LIBRARY DISTRICT BALLOT ISSUE 4C,LYONS REGIONAL LIBRARY DISTRICT  BALLOT ISSUE 4C:,No,763,763,0,match
 2014,general,2014-11-20T17:32:00,SUNSHINE FIRE PROTECTION DISTRICT BALLOT ISSUE 5A,SUNSHINE FIRE PROTECTION DISTRICT  BALLOT ISSUE 5A,Yes,152,152,0,match
 2014,general,2014-11-20T17:32:00,SUNSHINE FIRE PROTECTION DISTRICT BALLOT ISSUE 5A,SUNSHINE FIRE PROTECTION DISTRICT  BALLOT ISSUE 5A,No,44,44,0,match
 2015,coordinated,2015-11-20T14:39:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Jared Kaszuba,1534,1534,0,match
@@ -188,20 +188,20 @@ year,election_type,final_snapshot,contest,sov_contest,candidate_or_option,snapsh
 2015,coordinated,2015-11-20T14:39:00,Thompson School District R2-J Board of Education Director District G,Thompson School District R2-J  Board of Education  Director District G,Bruce Finger,16,16,0,match
 2015,coordinated,2015-11-20T14:39:00,Proposition BB (STATUTORY) Retain Revenue in Excess of Blue Book Estimate,Proposition BB (STATUTORY),Yes,65626,65626,0,match
 2015,coordinated,2015-11-20T14:39:00,Proposition BB (STATUTORY) Retain Revenue in Excess of Blue Book Estimate,Proposition BB (STATUTORY),No,19402,19402,0,match
-2015,coordinated,2015-11-20T14:39:00,CITY OF BOULDER BALLOT ISSUE 2N SHORT-TERM RENTAL TAX,CITY OF BOULDER BALLOT ISSUE 2N,FOR THE MEASURE,16132,16132,0,match
-2015,coordinated,2015-11-20T14:39:00,CITY OF BOULDER BALLOT ISSUE 2N SHORT-TERM RENTAL TAX,CITY OF BOULDER BALLOT ISSUE 2N,AGAINST THE MEASURE,12131,12131,0,match
-2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2O Utility Occupation Tax Extension,City of Boulder Ballot Question 2O,For the Measure,19153,19153,0,match
-2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2O Utility Occupation Tax Extension,City of Boulder Ballot Question 2O,Against the Measure,7671,7671,0,match
-2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2P Climate Action Plan Tax Extension,City of Boulder Ballot Question 2P,For the Measure,21636,21636,0,match
-2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2P Climate Action Plan Tax Extension,City of Boulder Ballot Question 2P,Against the Measure,6399,6399,0,match
-2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2Q Amending Charter Provisions Regarding Library Commission,City of Boulder Ballot Question 2Q,For the Measure,23159,23159,0,match
-2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2Q Amending Charter Provisions Regarding Library Commission,City of Boulder Ballot Question 2Q,Against the Measure,2269,2269,0,match
-2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2R Amending Charter Provisions Regarding Compensation for Council Members,City of Boulder Ballot Question 2R,For the Measure,12336,12336,0,match
-2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2R Amending Charter Provisions Regarding Compensation for Council Members,City of Boulder Ballot Question 2R,Against the Measure,14955,14955,0,match
-2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question No. 300 Neighborhood Right to Vote on Land Use Regulation Changes,City of Boulder Ballot Question No. 300,For the Measure,10938,10938,0,match
-2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question No. 300 Neighborhood Right to Vote on Land Use Regulation Changes,City of Boulder Ballot Question No. 300,Against the Measure,17956,17956,0,match
-2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question No. 301 New Development Shall Pay Its Own Way,City of Boulder Ballot Question No. 301,For the Measure,11077,11077,0,match
-2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question No. 301 New Development Shall Pay Its Own Way,City of Boulder Ballot Question No. 301,Against the Measure,17741,17741,0,match
+2015,coordinated,2015-11-20T14:39:00,CITY OF BOULDER BALLOT ISSUE 2N SHORT-TERM RENTAL TAX,CITY OF BOULDER BALLOT ISSUE 2N,Yes,16132,16132,0,match
+2015,coordinated,2015-11-20T14:39:00,CITY OF BOULDER BALLOT ISSUE 2N SHORT-TERM RENTAL TAX,CITY OF BOULDER BALLOT ISSUE 2N,No,12131,12131,0,match
+2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2O Utility Occupation Tax Extension,City of Boulder Ballot Question 2O,Yes,19153,19153,0,match
+2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2O Utility Occupation Tax Extension,City of Boulder Ballot Question 2O,No,7671,7671,0,match
+2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2P Climate Action Plan Tax Extension,City of Boulder Ballot Question 2P,Yes,21636,21636,0,match
+2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2P Climate Action Plan Tax Extension,City of Boulder Ballot Question 2P,No,6399,6399,0,match
+2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2Q Amending Charter Provisions Regarding Library Commission,City of Boulder Ballot Question 2Q,Yes,23159,23159,0,match
+2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2Q Amending Charter Provisions Regarding Library Commission,City of Boulder Ballot Question 2Q,No,2269,2269,0,match
+2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2R Amending Charter Provisions Regarding Compensation for Council Members,City of Boulder Ballot Question 2R,Yes,12336,12336,0,match
+2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question 2R Amending Charter Provisions Regarding Compensation for Council Members,City of Boulder Ballot Question 2R,No,14955,14955,0,match
+2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question No. 300 Neighborhood Right to Vote on Land Use Regulation Changes,City of Boulder Ballot Question No. 300,Yes,10938,10938,0,match
+2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question No. 300 Neighborhood Right to Vote on Land Use Regulation Changes,City of Boulder Ballot Question No. 300,No,17956,17956,0,match
+2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question No. 301 New Development Shall Pay Its Own Way,City of Boulder Ballot Question No. 301,Yes,11077,11077,0,match
+2015,coordinated,2015-11-20T14:39:00,City of Boulder Ballot Question No. 301 New Development Shall Pay Its Own Way,City of Boulder Ballot Question No. 301,No,17741,17741,0,match
 2015,coordinated,2015-11-20T14:39:00,City of Lafayette Ballot Question No. 2J Boards and Commissions Qualifications,City of Lafayette Ballot Question No. 2J,Yes,1748,1748,0,match
 2015,coordinated,2015-11-20T14:39:00,City of Lafayette Ballot Question No. 2J Boards and Commissions Qualifications,City of Lafayette Ballot Question No. 2J,No,5065,5065,0,match
 2015,coordinated,2015-11-20T14:39:00,City of Lafayette Ballot Question No. 2K Collective Bargaining for Lafayette Firefighters,City of Lafayette Ballot Question No. 2K,Yes,4640,4640,0,match
@@ -356,14 +356,14 @@ year,election_type,final_snapshot,contest,sov_contest,candidate_or_option,snapsh
 2016,general,2016-11-22T16:06:00,COUNTY ISSUE 1C (Countywide Sustainability Sales and Use Tax Extension),COUNTY ISSUE 1C  (Countywide Sustainability Sales and Use Tax Extension):,No,53180,53180,0,match
 2016,general,2016-11-22T16:06:00,County Question 1D (District Attorney Term Limit Extension to Four Terms),County Question 1D  (District Attorney Term Limit Extension to Four Terms):,Yes,80353,80353,0,match
 2016,general,2016-11-22T16:06:00,County Question 1D (District Attorney Term Limit Extension to Four Terms),County Question 1D  (District Attorney Term Limit Extension to Four Terms):,No,87197,87197,0,match
-2016,general,2016-11-22T16:06:00,CITY OF BOULDER BALLOT ISSUE 2H SUGAR SWEETENED BEVERAGE PRODUCT DISTRIBUTION TAX,CITY OF BOULDER BALLOT ISSUE 2H  SUGAR SWEETENED BEVERAGE PRODUCT DISTRIBUTION TAX,FOR THE MEASURE,32767,32767,0,match
-2016,general,2016-11-22T16:06:00,CITY OF BOULDER BALLOT ISSUE 2H SUGAR SWEETENED BEVERAGE PRODUCT DISTRIBUTION TAX,CITY OF BOULDER BALLOT ISSUE 2H  SUGAR SWEETENED BEVERAGE PRODUCT DISTRIBUTION TAX,AGAINST THE MEASURE,28021,28021,0,match
-2016,general,2016-11-22T16:06:00,"City of Boulder Ballot Question 2I Clarify and Amend Blue Line, Water Not Supplied West of Line","City of Boulder Ballot Question 2I  Clarify and Amend Blue Line, Water Not Supplied West of Line",For the Measure,40149,40149,0,match
-2016,general,2016-11-22T16:06:00,"City of Boulder Ballot Question 2I Clarify and Amend Blue Line, Water Not Supplied West of Line","City of Boulder Ballot Question 2I  Clarify and Amend Blue Line, Water Not Supplied West of Line",Against the Measure,11066,11066,0,match
-2016,general,2016-11-22T16:06:00,City of Boulder Ballot Question 2J Provide Insurance Benefits for Council Members,City of Boulder Ballot Question 2J  Provide Insurance Benefits for Council Members,For the Measure,33195,33195,0,match
-2016,general,2016-11-22T16:06:00,City of Boulder Ballot Question 2J Provide Insurance Benefits for Council Members,City of Boulder Ballot Question 2J  Provide Insurance Benefits for Council Members,Against the Measure,21636,21636,0,match
-2016,general,2016-11-22T16:06:00,City of Boulder Ballot Question 302 Qualifications of Council Members,City of Boulder Ballot Question 302  Qualifications of Council Members,For the Measure,31951,31951,0,match
-2016,general,2016-11-22T16:06:00,City of Boulder Ballot Question 302 Qualifications of Council Members,City of Boulder Ballot Question 302  Qualifications of Council Members,Against the Measure,21961,21961,0,match
+2016,general,2016-11-22T16:06:00,CITY OF BOULDER BALLOT ISSUE 2H SUGAR SWEETENED BEVERAGE PRODUCT DISTRIBUTION TAX,CITY OF BOULDER BALLOT ISSUE 2H  SUGAR SWEETENED BEVERAGE PRODUCT DISTRIBUTION TAX,Yes,32767,32767,0,match
+2016,general,2016-11-22T16:06:00,CITY OF BOULDER BALLOT ISSUE 2H SUGAR SWEETENED BEVERAGE PRODUCT DISTRIBUTION TAX,CITY OF BOULDER BALLOT ISSUE 2H  SUGAR SWEETENED BEVERAGE PRODUCT DISTRIBUTION TAX,No,28021,28021,0,match
+2016,general,2016-11-22T16:06:00,"City of Boulder Ballot Question 2I Clarify and Amend Blue Line, Water Not Supplied West of Line","City of Boulder Ballot Question 2I  Clarify and Amend Blue Line, Water Not Supplied West of Line",Yes,40149,40149,0,match
+2016,general,2016-11-22T16:06:00,"City of Boulder Ballot Question 2I Clarify and Amend Blue Line, Water Not Supplied West of Line","City of Boulder Ballot Question 2I  Clarify and Amend Blue Line, Water Not Supplied West of Line",No,11066,11066,0,match
+2016,general,2016-11-22T16:06:00,City of Boulder Ballot Question 2J Provide Insurance Benefits for Council Members,City of Boulder Ballot Question 2J  Provide Insurance Benefits for Council Members,Yes,33195,33195,0,match
+2016,general,2016-11-22T16:06:00,City of Boulder Ballot Question 2J Provide Insurance Benefits for Council Members,City of Boulder Ballot Question 2J  Provide Insurance Benefits for Council Members,No,21636,21636,0,match
+2016,general,2016-11-22T16:06:00,City of Boulder Ballot Question 302 Qualifications of Council Members,City of Boulder Ballot Question 302  Qualifications of Council Members,Yes,31951,31951,0,match
+2016,general,2016-11-22T16:06:00,City of Boulder Ballot Question 302 Qualifications of Council Members,City of Boulder Ballot Question 302  Qualifications of Council Members,No,21961,21961,0,match
 2016,general,2016-11-22T16:06:00,CITY OF LAFAYETTE BALLOT ISSUE NO. 2C CITY OF LAFAYETTE COMMUNITY BUS PASS PROGRAM LEVY,CITY OF LAFAYETTE BALLOT ISSUE NO. 2C  CITY OF LAFAYETTE COMMUNITY BUS PASS PROGRAM LEVY,Yes,7091,7091,0,match
 2016,general,2016-11-22T16:06:00,CITY OF LAFAYETTE BALLOT ISSUE NO. 2C CITY OF LAFAYETTE COMMUNITY BUS PASS PROGRAM LEVY,CITY OF LAFAYETTE BALLOT ISSUE NO. 2C  CITY OF LAFAYETTE COMMUNITY BUS PASS PROGRAM LEVY,No,8625,8625,0,match
 2016,general,2016-11-22T16:06:00,CITY OF LAFAYETTE BALLOT ISSUE NO. 2D CITY OF LAFAYETTE STORAGE TAX,CITY OF LAFAYETTE BALLOT ISSUE NO. 2D  CITY OF LAFAYETTE STORAGE TAX,Yes,6436,6436,0,match
@@ -451,18 +451,18 @@ year,election_type,final_snapshot,contest,sov_contest,candidate_or_option,snapsh
 2017,coordinated,2017-11-21T16:23:00,Boulder County Question 1B (Sheriff Term Limit Extension to Five Terms),Boulder County Question 1B,No,40287,40287,0,match
 2017,coordinated,2017-11-21T16:23:00,Boulder County Question 1C (Authorization to Provide Broadband Services),Boulder County Question 1C,Yes,75699,75699,0,match
 2017,coordinated,2017-11-21T16:23:00,Boulder County Question 1C (Authorization to Provide Broadband Services),Boulder County Question 1C,No,15558,15558,0,match
-2017,coordinated,2017-11-21T16:23:00,CITY OF BOULDER BALLOT ISSUE 2L UTILITY OCCUPATION TAX INCREASE AND EXTENSION,CITY OF BOULDER BALLOT ISSUE 2L,For the Measure,15852,15852,0,match
-2017,coordinated,2017-11-21T16:23:00,CITY OF BOULDER BALLOT ISSUE 2L UTILITY OCCUPATION TAX INCREASE AND EXTENSION,CITY OF BOULDER BALLOT ISSUE 2L,Against the Measure,14807,14807,0,match
-2017,coordinated,2017-11-21T16:23:00,CITY OF BOULDER BALLOT ISSUE 2M 0.3 CENTS CAPITAL IMPROVEMENT TAX EXTENSION,CITY OF BOULDER BALLOT ISSUE 2M,For the Measure,25438,25438,0,match
-2017,coordinated,2017-11-21T16:23:00,CITY OF BOULDER BALLOT ISSUE 2M 0.3 CENTS CAPITAL IMPROVEMENT TAX EXTENSION,CITY OF BOULDER BALLOT ISSUE 2M,Against the Measure,5417,5417,0,match
-2017,coordinated,2017-11-21T16:23:00,CITY OF BOULDER BALLOT ISSUE 2N DEBT AUTHORITY FOR CAPITAL IMPROVEMENT TAX,CITY OF BOULDER BALLOT ISSUE 2N,For the Measure,21433,21433,0,match
-2017,coordinated,2017-11-21T16:23:00,CITY OF BOULDER BALLOT ISSUE 2N DEBT AUTHORITY FOR CAPITAL IMPROVEMENT TAX,CITY OF BOULDER BALLOT ISSUE 2N,Against the Measure,8280,8280,0,match
-2017,coordinated,2017-11-21T16:23:00,City of Boulder Ballot Question 2O Charter Requirement for Vote Before Electric Construction Debt,City of Boulder Ballot Question 2O,For the Measure,24423,24423,0,match
-2017,coordinated,2017-11-21T16:23:00,City of Boulder Ballot Question 2O Charter Requirement for Vote Before Electric Construction Debt,City of Boulder Ballot Question 2O,Against the Measure,5084,5084,0,match
-2017,coordinated,2017-11-21T16:23:00,City of Boulder Ballot Question 2P Charter Provision Allowing Executive Sessions for Municipalization,City of Boulder Ballot Question 2P,For the Measure,12534,12534,0,match
-2017,coordinated,2017-11-21T16:23:00,City of Boulder Ballot Question 2P Charter Provision Allowing Executive Sessions for Municipalization,City of Boulder Ballot Question 2P,Against the Measure,16286,16286,0,match
-2017,coordinated,2017-11-21T16:23:00,City of Boulder Ballot Question 2Q Charter Clean Up,City of Boulder Ballot Question 2Q,For the Measure,19400,19400,0,match
-2017,coordinated,2017-11-21T16:23:00,City of Boulder Ballot Question 2Q Charter Clean Up,City of Boulder Ballot Question 2Q,Against the Measure,9014,9014,0,match
+2017,coordinated,2017-11-21T16:23:00,CITY OF BOULDER BALLOT ISSUE 2L UTILITY OCCUPATION TAX INCREASE AND EXTENSION,CITY OF BOULDER BALLOT ISSUE 2L,Yes,15852,15852,0,match
+2017,coordinated,2017-11-21T16:23:00,CITY OF BOULDER BALLOT ISSUE 2L UTILITY OCCUPATION TAX INCREASE AND EXTENSION,CITY OF BOULDER BALLOT ISSUE 2L,No,14807,14807,0,match
+2017,coordinated,2017-11-21T16:23:00,CITY OF BOULDER BALLOT ISSUE 2M 0.3 CENTS CAPITAL IMPROVEMENT TAX EXTENSION,CITY OF BOULDER BALLOT ISSUE 2M,Yes,25438,25438,0,match
+2017,coordinated,2017-11-21T16:23:00,CITY OF BOULDER BALLOT ISSUE 2M 0.3 CENTS CAPITAL IMPROVEMENT TAX EXTENSION,CITY OF BOULDER BALLOT ISSUE 2M,No,5417,5417,0,match
+2017,coordinated,2017-11-21T16:23:00,CITY OF BOULDER BALLOT ISSUE 2N DEBT AUTHORITY FOR CAPITAL IMPROVEMENT TAX,CITY OF BOULDER BALLOT ISSUE 2N,Yes,21433,21433,0,match
+2017,coordinated,2017-11-21T16:23:00,CITY OF BOULDER BALLOT ISSUE 2N DEBT AUTHORITY FOR CAPITAL IMPROVEMENT TAX,CITY OF BOULDER BALLOT ISSUE 2N,No,8280,8280,0,match
+2017,coordinated,2017-11-21T16:23:00,City of Boulder Ballot Question 2O Charter Requirement for Vote Before Electric Construction Debt,City of Boulder Ballot Question 2O,Yes,24423,24423,0,match
+2017,coordinated,2017-11-21T16:23:00,City of Boulder Ballot Question 2O Charter Requirement for Vote Before Electric Construction Debt,City of Boulder Ballot Question 2O,No,5084,5084,0,match
+2017,coordinated,2017-11-21T16:23:00,City of Boulder Ballot Question 2P Charter Provision Allowing Executive Sessions for Municipalization,City of Boulder Ballot Question 2P,Yes,12534,12534,0,match
+2017,coordinated,2017-11-21T16:23:00,City of Boulder Ballot Question 2P Charter Provision Allowing Executive Sessions for Municipalization,City of Boulder Ballot Question 2P,No,16286,16286,0,match
+2017,coordinated,2017-11-21T16:23:00,City of Boulder Ballot Question 2Q Charter Clean Up,City of Boulder Ballot Question 2Q,Yes,19400,19400,0,match
+2017,coordinated,2017-11-21T16:23:00,City of Boulder Ballot Question 2Q Charter Clean Up,City of Boulder Ballot Question 2Q,No,9014,9014,0,match
 2017,coordinated,2017-11-21T16:23:00,CITY OF LAFAYETTE BALLOT ISSUE 2A OPEN SPACE TAX EXTENSION,CITY OF LAFAYETTE BALLOT ISSUE 2A,Yes,6986,6986,0,match
 2017,coordinated,2017-11-21T16:23:00,CITY OF LAFAYETTE BALLOT ISSUE 2A OPEN SPACE TAX EXTENSION,CITY OF LAFAYETTE BALLOT ISSUE 2A,No,1499,1499,0,match
 2017,coordinated,2017-11-21T16:23:00,CITY OF LAFAYETTE BALLOT ISSUE 2B STORAGE TAX,CITY OF LAFAYETTE BALLOT ISSUE 2B,Yes,4416,4416,0,match
@@ -604,20 +604,20 @@ year,election_type,final_snapshot,contest,sov_contest,candidate_or_option,snapsh
 2018,general,2018-11-27T16:40:00,Proposition 112 (Statutory),Proposition 112 (Statutory),No,50705,50705,0,match
 2018,general,2018-11-27T16:40:00,Boulder County Ballot Issue 1A - (Alternative Sentencing Facility and Jail Modernization Countywide Sales and Use Tax Extension),Boulder County Ballot Issue 1A - (Alternative Sentencing Facility and Jail Modernization Countywide Sales and Use Tax Extension),Yes,126701,126701,0,match
 2018,general,2018-11-27T16:40:00,Boulder County Ballot Issue 1A - (Alternative Sentencing Facility and Jail Modernization Countywide Sales and Use Tax Extension),Boulder County Ballot Issue 1A - (Alternative Sentencing Facility and Jail Modernization Countywide Sales and Use Tax Extension),No,42784,42784,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Issue 2C - Imposition of Oil and Gas Pollution Tax,City of Boulder Ballot Issue 2C - Imposition of Oil and Gas Pollution Tax,FOR THE MEASURE,39366,39366,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Issue 2C - Imposition of Oil and Gas Pollution Tax,City of Boulder Ballot Issue 2C - Imposition of Oil and Gas Pollution Tax,AGAINST THE MEASURE,12627,12627,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Issue 2D - Authorize Retention of All Sugar-Sweetened Beverages Tax Revenue,City of Boulder Ballot Issue 2D - Authorize Retention of All Sugar-Sweetened Beverages Tax Revenue,FOR THE MEASURE,34953,34953,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Issue 2D - Authorize Retention of All Sugar-Sweetened Beverages Tax Revenue,City of Boulder Ballot Issue 2D - Authorize Retention of All Sugar-Sweetened Beverages Tax Revenue,AGAINST THE MEASURE,19288,19288,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2E - Charter Amendments for Initiative Referendum and Recall Processes,City of Boulder Ballot Question 2E - Charter Amendments for Initiative  Referendum and Recall Processes,FOR THE MEASURE,27940,27940,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2E - Charter Amendments for Initiative Referendum and Recall Processes,City of Boulder Ballot Question 2E - Charter Amendments for Initiative  Referendum and Recall Processes,AGAINST THE MEASURE,17980,17980,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2F - Charter Amendment for Initiative Petition Signature Verification,City of Boulder Ballot Question 2F - Charter Amendment for Initiative Petition Signature Verification,FOR THE MEASURE,37315,37315,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2F - Charter Amendment for Initiative Petition Signature Verification,City of Boulder Ballot Question 2F - Charter Amendment for Initiative Petition Signature Verification,AGAINST THE MEASURE,11002,11002,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2G - Charter Amendment Related to Electronic and Online Petitions,City of Boulder Ballot Question 2G - Charter Amendment Related to Electronic and Online Petitions,FOR THE MEASURE,35465,35465,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2G - Charter Amendment Related to Electronic and Online Petitions,City of Boulder Ballot Question 2G - Charter Amendment Related to Electronic and Online Petitions,AGAINST THE MEASURE,14363,14363,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2H - Charter Amendment Related to Advisory Commissions,City of Boulder Ballot Question 2H - Charter Amendment Related to Advisory Commissions,FOR THE MEASURE,38495,38495,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2H - Charter Amendment Related to Advisory Commissions,City of Boulder Ballot Question 2H - Charter Amendment Related to Advisory Commissions,AGAINST THE MEASURE,10211,10211,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2I - Charter Amendment for Planning Department Budget Recommendations,City of Boulder Ballot Question 2I - Charter Amendment for Planning Department Budget Recommendations,FOR THE MEASURE,28826,28826,0,match
-2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2I - Charter Amendment for Planning Department Budget Recommendations,City of Boulder Ballot Question 2I - Charter Amendment for Planning Department Budget Recommendations,AGAINST THE MEASURE,17362,17362,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Issue 2C - Imposition of Oil and Gas Pollution Tax,City of Boulder Ballot Issue 2C - Imposition of Oil and Gas Pollution Tax,Yes,39366,39366,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Issue 2C - Imposition of Oil and Gas Pollution Tax,City of Boulder Ballot Issue 2C - Imposition of Oil and Gas Pollution Tax,No,12627,12627,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Issue 2D - Authorize Retention of All Sugar-Sweetened Beverages Tax Revenue,City of Boulder Ballot Issue 2D - Authorize Retention of All Sugar-Sweetened Beverages Tax Revenue,Yes,34953,34953,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Issue 2D - Authorize Retention of All Sugar-Sweetened Beverages Tax Revenue,City of Boulder Ballot Issue 2D - Authorize Retention of All Sugar-Sweetened Beverages Tax Revenue,No,19288,19288,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2E - Charter Amendments for Initiative Referendum and Recall Processes,City of Boulder Ballot Question 2E - Charter Amendments for Initiative  Referendum and Recall Processes,Yes,27940,27940,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2E - Charter Amendments for Initiative Referendum and Recall Processes,City of Boulder Ballot Question 2E - Charter Amendments for Initiative  Referendum and Recall Processes,No,17980,17980,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2F - Charter Amendment for Initiative Petition Signature Verification,City of Boulder Ballot Question 2F - Charter Amendment for Initiative Petition Signature Verification,Yes,37315,37315,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2F - Charter Amendment for Initiative Petition Signature Verification,City of Boulder Ballot Question 2F - Charter Amendment for Initiative Petition Signature Verification,No,11002,11002,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2G - Charter Amendment Related to Electronic and Online Petitions,City of Boulder Ballot Question 2G - Charter Amendment Related to Electronic and Online Petitions,Yes,35465,35465,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2G - Charter Amendment Related to Electronic and Online Petitions,City of Boulder Ballot Question 2G - Charter Amendment Related to Electronic and Online Petitions,No,14363,14363,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2H - Charter Amendment Related to Advisory Commissions,City of Boulder Ballot Question 2H - Charter Amendment Related to Advisory Commissions,Yes,38495,38495,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2H - Charter Amendment Related to Advisory Commissions,City of Boulder Ballot Question 2H - Charter Amendment Related to Advisory Commissions,No,10211,10211,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2I - Charter Amendment for Planning Department Budget Recommendations,City of Boulder Ballot Question 2I - Charter Amendment for Planning Department Budget Recommendations,Yes,28826,28826,0,match
+2018,general,2018-11-27T16:40:00,City of Boulder Ballot Question 2I - Charter Amendment for Planning Department Budget Recommendations,City of Boulder Ballot Question 2I - Charter Amendment for Planning Department Budget Recommendations,No,17362,17362,0,match
 2018,general,2018-11-27T16:40:00,City of Lafayette Ballot Issue 2A - Oil and Gas Pollution Tax,City of Lafayette Ballot Issue 2A - Oil and Gas Pollution Tax,Yes,10736,10736,0,match
 2018,general,2018-11-27T16:40:00,City of Lafayette Ballot Issue 2A - Oil and Gas Pollution Tax,City of Lafayette Ballot Issue 2A - Oil and Gas Pollution Tax,No,4608,4608,0,match
 2018,general,2018-11-27T16:40:00,Town of Jamestown Ballot Question 2B,Town of Jamestown Ballot Question 2B,Yes,154,154,0,match
@@ -1095,18 +1095,18 @@ year,election_type,final_snapshot,contest,sov_contest,candidate_or_option,snapsh
 2022,general,2022-11-30T16:17:00,Boulder County Ballot Issue 1B EMERGENCY SERVICES SALES AND USE TAX AND REVENUE CHANGE,Boulder County Ballot Issue 1B,No,50729,50729,0,match
 2022,general,2022-11-30T16:17:00,Boulder County Ballot Issue 1C TRANSPORTATION SALES AND USE TAX EXTENSION AND REVENUE CHANGE,Boulder County Ballot Issue 1C,Yes,128142,128142,0,match
 2022,general,2022-11-30T16:17:00,Boulder County Ballot Issue 1C TRANSPORTATION SALES AND USE TAX EXTENSION AND REVENUE CHANGE,Boulder County Ballot Issue 1C,No,30803,30803,0,match
-2022,general,2022-11-30T16:17:00,City of Boulder Ballot Issue 2A CLIMATE TAX (TABOR),City of Boulder Ballot Issue 2A,FOR THE MEASURE,31947,,,candidate_not_in_sov
-2022,general,2022-11-30T16:17:00,City of Boulder Ballot Issue 2A CLIMATE TAX (TABOR),City of Boulder Ballot Issue 2A,AGAINST THE MEASURE,13400,,,candidate_not_in_sov
-2022,general,2022-11-30T16:17:00,City of Boulder Ballot Issue 2B APPROVING ISSUANCE OF BONDS TO BE PAID FROM CLIMATE TAX (TABOR),City of Boulder Ballot Issue 2B,FOR THE MEASURE,30151,,,candidate_not_in_sov
-2022,general,2022-11-30T16:17:00,City of Boulder Ballot Issue 2B APPROVING ISSUANCE OF BONDS TO BE PAID FROM CLIMATE TAX (TABOR),City of Boulder Ballot Issue 2B,AGAINST THE MEASURE,13910,,,candidate_not_in_sov
-2022,general,2022-11-30T16:17:00,City of Boulder Ballot Question 2C Repeal of Library Commission and Tax if Library District Created,City of Boulder Ballot Question 2C,For the Measure,26821,,,candidate_not_in_sov
-2022,general,2022-11-30T16:17:00,City of Boulder Ballot Question 2C Repeal of Library Commission and Tax if Library District Created,City of Boulder Ballot Question 2C,Against the Measure,12679,,,candidate_not_in_sov
-2022,general,2022-11-30T16:17:00,City of Boulder Ballot Question 2D Charter Clarification of Candidate Issues,City of Boulder Ballot Question 2D,For the Measure,33079,,,candidate_not_in_sov
-2022,general,2022-11-30T16:17:00,City of Boulder Ballot Question 2D Charter Clarification of Candidate Issues,City of Boulder Ballot Question 2D,Against the Measure,7063,,,candidate_not_in_sov
-2022,general,2022-11-30T16:17:00,City of Boulder Ballot Question 2E Change Regular Municipal Election to Even Years,City of Boulder Ballot Question 2E,For the Measure,26138,,,candidate_not_in_sov
-2022,general,2022-11-30T16:17:00,City of Boulder Ballot Question 2E Change Regular Municipal Election to Even Years,City of Boulder Ballot Question 2E,Against the Measure,15039,,,candidate_not_in_sov
-2022,general,2022-11-30T16:17:00,"City of Boulder Ballot Question 2F Repeal of Ordinance 8483, Regarding the Annexation of CU South",City of Boulder Ballot Question 2F,For the Measure,19292,,,candidate_not_in_sov
-2022,general,2022-11-30T16:17:00,"City of Boulder Ballot Question 2F Repeal of Ordinance 8483, Regarding the Annexation of CU South",City of Boulder Ballot Question 2F,Against the Measure,22539,,,candidate_not_in_sov
+2022,general,2022-11-30T16:17:00,City of Boulder Ballot Issue 2A CLIMATE TAX (TABOR),City of Boulder Ballot Issue 2A,Yes,31947,31947,0,match
+2022,general,2022-11-30T16:17:00,City of Boulder Ballot Issue 2A CLIMATE TAX (TABOR),City of Boulder Ballot Issue 2A,No,13400,13400,0,match
+2022,general,2022-11-30T16:17:00,City of Boulder Ballot Issue 2B APPROVING ISSUANCE OF BONDS TO BE PAID FROM CLIMATE TAX (TABOR),City of Boulder Ballot Issue 2B,Yes,30151,30151,0,match
+2022,general,2022-11-30T16:17:00,City of Boulder Ballot Issue 2B APPROVING ISSUANCE OF BONDS TO BE PAID FROM CLIMATE TAX (TABOR),City of Boulder Ballot Issue 2B,No,13910,13910,0,match
+2022,general,2022-11-30T16:17:00,City of Boulder Ballot Question 2C Repeal of Library Commission and Tax if Library District Created,City of Boulder Ballot Question 2C,Yes,26821,26821,0,match
+2022,general,2022-11-30T16:17:00,City of Boulder Ballot Question 2C Repeal of Library Commission and Tax if Library District Created,City of Boulder Ballot Question 2C,No,12679,12679,0,match
+2022,general,2022-11-30T16:17:00,City of Boulder Ballot Question 2D Charter Clarification of Candidate Issues,City of Boulder Ballot Question 2D,Yes,33079,33079,0,match
+2022,general,2022-11-30T16:17:00,City of Boulder Ballot Question 2D Charter Clarification of Candidate Issues,City of Boulder Ballot Question 2D,No,7063,7063,0,match
+2022,general,2022-11-30T16:17:00,City of Boulder Ballot Question 2E Change Regular Municipal Election to Even Years,City of Boulder Ballot Question 2E,Yes,26138,26138,0,match
+2022,general,2022-11-30T16:17:00,City of Boulder Ballot Question 2E Change Regular Municipal Election to Even Years,City of Boulder Ballot Question 2E,No,15039,15039,0,match
+2022,general,2022-11-30T16:17:00,"City of Boulder Ballot Question 2F Repeal of Ordinance 8483, Regarding the Annexation of CU South",City of Boulder Ballot Question 2F,Yes,19292,19292,0,match
+2022,general,2022-11-30T16:17:00,"City of Boulder Ballot Question 2F Repeal of Ordinance 8483, Regarding the Annexation of CU South",City of Boulder Ballot Question 2F,No,22539,22539,0,match
 2022,general,2022-11-30T16:17:00,Town of Erie Ballot Issue 3D,Town of Erie Ballot Issue 3D,Yes,5768,5768,0,match
 2022,general,2022-11-30T16:17:00,Town of Erie Ballot Issue 3D,Town of Erie Ballot Issue 3D,No,1414,1414,0,match
 2022,general,2022-11-30T16:17:00,Town of Erie Ballot Question 3E,Town of Erie Ballot Question 3E,Yes,3804,3804,0,match
@@ -1239,12 +1239,12 @@ year,election_type,final_snapshot,contest,sov_contest,candidate_or_option,snapsh
 2023,coordinated,2023-12-06T16:50:00,Boulder County Ballot Issue 1A Open Space Sales and Use Tax Extension and Revenue Change,Boulder County Ballot Issue 1A,No,22844,22844,0,match
 2023,coordinated,2023-12-06T16:50:00,Boulder County Ballot Issue 1B Affordable and Attainable Sales and Use Tax Extension and Revenue Change,Boulder County Ballot Issue 1B,Yes,83505,83505,0,match
 2023,coordinated,2023-12-06T16:50:00,Boulder County Ballot Issue 1B Affordable and Attainable Sales and Use Tax Extension and Revenue Change,Boulder County Ballot Issue 1B,No,33426,33426,0,match
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Ballot Issue 2A City Sales Use and Tax Extension (TABOR),City of Boulder Ballot Issue 2A,For the Measure,24810,,,candidate_not_in_sov
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Ballot Issue 2A City Sales Use and Tax Extension (TABOR),City of Boulder Ballot Issue 2A,Against the Measure,8473,,,candidate_not_in_sov
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Ballot Question 2B Elections Administrative Charter Cleanup,City of Boulder Ballot Question 2B,For the Measure,26137,,,candidate_not_in_sov
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Ballot Question 2B Elections Administrative Charter Cleanup,City of Boulder Ballot Question 2B,Against the Measure,4153,,,candidate_not_in_sov
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Ballot Question 302 Safe Zones 4 Kids,City of Boulder Ballot Question 302,For the Measure,20261,,,candidate_not_in_sov
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Ballot Question 302 Safe Zones 4 Kids,City of Boulder Ballot Question 302,Against the Measure,12973,,,candidate_not_in_sov
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Ballot Issue 2A City Sales Use and Tax Extension (TABOR),City of Boulder Ballot Issue 2A,Yes,24810,24810,0,match
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Ballot Issue 2A City Sales Use and Tax Extension (TABOR),City of Boulder Ballot Issue 2A,No,8473,8473,0,match
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Ballot Question 2B Elections Administrative Charter Cleanup,City of Boulder Ballot Question 2B,Yes,26137,26137,0,match
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Ballot Question 2B Elections Administrative Charter Cleanup,City of Boulder Ballot Question 2B,No,4153,4153,0,match
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Ballot Question 302 Safe Zones 4 Kids,City of Boulder Ballot Question 302,Yes,20261,20261,0,match
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Ballot Question 302 Safe Zones 4 Kids,City of Boulder Ballot Question 302,No,12973,12973,0,match
 2023,coordinated,2023-12-06T16:50:00,Town of Erie Ballot Question 3A,Town of Erie Ballot Question 3A,Yes,3015,3015,0,match
 2023,coordinated,2023-12-06T16:50:00,Town of Erie Ballot Question 3A,Town of Erie Ballot Question 3A,No,1846,1846,0,match
 2023,coordinated,2023-12-06T16:50:00,Town of Erie Ballot Question 3B,Town of Erie Ballot Question 3B,Yes,2963,2963,0,match
@@ -1489,10 +1489,10 @@ year,election_type,final_snapshot,contest,sov_contest,candidate_or_option,snapsh
 2025,coordinated,2025-11-13T16:50:00,Boulder County Ballot Issue 1A Open Space Sales and Use Tax Extension and Revenue Change,Boulder County Ballot Issue 1A,No,30720,30720,0,match
 2025,coordinated,2025-11-13T16:50:00,Boulder County Ballot Issue 1B Mental and Behavioral Health Sales and Use Tax and Revenue Change,Boulder County Ballot Issue 1B,Yes,76542,76542,0,match
 2025,coordinated,2025-11-13T16:50:00,Boulder County Ballot Issue 1B Mental and Behavioral Health Sales and Use Tax and Revenue Change,Boulder County Ballot Issue 1B,No,41939,41939,0,match
-2025,coordinated,2025-11-13T16:50:00,"City of Boulder Ballot Issue 2A Community, Culture, Resilience, and Safety (CCRS) Tax Extension (TABOR)",City of Boulder Ballot Issue 2A,For the Measure,24007,,,candidate_not_in_sov
-2025,coordinated,2025-11-13T16:50:00,"City of Boulder Ballot Issue 2A Community, Culture, Resilience, and Safety (CCRS) Tax Extension (TABOR)",City of Boulder Ballot Issue 2A,Against the Measure,9159,,,candidate_not_in_sov
-2025,coordinated,2025-11-13T16:50:00,"City of Boulder Ballot Issue 2B Community, Culture, Resilience, and Safety (CCRS) Tax Debt Authorization (TABOR)",City of Boulder Ballot Issue 2B,For the Measure,21082,,,candidate_not_in_sov
-2025,coordinated,2025-11-13T16:50:00,"City of Boulder Ballot Issue 2B Community, Culture, Resilience, and Safety (CCRS) Tax Debt Authorization (TABOR)",City of Boulder Ballot Issue 2B,Against the Measure,11435,,,candidate_not_in_sov
+2025,coordinated,2025-11-13T16:50:00,"City of Boulder Ballot Issue 2A Community, Culture, Resilience, and Safety (CCRS) Tax Extension (TABOR)",City of Boulder Ballot Issue 2A,Yes,24007,24007,0,match
+2025,coordinated,2025-11-13T16:50:00,"City of Boulder Ballot Issue 2A Community, Culture, Resilience, and Safety (CCRS) Tax Extension (TABOR)",City of Boulder Ballot Issue 2A,No,9159,9159,0,match
+2025,coordinated,2025-11-13T16:50:00,"City of Boulder Ballot Issue 2B Community, Culture, Resilience, and Safety (CCRS) Tax Debt Authorization (TABOR)",City of Boulder Ballot Issue 2B,Yes,21082,21082,0,match
+2025,coordinated,2025-11-13T16:50:00,"City of Boulder Ballot Issue 2B Community, Culture, Resilience, and Safety (CCRS) Tax Debt Authorization (TABOR)",City of Boulder Ballot Issue 2B,No,11435,11435,0,match
 2025,coordinated,2025-11-13T16:50:00,"City of Lafayette Ballot Issue 2C Funding Recreation Center Improvements, a New Civic Center, and Service Center Improvements",City of Lafayette Ballot Issue 2C,Yes,6410,6410,0,match
 2025,coordinated,2025-11-13T16:50:00,"City of Lafayette Ballot Issue 2C Funding Recreation Center Improvements, a New Civic Center, and Service Center Improvements",City of Lafayette Ballot Issue 2C,No,5417,5417,0,match
 2025,coordinated,2025-11-13T16:50:00,City of Louisville Ballot Question 300 Residential Rezoning,City of Louisville Ballot Question 300,Yes,2066,2066,0,match
