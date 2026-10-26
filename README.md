@@ -65,7 +65,10 @@ uv run python -m scripts.pipeline --discover
 #    to skip the slower PDF years — the shared outputs keep every year either way)
 uv run python -m scripts.pipeline --skip-fetch
 
-# 5. Run the test suite
+# 5. One election only — every CLI takes an election key, {year}-{type}
+uv run python -m scripts.pipeline --skip-fetch --election 2025-coordinated
+
+# 6. Run the test suite
 uv run pytest
 ```
 
@@ -167,6 +170,7 @@ sum to the card's total and match the published percentages), and the final snap
 ```bash
 uv run python -m scripts.vote_counting          # rebuild from the committed OCR cache
 uv run python -m scripts.vote_counting --ocr    # OCR new screenshots (needs DATALAB_API_KEY)
+uv run python -m scripts.vote_counting --ocr --election 2024-general   # just one election
 ```
 
 ## How to use the data
@@ -221,7 +225,7 @@ uv run python -m scripts.pipeline --discover            # full end-to-end with d
 The pytest suite and [ruff](https://docs.astral.sh/ruff/) lint run on every push and PR via [`.github/workflows/tests.yml`](.github/workflows/tests.yml). The tests cover schema contracts, per-parser helpers, the discovery classifier (with cached HTML fixtures so it works offline), source-registry shape, the election-night parser and QA, fixture or golden-page tests for the SOS, panel and PDF parsers, and every committed processed CSV. They never touch the network or rewrite committed files.
 
 ```bash
-uv run pytest                  # run everything (<!-- generated:test-count -->431 tests<!-- /generated:test-count -->)
+uv run pytest                  # run everything (<!-- generated:test-count -->435 tests<!-- /generated:test-count -->)
 uv run pytest tests/test_discover.py -v
 uv run ruff check .            # lint (rules in pyproject.toml)
 ```
@@ -234,6 +238,10 @@ uv run ruff check .            # lint (rules in pyproject.toml)
 - **`Cleaning.ipynb` rewrite** preserves the methodology of the original notebook but no longer re-implements every per-year transform — those live in `scripts/parsers/` now.
 
 ## Glossary
+
+The short version is below; the full glossary shared with
+[Cast-Vote-Records](https://github.com/BoulderPublicData/Cast-Vote-Records) is
+[`docs/glossary.md`](docs/glossary.md).
 
 - **SoV (Statement of Votes)** — the county's official, certified results file: votes for every
   candidate and ballot question in every precinct.

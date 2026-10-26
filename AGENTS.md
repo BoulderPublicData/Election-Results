@@ -107,6 +107,20 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at for ev
 
 **Why:** The discovery tests use HTML fixtures captured under `tests/fixtures/` so CI doesn't break if a vendor's CDN flakes. Re-capture them when the upstream pages change shape (instructions in `tests/test_discover.py`'s module docstring). Tests against `data/processed/` skip gracefully when the CSVs aren't present on disk, so the suite passes on a fresh clone without running the full pipeline first.
 
+### 2.10 Shared conventions with Cast-Vote-Records
+
+**Why:** BoulderPublicData/Cast-Vote-Records (ballot-level CVRs) and this repo describe the same elections, so a user moving between them should meet the same names (#34). Keep these aligned; change them in both repos or neither.
+
+| Convention | Value |
+|---|---|
+| Election key | lowercase `{year}-{type}`, `type` ∈ `general` / `primary` / `coordinated` — `scripts.sources.election_key()` / `parse_election_key()`. File stems (`2016-general-boulder-county.csv`), the Datalab cache (`datalab/2016-general/`) and `--election` arguments use it. Raw folders under `data/original/` keep their published names (`2016G`) and are mapped in code — never renamed. |
+| `data/processed/` layout | one subfolder per dataset (`statements-of-votes/`, `vote-counting/`) |
+| Packaging | uv + `uv.lock` + hatchling; `[dependency-groups] dev` holds pytest + ruff, so `uv sync` installs them; `.python-version` = 3.11 |
+| Python | `requires-python >= 3.11`; CI tests 3.11 (the floor) and 3.13 |
+| Lint | ruff, configured in `pyproject.toml` `[tool.ruff]` |
+| CLI filters | `--year`, `--since`, `--source`; one election: `--election {election key}` |
+| Changelog / glossary | [`docs/changelog.md`](docs/changelog.md), [`docs/glossary.md`](docs/glossary.md) |
+
 ---
 
 ## 3. Where to be careful
@@ -187,7 +201,7 @@ In rough order of value:
 3. Update every parser under `scripts/parsers/` to populate the new column (start with `pd.NA` if the source doesn't provide it).
 4. Re-run `scripts.export_lookups`; verify `data/lookups/schema.json` updated.
 5. Re-run the pipeline; check `validate()` doesn't surface unexpected nulls.
-6. Bump `SCHEMA_VERSION` in `schema.py` (minor for an added column, major for a removed or renamed one) and add a changelog entry (`docs/data-dictionary.md` §9).
+6. Bump `SCHEMA_VERSION` in `schema.py` (minor for an added column, major for a removed or renamed one) and add a changelog entry ([`docs/changelog.md`](docs/changelog.md)).
 7. Append new columns after `ballots_cast` rather than in the middle, so readers that address CSV columns by position keep working (that's where 1.2.0 put `is_pseudo_precinct`).
 8. Derived columns are computed in one place — `parsers/common.py:add_provenance` (and `schema.coerce` as a fallback) — not per parser.
 
@@ -208,9 +222,11 @@ In rough order of value:
 | End-to-end driver | [`scripts/pipeline.py`](scripts/pipeline.py) |
 | JSON lookup exporter | [`scripts/export_lookups.py`](scripts/export_lookups.py) |
 | Doc counts/sizes generator | [`scripts/doc_stats.py`](scripts/doc_stats.py) (rewrites the `<!-- generated:… -->` spans) |
-| Test suite | [`tests/`](tests/) (pytest, <!-- generated:test-count -->431 tests<!-- /generated:test-count -->; hermetic — never writes into `data/`) |
+| Test suite | [`tests/`](tests/) (pytest, <!-- generated:test-count -->435 tests<!-- /generated:test-count -->; hermetic — never writes into `data/`) |
 | Shared Excel reader | [`scripts/parsers/common.py`](scripts/parsers/common.py) (`read_excel`, `excel_file`) |
 | Data dictionary | [`docs/data-dictionary.md`](docs/data-dictionary.md) |
+| Changelog | [`docs/changelog.md`](docs/changelog.md) |
+| Glossary (shared with Cast-Vote-Records) | [`docs/glossary.md`](docs/glossary.md) |
 | Filter/pivot recipes | [`docs/filter-pivot-recipes.md`](docs/filter-pivot-recipes.md) |
 | Methodology notebook | [`Cleaning.ipynb`](Cleaning.ipynb) |
 | Annual refresh workflow | [`.github/workflows/annual-sov-refresh.yml`](.github/workflows/annual-sov-refresh.yml) |

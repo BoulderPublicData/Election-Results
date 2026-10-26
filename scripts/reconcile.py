@@ -712,10 +712,20 @@ def report_markdown(all_recon: pd.DataFrame, cand: pd.DataFrame, checks: list[di
     return "\n".join(md_lines)
 
 
+def _election_arg(value: str) -> tuple[int, str]:
+    from .sources import parse_election_key
+    try:
+        return parse_election_key(value)
+    except ValueError as e:
+        raise argparse.ArgumentTypeError(str(e)) from e
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--year", type=int)
+    ap.add_argument("-e", "--election", type=_election_arg, metavar="KEY",
+                    help="Only this election, as an election key, e.g. 2024-general")
     ap.add_argument("--source", choices=["boulder_county", "secretary_of_state", "all"],
                     default="all")
     args = ap.parse_args(argv)
@@ -728,6 +738,8 @@ def main(argv: list[str] | None = None) -> int:
         pool = ALL_SOURCES
     if args.year:
         pool = [s for s in pool if s.year == args.year]
+    if args.election:
+        pool = [s for s in pool if (s.year, s.election_type) == args.election]
 
     AUDIT.mkdir(parents=True, exist_ok=True)
     all_recon, cand, checks = run(pool)

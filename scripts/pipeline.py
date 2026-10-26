@@ -63,6 +63,14 @@ def _epilog() -> str:
     return "\n".join(lines)
 
 
+def _election_arg(value: str) -> tuple[int, str]:
+    from .sources import parse_election_key
+    try:
+        return parse_election_key(value)
+    except ValueError as e:
+        raise argparse.ArgumentTypeError(str(e)) from e
+
+
 def _run_end_to_end(argv: list[str] | None = None) -> int:
     """The full discover → fetch → clean → reconcile → audit driver.
 
@@ -73,6 +81,8 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
         prog="python -m scripts.pipeline [run]", description=__doc__, epilog=_epilog(),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--year", type=int)
+    ap.add_argument("-e", "--election", type=_election_arg, metavar="KEY",
+                    help="Only this election, as an election key, e.g. 2024-general")
     ap.add_argument("--since", type=int)
     ap.add_argument("--source", choices=["boulder_county", "secretary_of_state", "all"],
                     default="all")
@@ -109,6 +119,8 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
 
     if args.year:
         pool = [s for s in pool if s.year == args.year]
+    if args.election:
+        pool = [s for s in pool if (s.year, s.election_type) == args.election]
     if args.since:
         pool = [s for s in pool if s.year >= args.since]
     if args.no_pdf:
