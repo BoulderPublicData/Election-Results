@@ -119,3 +119,15 @@ def test_integer_columns_written_as_integers(path):
     for col in INT_COLUMNS:
         floaty = df[col].dropna().str.contains(r"\.", regex=True)
         assert not floaty.any(), f"{path.name}:{col} has float-formatted values"
+
+
+@pytest.mark.parametrize("path", ALL_FILES, ids=lambda p: p.name)
+def test_composite_ids_use_one_separator_and_pseudo_flag_matches(path):
+    """#27: composite IDs mixed ',', ', ', ' + ' and '+'."""
+    from scripts.parsers.common import is_pseudo_precinct
+    df = pd.read_csv(path, dtype={"precinct_id": "string", "is_pseudo_precinct": "boolean"},
+                     usecols=["precinct_id", "is_pseudo_precinct"]).drop_duplicates()
+    ids = df["precinct_id"].dropna()
+    assert not ids.str.contains(r"\+|,(?! )|\s{2,}", regex=True).any(), path.name
+    assert df["is_pseudo_precinct"].notna().all()
+    assert (df["is_pseudo_precinct"] == df["precinct_id"].map(is_pseudo_precinct)).all()

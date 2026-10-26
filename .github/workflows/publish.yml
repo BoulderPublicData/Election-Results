@@ -54,7 +54,7 @@ jobs:
         run: uv run python -m scripts.pipeline publish
 
       - name: Show sizes
-        run: ls -lh data/processed/elections.db data/processed/metadata.yaml
+        run: ls -lh data/processed/elections.db data/processed/elections-recent.db data/processed/metadata.yaml data/processed/statements-of-votes-excel.zip
 
       - name: Write release notes
         env:
@@ -69,10 +69,13 @@ jobs:
 
           **Files**
           - `elections.db` — single SQLite with `elections` + `provenance` + `concepts` tables, the election-night `vote_counting_contests` + `vote_counting_summary` tables, and an `elections_with_provenance` join view.
+          - `elections-recent.db` — the same tables for 2018 onward only; about a third of the size, so it loads faster in Datasette Lite (which downloads the whole file into the browser).
           - `metadata.yaml` — Datasette annotations: per-column docs, suggested facets, canned queries.
+          - `statements-of-votes-excel.zip` — the per-year CSVs saved as UTF-8 with a byte-order mark, so they open in Excel by double-click with accented names intact.
 
           **Open in Datasette Lite (no install):**
           https://lite.datasette.io/?url=https://github.com/__REPO__/releases/download/latest/elections.db
+          Recent years only (faster): https://lite.datasette.io/?url=https://github.com/__REPO__/releases/download/latest/elections-recent.db
 
           Source commit: __SHA__
           NOTES_EOF
@@ -91,4 +94,6 @@ jobs:
             --title "Latest harmonized dataset" \
             --notes-file release-notes.md \
             data/processed/elections.db \
-            data/processed/metadata.yaml
+            data/processed/elections-recent.db \
+            data/processed/metadata.yaml \
+            data/processed/statements-of-votes-excel.zip

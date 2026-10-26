@@ -143,3 +143,31 @@ class TestPartyDrift:
 
     def test_zero_is_no_party(self):
         assert pd.isna(normalize_party("0"))
+
+
+class TestPrecinctIds:
+    """#27: composite separators and pseudo-precincts."""
+
+    @pytest.mark.parametrize(("raw", "want"), [
+        ("2181207201,2181207202", "2181207201, 2181207202"),       # 2023
+        ("073 + 74", "073, 74"),                                    # 2011
+        ("128+132+133+  232+233", "128, 132, 133, 232, 233"),        # 2011
+        ("2181007800, 2181207403", "2181007800, 2181207403"),
+        ("002-004", "002-004"),                                     # 2010: may be a range
+        ("Landowner-FMLV, Landowner-LV", "Landowner-FMLV, Landowner-LV"),
+    ])
+    def test_normalize(self, raw, want):
+        from scripts.parsers.common import normalize_precinct_id
+        assert normalize_precinct_id(raw) == want
+
+    @pytest.mark.parametrize(("raw", "want"), [
+        ("2181007800", False), ("073", False), ("002-004", False),
+        ("2181007800, 2181207403", False),
+        ("Property Owner", True), ("Landowner", True), ("LANDOWNER", True),
+        ("Landowner CCCPR", True), ("RMFPD", True), ("004, 005, LFPD", True),
+        ("2181307910, Landowner", True), ("Property Owner, 627", True),
+        ("SUM", True), ("Provisional", True),
+    ])
+    def test_is_pseudo(self, raw, want):
+        from scripts.parsers.common import is_pseudo_precinct
+        assert is_pseudo_precinct(raw) is want

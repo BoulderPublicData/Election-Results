@@ -123,9 +123,10 @@ def export_schema() -> None:
         "$schema_version": SCHEMA_VERSION,
         "$description": (
             "Harmonized schema for data/processed/statements-of-votes/. `columns` is the full "
-            "in-memory schema (20 cols). `csv_columns` is the slim view written "
-            "to per-year CSV files (15 cols). `provenance_columns` are the "
-            "5 fields stored in data/processed/statements-of-votes/provenance.csv instead of "
+            f"in-memory schema ({len(COLUMNS)} cols). `csv_columns` is the slim view written "
+            f"to per-year CSV files ({len(CSV_COLUMNS)} cols). `provenance_columns` are the "
+            f"{len(PROVENANCE_COLUMNS)} fields stored in "
+            "data/processed/statements-of-votes/provenance.csv instead of "
             "duplicating them on every row."
         ),
         "$generated_by": "scripts/export_lookups.py from scripts/schema.py",

@@ -68,7 +68,9 @@ VOTE_COUNTING = PROCESSED / "vote-counting"
 
 # Cross-dataset publishing artifacts (gitignored; built by scripts/publish.py).
 DATASETTE_DB = PROCESSED / "elections.db"
+DATASETTE_RECENT_DB = PROCESSED / "elections-recent.db"
 DATASETTE_METADATA = PROCESSED / "metadata.yaml"
+EXCEL_ZIP = PROCESSED / "statements-of-votes-excel.zip"
 
 # Election-night snapshots: screenshots in, tidy CSVs + QA out. The Datalab
 # response cache lives under the processed folder by design (see AGENTS §2.5):
@@ -145,7 +147,7 @@ __all__ = [
     "RECONCILIATION_CSV", "RECONCILIATION_MD", "RECONCILIATION_CANDIDATES_CSV",
     "VOTE_COUNTING_VS_SOV_CSV", "REJECTED_CSV", "AUDIT_SUMMARY_MD",
     "STATEMENTS_OF_VOTES", "VOTE_COUNTING", "sov_csv_path",
-    "DATASETTE_DB", "DATASETTE_METADATA",
+    "DATASETTE_DB", "DATASETTE_RECENT_DB", "DATASETTE_METADATA", "EXCEL_ZIP",
     "VOTE_COUNTING_ORIGINAL", "VOTE_COUNTING_CACHE", "VOTE_COUNTING_CONTESTS_CSV",
     "VOTE_COUNTING_SUMMARY_CSV", "VOTE_COUNTING_CORRECTIONS_CSV",
     "VOTE_COUNTING_QA_CSV", "VOTE_COUNTING_QA_MD",

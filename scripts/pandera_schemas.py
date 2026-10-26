@@ -67,8 +67,10 @@ _BASE_COLUMNS = {
     ),
     "jurisdiction_name": _REQ_STR("Always 'Boulder County' in this project."),
     "precinct_id": _REQ_STR(
-        "10-digit Boulder/Colorado precinct identifier, string-typed to preserve "
-        "leading zeros. Composite IDs (2015, 2022) are joined with commas."
+        "Precinct identifier, string-typed to preserve leading zeros: 10 digits "
+        "(SOS; Boulder 2005 and 2013+) or 3 digits (Boulder 2007-2012). Composite "
+        "reporting units join their IDs with ', '; pseudo-precincts carry a code "
+        "such as 'Landowner' or 'Property Owner' (see is_pseudo_precinct)."
     ),
     "precinct_name": _OPT_STR(
         "Short-form precinct code (3 digits). Null for SOS rows + older Boulder "
@@ -91,6 +93,12 @@ _BASE_COLUMNS = {
     ),
     "active_voters": _OPT_INT64("Active registered voters in the precinct."),
     "ballots_cast": _OPT_INT64("Ballots cast in the precinct. Null on SOS rows."),
+    "is_pseudo_precinct": pa.Column(
+        "boolean", nullable=False, required=True,
+        description="True when precinct_id is, or includes, a unit with no precinct "
+                    "geography (property-owner / landowner ballots, SOS 'SUM' / "
+                    "'Provisional' rows).",
+    ),
 }
 
 
@@ -118,7 +126,7 @@ def _build_inmemory_schema() -> pa.DataFrameSchema:
     )
     return pa.DataFrameSchema(
         cols, strict=False, ordered=False, name="ElectionResults_InMemory",
-        description="Full 20-column parser-output frame.",
+        description=f"Full {len(COLUMNS)}-column parser-output frame.",
     )
 
 
@@ -130,7 +138,8 @@ def _build_csv_schema() -> pa.DataFrameSchema:
     )
     return pa.DataFrameSchema(
         cols, strict=False, ordered=False, name="ElectionResults_CSV",
-        description="Slim 15-column view written to data/processed/statements-of-votes/*.csv.",
+        description=f"Slim {len(CSV_COLUMNS)}-column view written to "
+                    "data/processed/statements-of-votes/*.csv.",
     )
 
 
