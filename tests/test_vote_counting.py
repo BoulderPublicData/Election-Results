@@ -118,7 +118,8 @@ def test_split_title():
     ("Mike Watson - Write-In", ("Mike Watson", pd.NA, True)),
     ("Lynn Greer - Certified Write-in Candidate", ("Lynn Greer", pd.NA, True)),
     ("YES/FOR", ("Yes", None, False)),
-    ("Against the Measure", ("Against the Measure", None, False)),
+    # Local questions' For/Against labels normalize to Yes/No, as in the SoV (#24).
+    ("Against the Measure", ("No", None, False)),
     ("Nicole Speer", ("Nicole Speer", None, False)),
 ])
 def test_split_candidate(raw, expected):

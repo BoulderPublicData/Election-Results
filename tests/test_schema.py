@@ -141,3 +141,24 @@ def test_validate_flags_unknown_contest_type():
     df = coerce(pd.DataFrame([base]))
     problems = validate(df)
     assert any("contest_type" in p for p in problems)
+
+
+def test_provenance_record_from_meta_for_an_empty_frame():
+    """#31: a parser that returns no rows (the turnout-only 2024 SOS file)
+    used to leave an all-null provenance row."""
+    from scripts.parsers.common import add_provenance
+    from scripts.schema import SourceMeta, coerce, provenance_record
+
+    meta = SourceMeta(
+        election_year=2024, election_date="2024-11-05", election_type="general",
+        data_source="secretary_of_state", jurisdiction_level="state",
+        jurisdiction_name="Boulder County", source_file="t.xlsx", source_url="https://x",
+        retrieved_at="2026-05-23T18:30:07+00:00", extraction_quality="machine_readable",
+    )
+    df = coerce(add_provenance(pd.DataFrame(), meta, extraction_notes="turnout-only file"))
+    assert df.empty
+    rec = provenance_record(df, meta)
+    assert rec["election_year"] == 2024
+    assert rec["data_source"] == "secretary_of_state"
+    assert rec["source_file"] == "t.xlsx"
+    assert rec["extraction_notes"] == "turnout-only file"

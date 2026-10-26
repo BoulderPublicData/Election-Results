@@ -64,8 +64,10 @@ def export_choice_map() -> None:
         "$schema_version": SCHEMA_VERSION,
         "$description": (
             "Yes/No variant normalization. Published files use many spellings "
-            "(`Yes/For`, `No/Against`, `Yes/Sí`, ...). `mapping` is source → canonical. "
-            "All canonical values are either `Yes` or `No`."
+            "(`Yes/For`, `No/Against`, `Yes/Sí`, `FOR THE MEASURE`, ...). `mapping` is "
+            "source → canonical. Matching is case- and whitespace-insensitive: lower-case "
+            "the value and collapse runs of spaces before looking it up (so `YES`, ` yes ` "
+            "and `For The Measure` all match). All canonical values are either `Yes` or `No`."
         ),
         "$generated_by": "scripts/export_lookups.py from scripts/parsers/common.py:CHOICE_MAP",
         "$generated_at": _now(),

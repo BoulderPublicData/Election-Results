@@ -6,25 +6,25 @@
 - **Extraction quality:** pdf_text_layer
 - **Extraction notes:** pdfplumber: parsed 108 pages, skipped 0, 0 pages had no recognizable candidate header (skipped); Candidate names recovered from rotated PDF text via _unrotate(); spot-check a sample of precincts against the source PDF before publishing
 
-- **Rows:** 3,403
-- **Distinct contests:** 37
-- **Distinct precincts:** 234
-- **Total votes summed:** 543,123
+- **Rows:** 6,866
+- **Distinct contests:** 45
+- **Distinct precincts:** 235
+- **Total votes summed:** 561,237
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 2520, 'measure': 883}
-- **Party breakdown (top 8):** {'(none)': 3403}
+- **Contest type breakdown:** {'candidate': 4364, 'measure': 2502}
+- **Party breakdown (top 8):** {'(none)': 6866}
 
 **Top 10 contests by vote total** (sanity check):
 
 | contest | total_votes |
 |---|---|
-| City of Boulder Council Candidates | 166,056 |
+| City of Boulder Council Candidates | 94,549 |
 | County Issue 1B (Transportation Sales and Use Tax Extension and Revenue Change): | 57,153 |
 | County Issue 1A (Open Space Bond Authorization, Sales and Use Tax Extension, and Revenue Change): | 56,607 |
 | Boulder Valley School District Director District C (4 Years) | 22,507 |
+| Boulder Valley School District Director District G (4 Years) | 21,899 |
+| Boulder Valley School District Director District A (4 Years) | 19,990 |
+| Boulder Valley School District Director District D (4 Years) | 18,372 |
 | City of Longmont Ballot Issue 2A | 16,402 |
 | City of Longmont Ballot Issue 2C | 16,369 |
 | City of Boulder Ballot Question 2B City Council Compensation | 16,273 |
-| City of Longmont Ballot Issue 2B | 16,248 |
-| City of Boulder Ballot Question 2C Clarifying Circumstances That Cause a City Council Vacancy | 15,906 |
-| City of Boulder Question 2D Filling City Council Vacancies | 15,720 |

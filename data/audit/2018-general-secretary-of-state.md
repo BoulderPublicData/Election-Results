@@ -6,13 +6,13 @@
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 
-- **Rows:** 21,422
-- **Distinct contests:** 34
+- **Rows:** 17,085
+- **Distinct contests:** 39
 - **Distinct precincts:** 235
-- **Total votes summed:** 4,288,865
+- **Total votes summed:** 4,946,502
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'measure': 11622, 'candidate': 8860, 'retention': 940}
-- **Party breakdown (top 8):** {'(none)': 14837, 'DEM': 2184, 'REP': 1835, 'LBR': 908, 'Unity Party of Colorado': 470, 'ACN': 470, 'GRN': 235, 'AVP': 235}
+- **Contest type breakdown:** {'candidate': 6745, 'measure': 6110, 'retention': 4230}
+- **Party breakdown (top 8):** {'(none)': 10500, 'DEM': 2184, 'REP': 1835, 'LBR': 908, 'UTY': 470, 'ACN': 470, 'GRN': 235, 'AVP': 235}
 
 **Top 10 contests by vote total** (sanity check):
 

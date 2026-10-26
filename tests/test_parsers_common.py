@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pandas as pd
+import pytest
 
 from scripts.parsers.common import (
     clean_col,
@@ -87,3 +88,58 @@ def test_clean_col_collapses_whitespace():
     assert clean_col("Active \nVoters") == "Active Voters"
     assert clean_col("Total\nBallots Cast") == "Total Ballots Cast"
     assert clean_col("  Contest\rTitle  ") == "Contest Title"
+
+
+class TestRetentionPhrasings:
+    """#25: county and district court judges were typed 'measure'."""
+
+    @pytest.mark.parametrize("title", [
+        "County Court, Boulder",                              # SOS 2012+
+        "District Court, 20th Judicial District",              # SOS 2012+
+        "COUNTY JUDGE, BOULDER - Thomas J.B. Reed",            # 2008
+        "Boulder County Court: David A. Archuleta",            # 2010
+        "Reed of the Boulder County Court",                    # 2004
+        "District Court Judge - 20th Judicial District - Hartman",
+        "Court of Appeals - Anthony J. Navarro",
+    ])
+    def test_retention(self, title):
+        assert infer_contest_type(title, "Yes") == "retention"
+        assert infer_contest_type(title, "No") == "retention"
+
+    @pytest.mark.parametrize("title", [
+        "City of Boulder Ballot Issue 2D - Authorize Retention of All Sugar-Sweetened "
+        "Beverages Tax Revenue",
+        "Proposition BB (STATUTORY) Retain Revenue in Excess of Blue Book Estimate",
+    ])
+    def test_revenue_retention_is_a_measure(self, title):
+        assert infer_contest_type(title, "Yes") == "measure"
+
+
+class TestChoiceVariants:
+    @pytest.mark.parametrize(("raw", "want"), [
+        ("FOR THE MEASURE", "Yes"), ("For the measure", "Yes"), ("For The Measure", "Yes"),
+        ("AGAINST THE MEASURE", "No"), ("Against the Measure", "No"),
+        ("FOR THE ISSUE", "Yes"), ("AGAINST THE ISSUE", "No"),
+        ("FOR", "Yes"), ("AGAINST", "No"), ("AGAINST THE", "No"),
+        ("  YES ", "Yes"), ("Yes/Sí", "Yes"),
+    ])
+    def test_maps_to_yes_no(self, raw, want):
+        assert normalize_choice(raw) == want
+
+
+class TestPartyDrift:
+    """#33: one code per party across sources and years."""
+
+    @pytest.mark.parametrize(("raw", "want"), [
+        ("UNI", "UTY"), ("Unity", "UTY"), ("Unity Party of Colorado", "UTY"),
+        ("LIB", "LBR"), ("UNA", "UAF"), ("APV", "AVP"), ("Approval Voting Party", "AVP"),
+        ("AMS", "ASP"), ("ALL", "ALP"), ("Socialist Workers Party", "SWP"),
+        ("Socialism and Liberation", "SLB"), ("Prohibition Party", "PRB"),
+        ("DEM/REP", "DEM / REP"), ("Unaffiliated / Republican", "UAF / REP"),
+        ("Democratic   Party", "DEM"),
+    ])
+    def test_canonical(self, raw, want):
+        assert normalize_party(raw) == want
+
+    def test_zero_is_no_party(self):
+        assert pd.isna(normalize_party("0"))

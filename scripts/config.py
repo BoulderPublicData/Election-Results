@@ -78,6 +78,8 @@ PROVENANCE_CSV = STATEMENTS_OF_VOTES / "provenance.csv"
 COMBINED_CSV = STATEMENTS_OF_VOTES / "all-elections-tidy.csv"
 RECONCILIATION_CSV = AUDIT / "reconciliation.csv"
 RECONCILIATION_MD = AUDIT / "reconciliation.md"
+RECONCILIATION_CANDIDATES_CSV = AUDIT / "reconciliation-candidates.csv"
+VOTE_COUNTING_VS_SOV_CSV = AUDIT / "vote-counting-vs-sov.csv"
 REJECTED_CSV = AUDIT / "rejected.csv"
 AUDIT_SUMMARY_MD = AUDIT / "summary.md"
 
@@ -110,7 +112,7 @@ HTTP_RETRY_MAX_WAIT = 8.0
 # ---------------------------------------------------------------------------
 
 # Set to "json" in CI for parseable logs; "pretty" in interactive runs.
-# scripts/logging.py picks the renderer based on this + tty detection.
+# scripts/logging_setup.py picks the renderer based on this + tty detection.
 LOG_FORMAT = os.environ.get("ELECTIONS_LOG_FORMAT", "auto")
 
 
@@ -121,7 +123,8 @@ __all__ = [
     "REPO_ROOT", "DATA", "ORIGINAL", "PROCESSED", "AUDIT", "LOOKUPS",
     "ORIGINAL_SUBDIRS", "original_path",
     "MANIFEST_PATH", "PROVENANCE_CSV", "COMBINED_CSV",
-    "RECONCILIATION_CSV", "RECONCILIATION_MD", "REJECTED_CSV", "AUDIT_SUMMARY_MD",
+    "RECONCILIATION_CSV", "RECONCILIATION_MD", "RECONCILIATION_CANDIDATES_CSV",
+    "VOTE_COUNTING_VS_SOV_CSV", "REJECTED_CSV", "AUDIT_SUMMARY_MD",
     "HTTP_TIMEOUT", "HTTP_USER_AGENT",
     "HTTP_CACHE_HOURS", "HTTP_CACHE_PATH",
     "HTTP_RETRY_ATTEMPTS", "HTTP_RETRY_MIN_WAIT", "HTTP_RETRY_MAX_WAIT",

@@ -6,23 +6,25 @@
 - **Extraction quality:** machine_readable
 - **Extraction notes:** —
 
-- **Rows:** 2,868
-- **Distinct contests:** 8
-- **Distinct precincts:** 236
-- **Total votes summed:** 665,359
+- **Rows:** 23,078
+- **Distinct contests:** 57
+- **Distinct precincts:** 247
+- **Total votes summed:** 4,243,259
 - **Rows with null votes:** 0
-- **Contest type breakdown:** {'candidate': 2868}
-- **Party breakdown (top 8):** {'REP': 878, 'DEM': 580, 'GRN': 472, 'UAF': 470, 'LBR': 234, '(none)': 234}
+- **Contest type breakdown:** {'candidate': 12338, 'measure': 6060, 'retention': 4680}
+- **Party breakdown (top 8):** {'(none)': 11131, 'DEM': 3715, 'REP': 3252, 'UAF': 2174, 'LBR': 1162, 'ACN': 704, 'GRN': 472, 'DEM / REP': 234}
 
 **Top 10 contests by vote total** (sanity check):
 
 | contest | total_votes |
 |---|---|
-| GOVERNOR/LIEUTENANT GOVERNOR | 154,854 |
-| UNITED STATES SENATOR | 127,423 |
+| GOVERNOR/LIEUTENANT GOVERNOR | 125,486 |
+| UNITED STATES SENATOR | 125,265 |
+| Amendment 61 (CONSTITUTIONAL) | 121,416 |
+| Amendment 62 (CONSTITUTIONAL) | 121,217 |
+| COUNTY ISSUE 1B [Countywide Open Space Sales and Use Tax Increase and Bond Authorization] | 120,317 |
+| Amendment 60 (CONSTITUTIONAL) | 120,100 |
+| Proposition 101 (STATUTORY) | 119,955 |
 | SECRETARY OF STATE | 119,678 |
-| REGENT OF THE UNIVERSITY OF COLORADO - AT LARGE | 117,523 |
-| COUNTY COMMISSIONER - DISTRICT 3 | 116,922 |
-| STATE REPRESENTATIVE - DISTRICT 12 | 27,389 |
-| REPRESENTATIVE TO THE US CONGRESS - DISTRICT 2 | 1,148 |
-| REPRESENTATIVE TO THE US CONGRESS - DISTRICT 4 | 422 |
+| STATE TREASURER | 119,490 |
+| ATTORNEY GENERAL | 119,436 |

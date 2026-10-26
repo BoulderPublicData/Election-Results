@@ -2,56 +2,119 @@
   "$schema_version": "1.1.0",
   "$description": "Party-name normalization. `mapping` is source-string \u2192 canonical 3-letter code. `by_canonical` groups every known source-string variant under its canonical code so you can render party labels consistently. Unknown source strings pass through verbatim \u2014 they are never silently dropped.",
   "$generated_by": "scripts/export_lookups.py from scripts/parsers/common.py:PARTY_MAP",
-  "$generated_at": "2026-10-25T22:38:20+00:00",
+  "$generated_at": "2026-10-26T04:32:34+00:00",
   "mapping": {
     "ACN": "ACN",
     "AIP": "AIP",
+    "ALL": "ALP",
+    "AMS": "ASP",
+    "APV": "AVP",
     "AVP": "AVP",
+    "Alliance": "ALP",
     "Alliance Party": "ALP",
+    "America's": "AMP",
     "America's Independent": "AMI",
     "America's Party": "AMP",
     "American Constitution": "ACN",
     "American Constitution Party": "ACN",
+    "American Delta": "ADP",
     "American Delta Party": "ADP",
     "American Independent": "AIP",
     "American Independent Party": "AIP",
+    "American Solidarity": "ASP",
     "American Solidarity Party": "ASP",
     "American Third Position": "ATP",
+    "Approval Voting": "AVP",
     "Approval Voting Party": "AVP",
     "Boston Tea": "BTP",
     "Boston Tea Party": "BTP",
     "CON": "CON",
+    "CTR": "CTR",
+    "Center": "CTR",
+    "Center Party": "CTR",
     "Colorado Reform": "CRP",
     "Concerns of People": "COP",
     "Constitution": "CON",
     "Constitution Party": "CON",
     "DEM": "DEM",
+    "DEM / REP": "DEM / REP",
+    "DEM/REP": "DEM / REP",
     "Dem": "DEM",
     "Democrat": "DEM",
     "Democratic": "DEM",
     "Democratic Party": "DEM",
     "GRN": "GRN",
     "Green": "GRN",
+    "Green / Democratic": "GRN / DEM",
     "Green Party": "GRN",
+    "HeartQuake '08": "HQE",
     "Heartquake '08": "HQE",
+    "IAM": "IAM",
     "Independent": "IND",
-    "Independent / Republican": "IND",
+    "Independent / Republican": "IND / REP",
+    "Independent American": "IAM",
+    "Independent American Party": "IAM",
+    "Independent People": "IPC",
+    "Independent People of Colorado": "IPC",
+    "Justice": "JUS",
+    "Justice Party": "JUS",
+    "Kotlikoff for President": "KFP",
     "LBR": "LBR",
+    "LIB": "LBR",
     "Lib": "LBR",
     "Libertarian": "LBR",
     "Libertarian Party": "LBR",
+    "No Party Affiliation": "NPA",
     "Non Partisan": "NP",
     "Non-Partisan": "NP",
     "Nonpartisan": "NP",
+    "Nonviolent Resistance/Pacifist": "NRP",
+    "Nutrition": "NUT",
+    "Nutrition Party": "NUT",
+    "Objectivist": "OBJ",
+    "Objectivist Party": "OBJ",
+    "PRB": "PRB",
+    "PRO": "PRO",
+    "Party for Socialism and Liberation": "SLB",
+    "Peace and Freedom": "PFP",
+    "Peace and Freedom Party": "PFP",
+    "Progressive": "PRO",
+    "Progressive Party": "PRO",
+    "Prohibition": "PRB",
+    "Prohibition Party": "PRB",
     "REP": "REP",
     "Rep": "REP",
     "Republican": "REP",
     "Republican Party": "REP",
+    "SLB": "SLB",
+    "SOE": "SOE",
+    "SWP": "SWP",
+    "Socialism and Liberation": "SLB",
+    "Socialist Equality": "SOE",
+    "Socialist Equality Party": "SOE",
+    "Socialist Party": "SPU",
+    "Socialist Party USA": "SPU",
+    "Socialist USA": "SPU",
+    "Socialist Workers": "SWP",
+    "Socialist Workers Party": "SWP",
+    "Socialist, USA": "SPU",
+    "U.S. Pacifist": "USP",
     "UAF": "UAF",
+    "UAF / REP": "UAF / REP",
+    "UNA": "UAF",
+    "UNI": "UTY",
     "UTY": "UTY",
     "Unaffiliated": "UAF",
+    "Unaffiliated / Libertarian": "UAF / LBR",
+    "Unaffiliated / No Party Affiliation": "UAF / NPA",
+    "Unaffiliated / Republican": "UAF / REP",
     "Unity": "UTY",
+    "Unity Party": "UTY",
+    "Unity Party of Colorado": "UTY",
+    "Veterans Party of America": "VPA",
+    "Veterans of America": "VPA",
     "WI": "WI",
+    "We the People": "WTP",
     "Write In": "WI",
     "Write-In": "WI",
     "Write-in": "WI"
@@ -63,6 +126,7 @@
       "American Constitution Party"
     ],
     "ADP": [
+      "American Delta",
       "American Delta Party"
     ],
     "AIP": [
@@ -71,22 +135,29 @@
       "American Independent Party"
     ],
     "ALP": [
+      "ALL",
+      "Alliance",
       "Alliance Party"
     ],
     "AMI": [
       "America's Independent"
     ],
     "AMP": [
+      "America's",
       "America's Party"
     ],
     "ASP": [
+      "AMS",
+      "American Solidarity",
       "American Solidarity Party"
     ],
     "ATP": [
       "American Third Position"
     ],
     "AVP": [
+      "APV",
       "AVP",
+      "Approval Voting",
       "Approval Voting Party"
     ],
     "BTP": [
@@ -104,6 +175,11 @@
     "CRP": [
       "Colorado Reform"
     ],
+    "CTR": [
+      "CTR",
+      "Center",
+      "Center Party"
+    ],
     "DEM": [
       "DEM",
       "Dem",
@@ -111,20 +187,47 @@
       "Democratic",
       "Democratic Party"
     ],
+    "DEM / REP": [
+      "DEM / REP",
+      "DEM/REP"
+    ],
     "GRN": [
       "GRN",
       "Green",
       "Green Party"
     ],
+    "GRN / DEM": [
+      "Green / Democratic"
+    ],
     "HQE": [
+      "HeartQuake '08",
       "Heartquake '08"
     ],
+    "IAM": [
+      "IAM",
+      "Independent American",
+      "Independent American Party"
+    ],
     "IND": [
-      "Independent",
+      "Independent"
+    ],
+    "IND / REP": [
       "Independent / Republican"
+    ],
+    "IPC": [
+      "Independent People",
+      "Independent People of Colorado"
+    ],
+    "JUS": [
+      "Justice",
+      "Justice Party"
+    ],
+    "KFP": [
+      "Kotlikoff for President"
     ],
     "LBR": [
       "LBR",
+      "LIB",
       "Lib",
       "Libertarian",
       "Libertarian Party"
@@ -134,25 +237,98 @@
       "Non-Partisan",
       "Nonpartisan"
     ],
+    "NPA": [
+      "No Party Affiliation"
+    ],
+    "NRP": [
+      "Nonviolent Resistance/Pacifist"
+    ],
+    "NUT": [
+      "Nutrition",
+      "Nutrition Party"
+    ],
+    "OBJ": [
+      "Objectivist",
+      "Objectivist Party"
+    ],
+    "PFP": [
+      "Peace and Freedom",
+      "Peace and Freedom Party"
+    ],
+    "PRB": [
+      "PRB",
+      "Prohibition",
+      "Prohibition Party"
+    ],
+    "PRO": [
+      "PRO",
+      "Progressive",
+      "Progressive Party"
+    ],
     "REP": [
       "REP",
       "Rep",
       "Republican",
       "Republican Party"
     ],
+    "SLB": [
+      "Party for Socialism and Liberation",
+      "SLB",
+      "Socialism and Liberation"
+    ],
+    "SOE": [
+      "SOE",
+      "Socialist Equality",
+      "Socialist Equality Party"
+    ],
+    "SPU": [
+      "Socialist Party",
+      "Socialist Party USA",
+      "Socialist USA",
+      "Socialist, USA"
+    ],
+    "SWP": [
+      "SWP",
+      "Socialist Workers",
+      "Socialist Workers Party"
+    ],
     "UAF": [
       "UAF",
+      "UNA",
       "Unaffiliated"
     ],
+    "UAF / LBR": [
+      "Unaffiliated / Libertarian"
+    ],
+    "UAF / NPA": [
+      "Unaffiliated / No Party Affiliation"
+    ],
+    "UAF / REP": [
+      "UAF / REP",
+      "Unaffiliated / Republican"
+    ],
+    "USP": [
+      "U.S. Pacifist"
+    ],
     "UTY": [
+      "UNI",
       "UTY",
-      "Unity"
+      "Unity",
+      "Unity Party",
+      "Unity Party of Colorado"
+    ],
+    "VPA": [
+      "Veterans Party of America",
+      "Veterans of America"
     ],
     "WI": [
       "WI",
       "Write In",
       "Write-In",
       "Write-in"
+    ],
+    "WTP": [
+      "We the People"
     ]
   }
 }
