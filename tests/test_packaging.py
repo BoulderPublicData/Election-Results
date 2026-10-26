@@ -45,3 +45,23 @@ def test_annual_refresh_targets_previous_year():
 def test_publish_workflow_does_not_reparse_without_pdfs():
     wf = (ROOT / ".github/workflows/publish.yml").read_text()
     assert "--no-pdf" not in wf
+
+
+def test_every_cli_takes_an_election_key():
+    """#34: one --election {year}-{type} option across the CLIs (and CVR)."""
+    import argparse
+
+    import pytest
+    for name in ("clean", "fetch", "pipeline", "reconcile", "discover"):
+        mod = importlib.import_module(f"scripts.{name}")
+        assert mod._election_arg("2024-general") == (2024, "general")
+        assert mod._election_arg("2023C") == (2023, "coordinated")
+        with pytest.raises(argparse.ArgumentTypeError):
+            mod._election_arg("2024-General-Election")
+
+
+def test_changelog_and_glossary_are_shared_pages():
+    assert (ROOT / "docs" / "changelog.md").exists()
+    assert (ROOT / "docs" / "glossary.md").exists()
+    assert "docs/changelog.md" in (ROOT / "docs" / "data-dictionary.md").read_text() \
+        or "(changelog.md)" in (ROOT / "docs" / "data-dictionary.md").read_text()

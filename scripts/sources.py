@@ -11,6 +11,7 @@ patched without touching parser code.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Literal
 
@@ -156,6 +157,37 @@ def election_date_for(year: int, election_type: str) -> str:
     if election_type == "primary":
         return PRIMARY_ELECTION_DATES.get(year, f"{year}-06-XX")
     return ELECTION_DATES.get(year, f"{year}-11-XX")
+
+
+# The election key shared with BoulderPublicData/Cast-Vote-Records (#34):
+# lowercase "{year}-{type}", type one of ELECTION_TYPES. File stems, cache
+# folders and CLI --election arguments all use it.
+ELECTION_TYPES: tuple[str, ...] = ("general", "primary", "coordinated")
+_KEY_RE = re.compile(r"^(?P<year>\d{4})-(?P<type>general|primary|coordinated)$")
+# Raw election-night folders under data/original/ (immutable) are named
+# "2016G" / "2015C"; this maps their letter to the type.
+_LEGACY_CODE_RE = re.compile(r"^(?P<year>\d{4})(?P<kind>[GCP])$")
+_LEGACY_KIND = {"G": "general", "C": "coordinated", "P": "primary"}
+
+
+def election_key(year: int, election_type: str) -> str:
+    """(2016, "general") → "2016-general"."""
+    if election_type not in ELECTION_TYPES:
+        raise ValueError(f"unknown election type {election_type!r}; expected one of {ELECTION_TYPES}")
+    return f"{int(year)}-{election_type}"
+
+
+def parse_election_key(key: str) -> tuple[int, str]:
+    """"2016-general" → (2016, "general"). Also accepts the legacy folder code
+    "2016G" so old commands keep working."""
+    s = key.strip()
+    m = _KEY_RE.match(s.lower())
+    if m:
+        return int(m["year"]), m["type"]
+    m = _LEGACY_CODE_RE.match(s.upper())
+    if m:
+        return int(m["year"]), _LEGACY_KIND[m["kind"]]
+    raise ValueError(f"not an election key: {key!r} (expected e.g. '2016-general')")
 
 
 def sources_for_year(year: int) -> list[Source]:

@@ -3,15 +3,18 @@ Election-night incremental results ("vote counting") — screenshots → tidy CS
 
 Inputs (immutable, under data/original/boulder-county/vote-counting/):
   {YYYY}{G|C}/*.jpeg   full-page screenshots of the Boulder County results
-                       site, one per published update ("Last Updated" box)
+                       site, one per published update ("Last Updated" box).
+                       The raw folders keep their original "2016G" / "2015C"
+                       names; everything this module writes uses the shared
+                       election key "2016-general" / "2015-coordinated" (#34).
   2023C/*RCV Short Report*.pdf   round-by-round RCV reports for Boulder mayor
 
 Stages:
   1. OCR       each screenshot is sliced at between-contest gaps
                (scripts/vote_counting_tiles.py) and sent to Datalab
                (scripts/datalab.py). The response is cached, keyed on the
-               image's sha256, under data/processed/vote-counting/datalab/ so
-               re-runs never hit the API.
+               image's sha256, under data/processed/vote-counting/datalab/
+               {election key}/ so re-runs never hit the API.
   2. Parse     scripts/parsers/boco_vote_counting.py turns each cached
                Markdown payload into a snapshot header, an election-summary
                record, and contest × candidate rows.
@@ -27,7 +30,7 @@ Stages:
 Usage:
   uv run python -m scripts.vote_counting              # parse cache → CSVs
   uv run python -m scripts.vote_counting --ocr        # also OCR uncached images
-  uv run python -m scripts.vote_counting --ocr --election 2016G
+  uv run python -m scripts.vote_counting --ocr --election 2016-general
 """
 
 from __future__ import annotations
@@ -55,6 +58,8 @@ from .config import (
     VOTE_COUNTING_QA_CSV,
     VOTE_COUNTING_QA_MD,
     VOTE_COUNTING_SUMMARY_CSV,
+    election_key,
+    parse_election_key,
 )
 from .logging_setup import get_logger
 from .parsers.boco_vote_counting import (
@@ -82,13 +87,12 @@ CACHE_DIR = VOTE_COUNTING_CACHE
 DATALAB_MODE = "accurate"
 DATALAB_FORMAT = "markdown"
 
-_ELECTION_DIR = re.compile(r"^(?P<year>\d{4})(?P<kind>[GCP])$")
-_ELECTION_KIND = {"G": "general", "C": "coordinated", "P": "primary"}
+_ELECTION_DIR = re.compile(r"^(?P<year>\d{4})(?P<kind>[GCP])$")  # raw folder names
 
 
 @dataclass(frozen=True)
 class Screenshot:
-    election_code: str  # e.g. "2016G"
+    election_key: str  # e.g. "2016-general" (the raw folder is "2016G")
     election_year: int
     election_type: str
     path: Path
@@ -100,7 +104,7 @@ class Screenshot:
 
     @property
     def cache_path(self) -> Path:
-        return CACHE_DIR / self.election_code / f"{slugify(self.path.stem)}.json"
+        return CACHE_DIR / self.election_key / f"{slugify(self.path.stem)}.json"
 
 
 def slugify(text: str) -> str:
@@ -116,15 +120,21 @@ def sha256(path: Path) -> str:
 
 
 def discover(election: str | None = None, suffix: str = ".jpeg") -> list[Screenshot]:
-    """Every file with `suffix` under INPUT_DIR/{YYYY}{G|C}/, sorted."""
+    """Every file with `suffix` under INPUT_DIR/{YYYY}{G|C}/, sorted.
+    `election` is an election key ("2016-general"; the legacy "2016G" also works)."""
+    want = election_key(*parse_election_key(election)) if election else None
     out: list[Screenshot] = []
     for d in sorted(INPUT_DIR.iterdir()):
         m = _ELECTION_DIR.match(d.name)
-        if not d.is_dir() or not m or (election and d.name != election):
+        if not d.is_dir() or not m:
+            continue
+        year, etype = parse_election_key(d.name)
+        key = election_key(year, etype)
+        if want and key != want:
             continue
         for p in sorted(d.iterdir()):
             if p.suffix.lower() == suffix:
-                out.append(Screenshot(d.name, int(m["year"]), _ELECTION_KIND[m["kind"]], p))
+                out.append(Screenshot(key, year, etype, p))
     return out
 
 
@@ -377,13 +387,13 @@ def qa_snapshot(shot: Screenshot, snap: Snapshot) -> list[dict]:
 def _rcv_frame() -> pd.DataFrame:
     """2023 City of Boulder mayor RCV short reports → long rows."""
     rows: list[dict] = []
-    for pdf in discover("2023C", suffix=".pdf"):
+    for pdf in discover("2023-coordinated", suffix=".pdf"):
         stamp, recs = parse_rcv_report(pdf.path)
         for r in recs:
             suffix = [f"Round {r['round']}"] + (["Final"] if r["final"] else [])
             for sfx in suffix:
                 rows.append({
-                    "election_code": pdf.election_code, "election_year": pdf.election_year,
+                    "election_key": pdf.election_key, "election_year": pdf.election_year,
                     "election_type": pdf.election_type, "last_updated": stamp,
                     "results_label": "RCV Short Report", "contest": RCV_CONTEST,
                     "vote_for": 1, "contest_type": "ranked_choice",
@@ -414,7 +424,7 @@ def build(shots: list[Screenshot]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataF
             key = (row["contest"], row["candidate"], row["check"])
             row["status"] = "accepted" if key in accepted else "open"
             qa_rows.append(row)
-        base = {"election_code": shot.election_code, "election_year": shot.election_year,
+        base = {"election_key": shot.election_key, "election_year": shot.election_year,
                 "election_type": shot.election_type, "last_updated": snap.last_updated,
                 "results_label": snap.results_label, "source_file": shot.source_file}
         for r in snapshot_rows(shot, snap):
@@ -465,7 +475,7 @@ def _dedupe(contests: pd.DataFrame, summary: pd.DataFrame):
     qa: list[dict] = []
     drop: set[str] = set()
     value_cols = ["contest", "candidate_or_option", "votes", "contest_total_votes"]
-    for (_, ts), grp in summary.groupby(["election_code", "last_updated"]):
+    for (_, ts), grp in summary.groupby(["election_key", "last_updated"]):
         files = sorted(grp["source_file"])
         if len(files) < 2:
             continue
@@ -515,11 +525,11 @@ def _dedupe_rcv(rcv: pd.DataFrame) -> tuple[pd.DataFrame, list[dict]]:
 
 def _sequence(summary: pd.DataFrame) -> pd.DataFrame:
     summary = summary.sort_values(["election_year", "last_updated", "source_file"])
-    summary["snapshot_seq"] = summary.groupby("election_code").cumcount() + 1
-    last = summary.groupby("election_code")["snapshot_seq"].transform("max")
+    summary["snapshot_seq"] = summary.groupby("election_key").cumcount() + 1
+    last = summary.groupby("election_key")["snapshot_seq"].transform("max")
     summary["is_final_snapshot"] = summary["snapshot_seq"] == last
     summary["ballots_counted_change"] = (
-        summary.groupby("election_code")["total_ballots_counted"].diff())
+        summary.groupby("election_key")["total_ballots_counted"].diff())
     first = summary["snapshot_seq"] == 1
     summary.loc[first, "ballots_counted_change"] = summary.loc[first, "total_ballots_counted"]
     return summary
@@ -535,17 +545,17 @@ def _finalize_contests(df: pd.DataFrame) -> pd.DataFrame:
         {True: "rcv", False: "web"})
     df = df.sort_values(["election_year", "_series", "last_updated", "source_file"],
                         kind="stable")
-    series_last = df.groupby(["election_code", "_series"])["last_updated"].transform("max")
+    series_last = df.groupby(["election_key", "_series"])["last_updated"].transform("max")
     df["is_final_snapshot"] = df["last_updated"] == series_last
 
     # vote_change: difference from the same contest+candidate in the previous
     # snapshot of the series. The first snapshot of an election counts from
     # zero (nothing is reported before polls close); a candidate missing from
     # the previous snapshot gets NA rather than a misleading jump.
-    key = ["election_code", "_series", "contest", "candidate_or_option"]
-    snap_order = (df[["election_code", "_series", "last_updated"]].drop_duplicates()
-                    .assign(_k=lambda d: d.groupby(["election_code", "_series"]).cumcount()))
-    df = df.merge(snap_order, on=["election_code", "_series", "last_updated"], how="left")
+    key = ["election_key", "_series", "contest", "candidate_or_option"]
+    snap_order = (df[["election_key", "_series", "last_updated"]].drop_duplicates()
+                    .assign(_k=lambda d: d.groupby(["election_key", "_series"]).cumcount()))
+    df = df.merge(snap_order, on=["election_key", "_series", "last_updated"], how="left")
     df = df.sort_values(key + ["_k"], kind="stable")
     prev_votes = df.groupby(key)["votes"].shift()
     prev_k = df.groupby(key)["_k"].shift()
@@ -630,9 +640,10 @@ def write_outputs(contests: pd.DataFrame, summary: pd.DataFrame, qa: pd.DataFram
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--election",
-                    help="Only OCR this election folder, e.g. 2016G. The dataset is always "
-                         "rebuilt from every cached snapshot, so the other elections stay put.")
+    ap.add_argument("-e", "--election",
+                    help="Only OCR this election, as an election key, e.g. 2016-general. "
+                         "The dataset is always rebuilt from every cached snapshot, so the "
+                         "other elections stay put.")
     ap.add_argument("--ocr", action="store_true",
                     help="Send uncached screenshots to Datalab (needs DATALAB_API_KEY)")
     ap.add_argument("--workers", type=int, default=4)

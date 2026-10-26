@@ -107,6 +107,20 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at for ev
 
 **Why:** The discovery tests use HTML fixtures captured under `tests/fixtures/` so CI doesn't break if a vendor's CDN flakes. Re-capture them when the upstream pages change shape (instructions in `tests/test_discover.py`'s module docstring). Tests against `data/processed/` skip gracefully when the CSVs aren't present on disk, so the suite passes on a fresh clone without running the full pipeline first.
 
+### 2.10 Shared conventions with Cast-Vote-Records
+
+**Why:** BoulderPublicData/Cast-Vote-Records (ballot-level CVRs) and this repo describe the same elections, so a user moving between them should meet the same names (#34). Keep these aligned; change them in both repos or neither.
+
+| Convention | Value |
+|---|---|
+| Election key | lowercase `{year}-{type}`, `type` ∈ `general` / `primary` / `coordinated` — `scripts.sources.election_key()` / `parse_election_key()`. File stems (`2016-general-boulder-county.csv`), the Datalab cache (`datalab/2016-general/`) and `--election` arguments use it. Raw folders under `data/original/` keep their published names (`2016G`) and are mapped in code — never renamed. |
+| `data/processed/` layout | one subfolder per dataset (`statements-of-votes/`, `vote-counting/`) |
+| Packaging | uv + `uv.lock` + hatchling; `[dependency-groups] dev` holds pytest + ruff, so `uv sync` installs them; `.python-version` = 3.11 |
+| Python | `requires-python >= 3.11`; CI tests 3.11 (the floor) and 3.13 |
+| Lint | ruff, configured in `pyproject.toml` `[tool.ruff]` |
+| CLI filters | `--year`, `--since`, `--source`; one election: `--election {election key}` |
+| Changelog / glossary | [`docs/changelog.md`](docs/changelog.md), [`docs/glossary.md`](docs/glossary.md) |
+
 ---
 
 ## 3. Where to be careful
@@ -162,7 +176,7 @@ In rough order of value:
 4. **Add precinct geographies** as a separate `data/geography/` directory (GeoJSON or shapefile) with a year column so changing precinct boundaries can be joined to historical results.
 5. **Golden-output tests per parser.** Done for `sos` (`tests/test_sos_parser.py`), `boco_panel` (synthetic sheet, `tests/test_boco_panel.py`) and `boco_pdf` (golden pages of each committed PDF, `tests/test_pdf_parser.py`); `boco_tidy` still has only helper-level tests and would benefit from a small fixture workbook.
 6. **Add primary-vs-general party-affiliation tracking** for partisan primaries (the schema already has `party`; needs the primary data to populate it).
-7. **Fail the annual-refresh PR on new reconcile mismatches.** The Action now runs `reconcile.py` and puts the mismatch count in the PR body; it doesn't yet fail the job when that count is above 0.
+7. **Fail the annual-refresh PR on new reconcile mismatches.** The tests workflow already runs `reconcile --check` on every push and PR (it fails on any mismatch); the annual refresh still only reports the counts in its PR body, because a new year may need parser work before it reconciles.
 8. **Repo / org setting prerequisite for the Action:** The Action opens a PR via `peter-evans/create-pull-request`. For that to work, the repo (and the org, if it enforces) must have **Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"** enabled. Without it, the scheduled run fails at the `Open PR` step with `"GitHub Actions is not permitted to create or approve pull requests"`. The workflow has a fallback step that opens an issue containing the same body in that case, but enabling the toggle is the proper fix.
 9. **Per-year contest-name canonicalization.** Right now `contest` carries the as-published title; `data/lookups/contest-aliases.json` has patterns but only for top-line offices. A full crosswalk would let analyses group, e.g., "Representative to the 113th Congress" and "Representative to the 114th Congress" without manual regex.
 
@@ -187,7 +201,7 @@ In rough order of value:
 3. Update every parser under `scripts/parsers/` to populate the new column (start with `pd.NA` if the source doesn't provide it).
 4. Re-run `scripts.export_lookups`; verify `data/lookups/schema.json` updated.
 5. Re-run the pipeline; check `validate()` doesn't surface unexpected nulls.
-6. Bump `SCHEMA_VERSION` in `schema.py` (minor for an added column, major for a removed or renamed one) and add a changelog entry (`docs/data-dictionary.md` §9).
+6. Bump `SCHEMA_VERSION` in `schema.py` (minor for an added column, major for a removed or renamed one) and add a changelog entry ([`docs/changelog.md`](docs/changelog.md)).
 7. Append new columns after `ballots_cast` rather than in the middle, so readers that address CSV columns by position keep working (that's where 1.2.0 put `is_pseudo_precinct`).
 8. Derived columns are computed in one place — `parsers/common.py:add_provenance` (and `schema.coerce` as a fallback) — not per parser.
 
@@ -208,9 +222,11 @@ In rough order of value:
 | End-to-end driver | [`scripts/pipeline.py`](scripts/pipeline.py) |
 | JSON lookup exporter | [`scripts/export_lookups.py`](scripts/export_lookups.py) |
 | Doc counts/sizes generator | [`scripts/doc_stats.py`](scripts/doc_stats.py) (rewrites the `<!-- generated:… -->` spans) |
-| Test suite | [`tests/`](tests/) (pytest, <!-- generated:test-count -->431 tests<!-- /generated:test-count -->; hermetic — never writes into `data/`) |
+| Test suite | [`tests/`](tests/) (pytest, <!-- generated:test-count -->436 tests<!-- /generated:test-count -->; hermetic — never writes into `data/`) |
 | Shared Excel reader | [`scripts/parsers/common.py`](scripts/parsers/common.py) (`read_excel`, `excel_file`) |
 | Data dictionary | [`docs/data-dictionary.md`](docs/data-dictionary.md) |
+| Changelog | [`docs/changelog.md`](docs/changelog.md) |
+| Glossary (shared with Cast-Vote-Records) | [`docs/glossary.md`](docs/glossary.md) |
 | Filter/pivot recipes | [`docs/filter-pivot-recipes.md`](docs/filter-pivot-recipes.md) |
 | Methodology notebook | [`Cleaning.ipynb`](Cleaning.ipynb) |
 | Annual refresh workflow | [`.github/workflows/annual-sov-refresh.yml`](.github/workflows/annual-sov-refresh.yml) |
@@ -260,7 +276,7 @@ uv run jupyter nbconvert --to notebook --execute \
     Cleaning.ipynb --output Cleaning.ipynb               # validates notebook
 ```
 
-If `ruff` or `pytest` fails, or `reconcile` reports any new `mismatch` rows, **stop and investigate** before committing. CI runs ruff and pytest on every push and PR; the annual-refresh workflow also runs reconcile and surfaces the mismatch counts in the PR body.
+If `ruff` or `pytest` fails, or `reconcile` reports any new `mismatch` rows, **stop and investigate** before committing. CI runs ruff, pytest (Python 3.11 and 3.13) and `reconcile --check` on every push and PR; the annual-refresh workflow also surfaces the mismatch counts in its PR body.
 
 Filtered runs (`--year`, `--since`, `--source`, `--no-pdf`, `clean`, `reconcile --year`, `vote_counting --election`) only re-parse their subset; the whole-dataset outputs (combined CSV, `provenance.csv`, `rejected.csv`, `summary.md`, the reconciliation report, the election-night CSVs) are rebuilt from every file on disk or upserted by key, so they never shrink to the subset. A full run before committing is still the safest check.
 

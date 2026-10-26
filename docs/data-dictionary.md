@@ -26,6 +26,9 @@ Schema version: **1.2.0** (see [`scripts/schema.py`](../scripts/schema.py)). Ter
 | **RCV** (ranked-choice voting) | Voters rank candidates; the last-place candidate is eliminated round by round until one has a majority. Boulder mayor, from 2023 (§3). |
 | **UOCAVA** | Uniformed and Overseas Citizens Absentee Voting Act — military and overseas ballots, which can arrive after election night. |
 | **Canvass / certification** | The post-election reconciliation of every ballot, ending in the certified SoV ~2-3 weeks after election day. |
+| **Election key** | `{year}-{type}`, lowercase (`2016-general`) — the identifier shared with the Cast-Vote-Records repository. |
+
+The full shared glossary (including cast-vote-record terms) is [`docs/glossary.md`](glossary.md).
 
 ---
 
@@ -373,7 +376,8 @@ A **separate dataset** (vote-counting schema **1.0.0**, defined in
 [`scripts/schema.py`](../scripts/schema.py) under `VOTE_COUNTING_*`) built by
 [`scripts/vote_counting.py`](../scripts/vote_counting.py) from 122 full-page screenshots of the
 Boulder County election-night results site (2014–2025, one per published update) in
-`data/original/boulder-county/vote-counting/{YYYY}{G|C}/`, plus the nine 2023 City of Boulder
+`data/original/boulder-county/vote-counting/{YYYY}{G|C}/` (the folder names as collected; everything
+derived uses the election key, e.g. `2016-general`), plus the nine 2023 City of Boulder
 mayoral RCV "Short Report" PDFs. Reports 7, 8 and 9 share the final report time (2023-11-16
 14:26:33) and identical numbers, so only report 9 is kept (the other two are logged as
 `duplicate_dropped` in the QA); filtering `is_final_snapshot` gives one row per candidate and
@@ -387,7 +391,7 @@ round.
 data/processed/vote-counting/
 ├── vote-counting-contests.csv   ← one row per election × snapshot × contest × candidate
 ├── vote-counting-summary.csv    ← one row per snapshot ("Election Summary" box + provenance)
-└── datalab/{YYYY}{G|C}/*.json   ← cached Datalab OCR responses (keyed on image sha256)
+└── datalab/{year}-{type}/*.json ← cached Datalab OCR responses (keyed on image sha256)
 ```
 
 ### 8.1 `vote-counting-contests.csv`
@@ -434,9 +438,9 @@ box's footnotes and update notices, verbatim), and provenance (`source_file`, `s
 3. **Corrections.** Every fix is a row in
    [`scripts/corrections/vote-counting.csv`](../scripts/corrections/vote-counting.csv) with the
    OCR'd value, the verified value, and a note. A correction whose OCR'd value no longer matches
-   fails the build. Current corrections: 2017C City of Boulder Council (one row hidden by a
+   fails the build. Current corrections: 2017-coordinated City of Boulder Council (one row hidden by a
    screenshot stitching seam in all 8 snapshots — votes derived as TOTAL minus the 13 legible
-   rows; the final value matches the SoV exactly) and three 2023C pages where OCR left two cards'
+   rows; the final value matches the SoV exactly) and three 2023-coordinated pages where OCR left two cards'
    vote cells blank (read from the image).
 4. **External check.** `scripts/reconcile.py` compares each election's final snapshot with the
    SoV, candidate by candidate (report only — see the last section of
@@ -451,17 +455,4 @@ hold; 2025's final snapshot is pre-certification ("Unofficial Results").
 
 ## 9. Changelog
 
-- **2026-05-23** — Schema 1.0.0 released alongside the new pipeline. Initial dictionary published.
-- **2026-05** — Added `discover.py` (BoCo + SOS upstream scraping), pytest suite under `tests/`, CI workflow at `.github/workflows/tests.yml`, plus 2025 Boulder coordinated + 2024 SOS general entries. `infer_contest_type` now handles `pd.NA` inputs.
-- **2026-05** — Schema bumped to **1.1.0**. Per-row CSVs now hold a slim 15-column view; the 5 provenance columns (`source_file`, `source_url`, `retrieved_at`, `extraction_quality`, `extraction_notes`) moved to `data/processed/statements-of-votes/provenance.csv`. Combined-CSV size dropped from 152 MB to 49 MB; per-year files shrank by ~60%.
-- **2026-10** — Added the election-night incremental results dataset (§8, vote-counting schema 1.0.0), OCR'd from results-site screenshots via Datalab. Boulder SoV raw files moved to `data/original/boulder-county/statement-of-votes/`; paths now resolve through `config.original_path()`.
-- **2026-10** — Boulder tidy parser keeps `Property Owner` pseudo-precinct rows (2023, 2025) instead of rejecting them (§4.3a).
-- **2026-10** — Accuracy fixes (data changes; schema unchanged):
-  - SOS 2012-2020: every judge's retention votes kept, one contest per judge (`Court of Appeals - {judge}`); no more 0-vote `Yes`/`No` rows on candidate contests or 0-vote judge "candidate" rows (§4.5). Boulder retention votes per year now equal the raw file's (e.g. 2016: 400,831 → 1,701,522).
-  - Boulder 2008/2010 panel files re-parsed with positional alignment; 2008 grows from 2,528 to 27,934 rows and every candidate reconciles to the file's `Totals` row (§4.2). 2011/2012 gain their `Landowner` rows.
-  - PDF years: candidate headers read per page; no duplicate keys; every candidate reconciles to the PDF's printed totals (§4.4).
-  - `For/Against the Measure`, `FOR THE ISSUE`, `FOR`/`AGAINST` → `Yes`/`No` (contest type `measure`); county/district court judges typed `retention`, TABOR revenue-retention questions typed `measure`.
-  - Party codes unified across sources (`UNI`/`Unity Party of Colorado` → `UTY`, `LIB` → `LBR`, `UNA` → `UAF`, `APV` → `AVP`, full names → codes; see `data/lookups/party-codes.json`).
-  - `provenance.csv` has a row for every source file, including the PDF years and the turnout-only 2024 SOS file; `reconcile.py` adds a contest × candidate check.
-- **2026-10** — Schema **1.2.0**: new `is_pseudo_precinct` boolean (appended after `ballots_cast`; CSVs are now 16 columns), and composite precinct IDs use one `", "` separator (§4.3). Glossary (§0); precinct-ID widths by year (§2.1); every pseudo-precinct variant listed (§4.3a); counts in §5 generated by `scripts/doc_stats.py`.
-- **2026-10** — Pipeline and provenance: filtered runs no longer overwrite the whole-dataset outputs (combined CSV, provenance, rejects, audit summary, reconciliation, election-night CSVs); `fetch` records and keeps files already on disk and verifies hashes (`--verify`); the Datasette database is built from the committed per-year CSVs, so it now has all 22 years (2005/2007/2009 were missing); the annual refresh targets the previous year. Election-night: the duplicate 2023 RCV final report rows are dropped (one row per candidate and round per report time), and the Round-N semantics are documented (§3).
+Moved to [`docs/changelog.md`](changelog.md) (the same place BoulderPublicData/Cast-Vote-Records keeps its changelog). Schema-version bumps are listed there with the data changes they brought.

@@ -146,7 +146,7 @@ def test_cut_points_respect_gaps_and_limit():
 
 
 def test_stale_correction_raises(snap, tmp_path):
-    shot = vc.Screenshot("2015C", 2015, "coordinated", vc.INPUT_DIR / "2015C" / "x.jpeg")
+    shot = vc.Screenshot("2015-coordinated", 2015, "coordinated", vc.INPUT_DIR / "2015C" / "x.jpeg")
     fixes = pd.DataFrame([{
         "source_file": shot.source_file, "contest": "City of Boulder Ballot Question 2R "
         "Compensation for Council Members", "candidate": "For the Measure", "field": "votes",
@@ -157,7 +157,7 @@ def test_stale_correction_raises(snap, tmp_path):
 
 
 def test_add_row_correction(snap):
-    shot = vc.Screenshot("2015C", 2015, "coordinated", vc.INPUT_DIR / "2015C" / "x.jpeg")
+    shot = vc.Screenshot("2015-coordinated", 2015, "coordinated", vc.INPUT_DIR / "2015C" / "x.jpeg")
     fixes = pd.DataFrame([{
         "source_file": shot.source_file, "contest": "Town Question 2C", "candidate": "",
         "field": "add_row", "ocr_value": "YES/FOR 51,35 6.95%",
@@ -260,14 +260,14 @@ def test_rcv_reports_sharing_a_timestamp_are_deduped():
 
 
 def test_election_flag_never_narrows_the_rebuild(monkeypatch):
-    """#33: `--election 2016G` used to rewrite the dataset with one election."""
+    """#33: `--election 2016-general` used to rewrite the dataset with one election."""
     from scripts import vote_counting as vc
     seen = {}
     monkeypatch.setattr(vc, "discover", lambda election=None, suffix=".jpeg": [election])
     monkeypatch.setattr(vc, "build", lambda shots: seen.setdefault("shots", shots) and
                         (pd.DataFrame(), pd.DataFrame(), pd.DataFrame()))
     monkeypatch.setattr(vc, "write_outputs", lambda *a: None)
-    assert vc.main(["--election", "2016G"]) == 0
+    assert vc.main(["--election", "2016-general"]) == 0
     assert seen["shots"] == [None]   # discover() with no filter
 
 
@@ -279,3 +279,29 @@ def test_committed_final_snapshots_have_unique_keys():
     final = df[df["is_final_snapshot"].astype(bool)]
     key = ["election_year", "election_type", "last_updated", "contest", "candidate_or_option"]
     assert not final.duplicated(key).any()
+
+
+def test_election_keys_replace_folder_codes():
+    """#34: one key format, `{year}-{type}`, shared with Cast-Vote-Records. The
+    raw folders keep their names; the cache and CLI use the key."""
+    from scripts.sources import election_key, parse_election_key
+    assert election_key(2016, "general") == "2016-general"
+    assert parse_election_key("2023-coordinated") == (2023, "coordinated")
+    assert parse_election_key("2016G") == (2016, "general")  # legacy folder code
+    with pytest.raises(ValueError):
+        parse_election_key("2016-General-Election")
+    shots = vc.discover("2016-general")
+    if not shots:
+        pytest.skip("raw screenshots not present")
+    assert {s.election_key for s in shots} == {"2016-general"}
+    assert all(s.cache_path.parent.name == "2016-general" for s in shots)
+    assert vc.discover("2016G") == shots
+
+
+def test_cache_folders_use_election_keys():
+    from scripts.sources import parse_election_key
+    if not vc.CACHE_DIR.exists():
+        pytest.skip("no Datalab cache")
+    for d in vc.CACHE_DIR.iterdir():
+        year, etype = parse_election_key(d.name)
+        assert d.name == f"{year}-{etype}", d.name

@@ -145,3 +145,22 @@ def test_filtered_run_keeps_other_sources_rows(tmp_path, monkeypatch):
         [src], new, pd.DataFrame(columns=reconcile.CANDIDATE_COLUMNS), [])
     assert sorted(top["year"].tolist()) == [2016, 2020]
     assert top.loc[top["year"] == 2020, "status"].tolist() == ["mismatch"]
+
+
+def test_check_mode_fails_on_mismatch_and_writes_nothing(tmp_path, monkeypatch):
+    """CI runs `reconcile --check` (#34): non-zero on any mismatch, no files."""
+    top = pd.DataFrame([{"year": 2020, "election_type": "general",
+                         "data_source": "boulder_county", "canonical": "x",
+                         "original_total": 10, "processed_total": 100, "delta": 90,
+                         "status": "mismatch"}])
+    checks = [{"year": 2020, "election_type": "general", "data_source": "boulder_county",
+               "duplicate_keys": 0, "mixed_contests": 0}]
+    monkeypatch.setattr(reconcile, "run", lambda pool: (
+        top, pd.DataFrame(columns=reconcile.CANDIDATE_COLUMNS), checks))
+    out = tmp_path / "reconciliation.csv"
+    monkeypatch.setattr(reconcile, "RECONCILIATION_CSV", out)
+    assert reconcile.main(["--check"]) == 1
+    assert not out.exists()
+    monkeypatch.setattr(reconcile, "run", lambda pool: (
+        top.assign(status="match"), pd.DataFrame(columns=reconcile.CANDIDATE_COLUMNS), checks))
+    assert reconcile.main(["--check"]) == 0

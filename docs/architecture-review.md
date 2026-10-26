@@ -14,7 +14,7 @@ Use this as the working agenda for what to land next. Each tier lands as its own
 > its gaps have since closed: the Publish phase exists (a Datasette database plus Datasette
 > Lite links, rebuilt on every push to `main`), the reject port, concept catalog, pandera
 > schemas and central `config.py` landed, and reconciliation now covers every contest ×
-> candidate key. Current counts: <!-- generated:test-count -->431 tests<!-- /generated:test-count -->;
+> candidate key. Current counts: <!-- generated:test-count -->436 tests<!-- /generated:test-count -->;
 > 175 top-line and about 3,200 contest × candidate reconciliation rows, 0 mismatches. Where
 > a line below disagrees with the code, the code and `AGENTS.md` win.
 

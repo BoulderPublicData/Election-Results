@@ -145,9 +145,19 @@ def write_csv(df: pd.DataFrame, dest: Path) -> None:
     to_csv_frame(df).to_csv(dest, index=False)
 
 
+def _election_arg(value: str) -> tuple[int, str]:
+    from .sources import parse_election_key
+    try:
+        return parse_election_key(value)
+    except ValueError as e:
+        raise argparse.ArgumentTypeError(str(e)) from e
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--year", type=int, help="Only this year")
+    ap.add_argument("-e", "--election", type=_election_arg, metavar="KEY",
+                    help="Only this election, as an election key, e.g. 2024-general")
     ap.add_argument("--since", type=int, help="This year and later")
     ap.add_argument("--source",
                     choices=["boulder_county", "secretary_of_state", "all"],
@@ -167,6 +177,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.year:
         pool = [s for s in pool if s.year == args.year]
+    if args.election:
+        pool = [s for s in pool if (s.year, s.election_type) == args.election]
     if args.since:
         pool = [s for s in pool if s.year >= args.since]
     if args.no_pdf:

@@ -17,6 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        # The floor (requires-python, .python-version) and the latest
+        # supported release (#34).
+        python-version: ["3.11", "3.13"]
+    env:
+      UV_PYTHON: ${{ matrix.python-version }}
 
     steps:
       - name: Checkout
@@ -36,3 +44,9 @@ jobs:
 
       - name: Run pytest
         run: uv run pytest -v --tb=short
+
+      - name: Reconcile committed CSVs against the originals
+        # Top-line and contest × candidate totals, plus duplicate-key and
+        # mixed-contest checks (#34, #35). Read-only; fails on any mismatch.
+        if: matrix.python-version == '3.11'
+        run: uv run python -m scripts.reconcile --check

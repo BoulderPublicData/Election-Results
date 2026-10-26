@@ -23,8 +23,11 @@ from .sources import (  # noqa: F401
 from .sources import (
     BOULDER_COUNTY,
     ELECTION_DATES,
+    ELECTION_TYPES,
     SECRETARY_OF_STATE,
     Source,
+    election_key,
+    parse_election_key,
 )
 
 # ---------------------------------------------------------------------------
@@ -84,9 +87,10 @@ VOTE_COUNTING_CORRECTIONS_CSV = REPO_ROOT / "scripts" / "corrections" / "vote-co
 
 
 def sov_csv_path(year: int, election_type: str, data_source: str) -> Path:
-    """Harmonized per-year CSV: statements-of-votes/{year}-{type}-{source}.csv."""
+    """Harmonized per-year CSV: statements-of-votes/{election key}-{source}.csv,
+    e.g. 2016-general-boulder-county.csv."""
     ds = data_source.replace("_", "-")
-    return STATEMENTS_OF_VOTES / f"{year}-{election_type}-{ds}.csv"
+    return STATEMENTS_OF_VOTES / f"{election_key(year, election_type)}-{ds}.csv"
 
 
 # Specific files used in several places.
@@ -156,4 +160,5 @@ __all__ = [
     "HTTP_RETRY_ATTEMPTS", "HTTP_RETRY_MIN_WAIT", "HTTP_RETRY_MAX_WAIT",
     "LOG_FORMAT", "LOG_LEVEL",
     "SOURCES", "BOULDER_COUNTY", "SECRETARY_OF_STATE", "ELECTION_DATES", "Source",
+    "ELECTION_TYPES", "election_key", "parse_election_key",
 ]
