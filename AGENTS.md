@@ -280,7 +280,7 @@ Run the cheapest check that can catch a mistake in what you changed, and say in 
 
 | Change touches | Run | Time |
 |---|---|---|
-| docs, comments, recipes, CI config | `ruff check .`, `pytest` | ~25 s |
+| docs, comments, recipes, CI config | `ruff check .`, `ruff format --check .`, `pytest` | ~25 s |
 | a parser, `clean.py`, `schema.py`, `sources.py`, `data/original/` | + `pipeline --skip-fetch` (with PDFs if a PDF year is affected; `--year`/`--source` while iterating), then `reconcile` | ~5 min (`--no-pdf` saves ~45 s) |
 | `common.py` cues, `PARTY_MAP`, concepts, choice maps | + full `pipeline --skip-fetch`, `reconcile`, `export_lookups` | ~5 min |
 | `vote_counting.py` | + `vote_counting` from the cache (the OCR step is **paid**: ask before `--election` triggers new Datalab calls) | not measured |
@@ -291,6 +291,7 @@ Per-year CSVs should come out byte-identical whenever a change isn't meant to mo
 ```bash
 uv sync                                                  # installs pytest + ruff (dev group)
 uv run ruff check .                                      # lint (CI enforces it)
+uv run ruff format --check .                             # formatting (CI enforces it; `ruff format .` fixes)
 uv run pytest                                            # all unit tests
 uv run python -m scripts.pipeline --skip-fetch           # rebuilds processed CSVs, PDFs included
 uv run python -m scripts.reconcile                       # top-line + contest × candidate totals

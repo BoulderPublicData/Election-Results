@@ -294,7 +294,7 @@ These are recorded without a definition change:
 
 ## 8. Revision actions — tracking table
 
-Applied after review (2026-10-26): P0-1 (project part), P0-2 and P2-1. The P0-1 skill part and the other skill edits remain proposed.
+Applied after review (2026-10-26): P0-1 (project part), P0-2, P2-1 and P2-2. The P0-1 skill part and the other skill edits remain proposed.
 
 | ID | Pri | Target | Medium | Change | Owner | Status | Check next time |
 |---|---|---|---|---|---|---|---|
@@ -303,6 +303,6 @@ Applied after review (2026-10-26): P0-1 (project part), P0-2 and P2-1. The P0-1 
 | P1-1 | P1 | `~/.claude/CLAUDE.md` or SessionStart hook; `AGENTS.md` note | hook (untested) / definition text | Fetch all branches in sibling clones | maintainer | Proposed | Fetch or tracking errors from single-branch clones: 4 → 0. False "no remote branch" alarms: 1 → 0 |
 | P1-2 | P1 | data-liberation `SKILL.md` § validation | skill body | Reconcile at the published grain, with an independent reader; it can fail, and it runs in CI | maintainer | Proposed | Accuracy defects found by a later review that reconcile should have caught: 4 classes → 0 |
 | P2-1 | P2 | GitHub settings (Election-Results, City-Council-Minutes) | tool config | Auto-delete head branches | repo admin | Applied by the maintainer in all three repos | Merged branches left after a sprint: 6 → 0 |
-| P2-2 | P2 | `tests.yml` or `AGENTS.md` (Election-Results, Cast-Vote-Records) | tool config | Enforce or disclaim `ruff format` | maintainer | Proposed | Files `ruff format --check` would change: 25 → 0, or a stated policy |
+| P2-2 | P2 | `tests.yml` or `AGENTS.md` (Election-Results, Cast-Vote-Records) | tool config | Enforce or disclaim `ruff format` | maintainer | Applied: enforced in CI after a one-time reformat (Election-Results 46 files, Cast-Vote-Records 28), listed in `.git-blame-ignore-revs` | Files `ruff format --check` would change: 25 → 0, or a stated policy |
 | P2-3 | P2 | data-liberation `discovery-and-audit.md` | skill body | Size a fix and spot-check 5 before briefing it | maintainer | Proposed | Briefed rules corrected after the first spot-check: 1 → 0 |
 | (2026-10-26 P0-1, P0-2 skill part, P1-2, P2-1) | — | data-liberation skill | skill body | Carried forward from the earlier AAR | maintainer | Proposed | As in the earlier report |
