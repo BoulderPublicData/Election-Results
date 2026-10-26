@@ -85,6 +85,8 @@ To recover row-level provenance, join on `(election_year, election_type, data_so
 
 **Why three:** The audit catches null-rate regressions and shape changes. The reconciliation catches vote-count regressions (the thing that would actually mislead an analyst). The notebook is the human-readable doc that explains both.
 
+**Check at the grain you publish.** Until 2026-10, reconcile compared only top-line contest totals. Under it shipped: SOS retention votes 60% missing, 2008 president at 1,005 of 171,763 votes, 1,154–1,448 duplicate keys per PDF year, and wrong measure pass rates. Each of these hid below or behind a total that still matched. So a new parser, source or year isn't done until its contest × candidate keys reconcile, at 0 mismatches, to totals read from the source independently of the parser (the file's own `Totals` rows, the PDF's printed totals, or the raw workbook).
+
 ### 2.5 `data/original/` is immutable
 
 Raw downloads are committed alongside the manifest (sha256 + retrieved_at for every file). Anything else under `data/` is regenerable. **Never edit `data/original/` files in place** — if you find an issue, change the parser, not the raw file. `scripts.fetch` never overwrites an original: an existing file is skipped (or recorded, if it has no manifest entry), a sha256 mismatch is a `FAIL`, and only `--force` re-downloads. `uv run python -m scripts.fetch --verify` checks every hash without the network.
