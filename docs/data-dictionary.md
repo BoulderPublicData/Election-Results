@@ -129,6 +129,15 @@ A bare "retention" / "retain" is not a judicial cue: TABOR questions such as `Au
 
 The 2023 Boulder coordinated election has a dedicated RCV sheet for Boulder Mayor (the first instant-runoff election in city history). RCV rows are flagged `ranked_choice` and the candidate is suffixed with the round number — e.g. `Aaron Brockett | Round 1`, `Aaron Brockett | Round 2`, `Aaron Brockett | Final` — so each round is its own row but groups cleanly when filtering on the candidate prefix.
 
+**What a round row holds differs between the two datasets** (#26). In the SoV (this dataset), `| Round 1` is the first-choice count and each later `| Round N` is the **transfer** in that round (negative for an eliminated candidate); `| Final` is the total. In the election-night dataset (§8), `| Round N` is the **cumulative** count after round N, as the RCV short reports print it. `| Final` agrees in both:
+
+| candidate | SoV Round 1 | SoV Round 2 | SoV Final | election-night Round 1 | election-night Round 2 | election-night Final |
+|---|---|---|---|---|---|---|
+| Aaron Brockett | 11,504 | +5,319 | 16,823 | 11,504 | 16,823 | 16,823 |
+| Nicole Speer | 6,369 | −6,369 | 0 | 6,369 | 0 | 0 |
+
+Sum SoV rounds to get the cumulative count; never add election-night rounds together.
+
 ---
 
 ## 4. Cross-walks (source columns → schema)
@@ -313,7 +322,10 @@ A **separate dataset** (vote-counting schema **1.0.0**, defined in
 [`scripts/vote_counting.py`](../scripts/vote_counting.py) from 122 full-page screenshots of the
 Boulder County election-night results site (2014–2025, one per published update) in
 `data/original/boulder-county/vote-counting/{YYYY}{G|C}/`, plus the nine 2023 City of Boulder
-mayoral RCV "Short Report" PDFs.
+mayoral RCV "Short Report" PDFs. Reports 7, 8 and 9 share the final report time (2023-11-16
+14:26:33) and identical numbers, so only report 9 is kept (the other two are logged as
+`duplicate_dropped` in the QA); filtering `is_final_snapshot` gives one row per candidate and
+round.
 
 > **Grain:** county-wide totals *at a point in time* — not precincts. Never concatenate with
 > `all-elections-tidy.csv`, and never sum `votes` across snapshots (they are cumulative). Use
@@ -337,7 +349,7 @@ data/processed/vote-counting/
 | `is_final_snapshot` | boolean | The latest update for the election (web pages and RCV reports are separate series). |
 | `contest` | string | Card title as published, with any "Vote for no more than N" line removed. |
 | `vote_for` | Int16 | N from "Vote for (no/not more than) N", when shown. |
-| `contest_type` | string | As in §3 (inferred the same way). RCV report rows are `ranked_choice` with `\| Round N` / `\| Final` suffixes, matching the 2023 SoV convention. |
+| `contest_type` | string | As in §3 (inferred the same way). RCV report rows are `ranked_choice` with `\| Round N` / `\| Final` suffixes. **Round N is cumulative here but a per-round transfer in the SoV** — see §3. |
 | `candidate_or_option` | string | Candidate name with party and write-in suffix removed; Yes/No choices canonicalized (§2.2), including `For/Against the Measure`. |
 | `party` | string | Text after the last ` - ` in the published name, normalized via `PARTY_MAP` (§2.3); unknown parties verbatim. |
 | `is_write_in` | boolean | Name carried `- Write-in Candidate`, `- Write-In`, or `- Certified Write-in Candidate`. |
@@ -399,3 +411,4 @@ hold; 2025's final snapshot is pre-certification ("Unofficial Results").
   - `For/Against the Measure`, `FOR THE ISSUE`, `FOR`/`AGAINST` → `Yes`/`No` (contest type `measure`); county/district court judges typed `retention`, TABOR revenue-retention questions typed `measure`.
   - Party codes unified across sources (`UNI`/`Unity Party of Colorado` → `UTY`, `LIB` → `LBR`, `UNA` → `UAF`, `APV` → `AVP`, full names → codes; see `data/lookups/party-codes.json`).
   - `provenance.csv` has a row for every source file, including the PDF years and the turnout-only 2024 SOS file; `reconcile.py` adds a contest × candidate check.
+- **2026-10** — Pipeline and provenance: filtered runs no longer overwrite the whole-dataset outputs (combined CSV, provenance, rejects, audit summary, reconciliation, election-night CSVs); `fetch` records and keeps files already on disk and verifies hashes (`--verify`); the Datasette database is built from the committed per-year CSVs, so it now has all 22 years (2005/2007/2009 were missing); the annual refresh targets the previous year. Election-night: the duplicate 2023 RCV final report rows are dropped (one row per candidate and round per report time), and the Round-N semantics are documented (§3).

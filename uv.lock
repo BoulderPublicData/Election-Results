@@ -613,15 +613,10 @@ dependencies = [
     { name = "tenacity" },
 ]
 
-[package.optional-dependencies]
-dev = [
-    { name = "pytest" },
-    { name = "ruff" },
-]
-
 [package.dev-dependencies]
 dev = [
     { name = "pytest" },
+    { name = "ruff" },
 ]
 
 [package.metadata]
@@ -639,20 +634,20 @@ requires-dist = [
     { name = "pdfplumber", specifier = ">=0.11.9" },
     { name = "pillow", specifier = ">=10.0" },
     { name = "pypdf", specifier = ">=4.3" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
     { name = "python-calamine", specifier = ">=0.3" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "requests", specifier = ">=2.32" },
     { name = "requests-cache", specifier = ">=1.2" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
     { name = "sqlite-utils", specifier = ">=3.37" },
     { name = "structlog", specifier = ">=24.4" },
     { name = "tenacity", specifier = ">=9.0" },
 ]
-provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = ">=9.0.3" }]
+dev = [
+    { name = "pytest", specifier = ">=9.0.3" },
+    { name = "ruff", specifier = ">=0.15.14" },
+]
 
 [[package]]
 name = "et-xmlfile"

@@ -87,7 +87,9 @@ To recover row-level provenance, join on `(election_year, election_type, data_so
 
 ### 2.5 `data/original/` is immutable
 
-Raw downloads are committed alongside the manifest (sha256 + retrieved_at). Anything else under `data/` is regenerable. **Never edit `data/original/` files in place** — if you find an issue, change the parser, not the raw file. The integrity check would otherwise be meaningless.
+Raw downloads are committed alongside the manifest (sha256 + retrieved_at for every file). Anything else under `data/` is regenerable. **Never edit `data/original/` files in place** — if you find an issue, change the parser, not the raw file. `scripts.fetch` never overwrites an original: an existing file is skipped (or recorded, if it has no manifest entry), a sha256 mismatch is a `FAIL`, and only `--force` re-downloads. `uv run python -m scripts.fetch --verify` checks every hash without the network.
+
+**One documented exception:** the Datalab OCR cache under `data/processed/vote-counting/datalab/` is derived from `data/original/` but costs money to rebuild, so it is committed and the pipeline only ever reads it. Treat it as append-only: re-OCR (`vote_counting --ocr`) only images whose cache entry is missing or stale.
 
 ### 2.6 uv + pyproject.toml (not pip + requirements.txt)
 
@@ -244,15 +246,18 @@ In rough order of value:
 After any non-trivial change, run all six:
 
 ```bash
+uv sync                                                  # installs pytest + ruff (dev group)
 uv run ruff check .                                      # lint (CI enforces it)
-uv run pytest                                            # all unit tests (~3s)
-uv run python -m scripts.pipeline --skip-fetch --no-pdf  # rebuilds processed CSVs (~2 min)
-uv run python -m scripts.reconcile                       # checks top-line totals
+uv run pytest                                            # all unit tests
+uv run python -m scripts.pipeline --skip-fetch           # rebuilds processed CSVs, PDFs included
+uv run python -m scripts.reconcile                       # top-line + contest × candidate totals
 uv run python -m scripts.export_lookups                  # refreshes JSON lookups
 uv run jupyter nbconvert --to notebook --execute \
     Cleaning.ipynb --output Cleaning.ipynb               # validates notebook
 ```
 
-If `ruff` or `pytest` fails, or `reconcile` reports any new `mismatch` rows, **stop and investigate** before committing. CI runs ruff and pytest on every push and PR; the annual-refresh workflow also runs reconcile and surfaces the mismatch count in the PR body.
+If `ruff` or `pytest` fails, or `reconcile` reports any new `mismatch` rows, **stop and investigate** before committing. CI runs ruff and pytest on every push and PR; the annual-refresh workflow also runs reconcile and surfaces the mismatch counts in the PR body.
 
-`pipeline --no-pdf` rewrites `data/audit/reconciliation.csv` for the non-PDF sources only; the full `scripts.reconcile` run above restores the PDF-year rows, so run it before committing.
+Filtered runs (`--year`, `--since`, `--source`, `--no-pdf`, `clean`, `reconcile --year`, `vote_counting --election`) only re-parse their subset; the whole-dataset outputs (combined CSV, `provenance.csv`, `rejected.csv`, `summary.md`, the reconciliation report, the election-night CSVs) are rebuilt from every file on disk or upserted by key, so they never shrink to the subset. A full run before committing is still the safest check.
+
+**Output convention:** user-facing progress and results are `print()` to stdout, problems (`WARN …`, `FAIL …`) `print()` to stderr; structlog is for diagnostics only (stderr, key=value text; `ELECTIONS_LOG_FORMAT=json` for JSON). Paths always come from `scripts/config.py`.

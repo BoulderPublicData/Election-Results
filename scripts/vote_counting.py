@@ -43,7 +43,19 @@ from pathlib import Path
 
 import pandas as pd
 
-from .config import AUDIT, ELECTION_DATES, ORIGINAL, REPO_ROOT, VOTE_COUNTING
+from .config import (
+    AUDIT,
+    ELECTION_DATES,
+    REPO_ROOT,
+    VOTE_COUNTING,
+    VOTE_COUNTING_CACHE,
+    VOTE_COUNTING_CONTESTS_CSV,
+    VOTE_COUNTING_CORRECTIONS_CSV,
+    VOTE_COUNTING_ORIGINAL,
+    VOTE_COUNTING_QA_CSV,
+    VOTE_COUNTING_QA_MD,
+    VOTE_COUNTING_SUMMARY_CSV,
+)
 from .logging_setup import get_logger
 from .parsers.boco_vote_counting import (
     Snapshot,
@@ -63,9 +75,9 @@ from .schema import (
 
 log = get_logger(__name__)
 
-INPUT_DIR = ORIGINAL / "boulder-county" / "vote-counting"
+INPUT_DIR = VOTE_COUNTING_ORIGINAL
 OUTPUT_DIR = VOTE_COUNTING
-CACHE_DIR = OUTPUT_DIR / "datalab"
+CACHE_DIR = VOTE_COUNTING_CACHE
 
 DATALAB_MODE = "accurate"
 DATALAB_FORMAT = "markdown"
@@ -188,11 +200,11 @@ def ocr_missing(shots: list[Screenshot], workers: int = 4) -> int:
 # Stages 2-5: parse → correct → QA → write
 # ---------------------------------------------------------------------------
 
-CORRECTIONS_CSV = REPO_ROOT / "scripts" / "corrections" / "vote-counting.csv"
-CONTESTS_CSV = OUTPUT_DIR / "vote-counting-contests.csv"
-SUMMARY_CSV = OUTPUT_DIR / "vote-counting-summary.csv"
-QA_CSV = AUDIT / "vote-counting-qa.csv"
-QA_MD = AUDIT / "vote-counting.md"
+CORRECTIONS_CSV = VOTE_COUNTING_CORRECTIONS_CSV
+CONTESTS_CSV = VOTE_COUNTING_CONTESTS_CSV
+SUMMARY_CSV = VOTE_COUNTING_SUMMARY_CSV
+QA_CSV = VOTE_COUNTING_QA_CSV
+QA_MD = VOTE_COUNTING_QA_MD
 
 # Percent is published to 2 dp; allow for rounding plus float noise.
 PCT_TOLERANCE = 0.011
@@ -426,7 +438,8 @@ def build(shots: list[Screenshot]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataF
     contests, summary, dup_qa = _dedupe(contests, summary)
     qa_rows.extend(dup_qa)
 
-    rcv = _rcv_frame()
+    rcv, rcv_qa = _dedupe_rcv(_rcv_frame())
+    qa_rows.extend(rcv_qa)
     if not rcv.empty:
         contests = pd.concat([contests, rcv], ignore_index=True)
 
@@ -439,6 +452,7 @@ def build(shots: list[Screenshot]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataF
     qa = pd.DataFrame(qa_rows, columns=QA_COLUMNS)
     qa = pd.concat([qa, _monotonic_qa(contests)], ignore_index=True)
     # Informational checks never block.
+    qa["status"] = qa["status"].astype(object)
     qa.loc[qa["check"].isin(INFO_CHECKS), "status"] = "info"
     qa["status"] = qa["status"].fillna("open")
     return contests, summary, qa
@@ -469,6 +483,34 @@ def _dedupe(contests: pd.DataFrame, summary: pd.DataFrame):
                            "detail": f"same Last Updated as {keep} but different numbers"})
     return (contests[~contests["source_file"].isin(drop)],
             summary[~summary["source_file"].isin(drop)], qa)
+
+
+def _dedupe_rcv(rcv: pd.DataFrame) -> tuple[pd.DataFrame, list[dict]]:
+    """RCV short reports that share a timestamp (2023 reports 7, 8 and 9 all
+    say 2023-11-16T14:26:33) would triple the final rows (#26). Keep one
+    report per timestamp: identical repeats are dropped (QA info); reports
+    with the same timestamp but different numbers keep the last file and are
+    reported as a conflict."""
+    if rcv.empty:
+        return rcv, []
+    qa: list[dict] = []
+    drop: set[str] = set()
+    value_cols = ["candidate_or_option", "votes"]
+    for ts, grp in rcv.groupby("last_updated"):
+        files = sorted(grp["source_file"].unique())
+        if len(files) < 2:
+            continue
+        keep = files[-1]
+        ref = rcv.loc[rcv["source_file"] == keep, value_cols].reset_index(drop=True)
+        for other in files[:-1]:
+            drop.add(other)
+            cmp = rcv.loc[rcv["source_file"] == other, value_cols].reset_index(drop=True)
+            same = ref.equals(cmp)
+            qa.append({"source_file": other, "last_updated": ts, "contest": RCV_CONTEST,
+                       "check": "duplicate_dropped" if same else "duplicate_timestamp_conflict",
+                       "detail": (f"identical to {keep}" if same else
+                                  f"same report time as {keep} but different numbers; kept {keep}")})
+    return rcv[~rcv["source_file"].isin(drop)].reset_index(drop=True), qa
 
 
 def _sequence(summary: pd.DataFrame) -> pd.DataFrame:
@@ -588,17 +630,20 @@ def write_outputs(contests: pd.DataFrame, summary: pd.DataFrame, qa: pd.DataFram
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--election", help="Only this election folder, e.g. 2016G")
+    ap.add_argument("--election",
+                    help="Only OCR this election folder, e.g. 2016G. The dataset is always "
+                         "rebuilt from every cached snapshot, so the other elections stay put.")
     ap.add_argument("--ocr", action="store_true",
                     help="Send uncached screenshots to Datalab (needs DATALAB_API_KEY)")
     ap.add_argument("--workers", type=int, default=4)
     args = ap.parse_args(argv)
 
-    shots = discover(args.election)
     if args.ocr:
-        if ocr_missing(shots, workers=args.workers):
+        if ocr_missing(discover(args.election), workers=args.workers):
             return 1
-    contests, summary, qa = build(shots)
+    # Always the whole cache: --election narrows the (paid) OCR step only, so
+    # a one-election run can't overwrite the dataset with that election (#33).
+    contests, summary, qa = build(discover())
     write_outputs(contests, summary, qa)
     return 0
 

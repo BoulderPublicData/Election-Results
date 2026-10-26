@@ -24,7 +24,7 @@ from pathlib import Path
 import pandas as pd
 
 from .config import AUDIT as AUDIT_DIR  # noqa: F401
-from .config import PROVENANCE_CSV, REPO_ROOT, STATEMENTS_OF_VOTES
+from .config import AUDIT_SUMMARY_MD, PROVENANCE_CSV, REPO_ROOT, STATEMENTS_OF_VOTES
 
 
 def _md_table(rows: list[dict], cols: list[str]) -> str:
@@ -61,9 +61,16 @@ def audit_frame(df: pd.DataFrame, stem: str, *, provenance: dict | None = None) 
     df = df.copy()
     df["_votes"] = pd.to_numeric(df.get("votes"), errors="coerce")
 
-    year = df["election_year"].iloc[0] if not df.empty else "?"
-    etype = df["election_type"].iloc[0] if not df.empty else "?"
-    src = df["data_source"].iloc[0] if not df.empty else "?"
+    def _key(col: str) -> object:
+        # An empty frame (the turnout-only 2024 SOS file) takes its key from
+        # the provenance record instead of printing "? ? — ?".
+        if not df.empty:
+            return df[col].iloc[0]
+        if provenance and pd.notna(provenance.get(col)):
+            return provenance[col]
+        return "?"
+
+    year, etype, src = _key("election_year"), _key("election_type"), _key("data_source")
 
     def _pick(col: str, default: str = "?") -> str:
         if provenance and col in provenance and pd.notna(provenance.get(col)):
@@ -133,8 +140,10 @@ def audit_file(csv_path: Path, *, provenance_lookup: dict | None = None) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--out", type=Path, default=AUDIT_DIR / "summary.md",
-                    help="Concatenated audit output (default: data/audit/summary.md)")
+    ap.add_argument("--out", type=Path, default=AUDIT_SUMMARY_MD,
+                    help="Concatenated audit output (default: data/audit/summary.md, "
+                         "rebuilt from every per-file fragment so auditing a few "
+                         "CSVs never drops the others' sections)")
     ap.add_argument("csv", nargs="*", type=Path,
                     help="Specific CSVs (default: every per-year CSV in "
                          "data/processed/statements-of-votes/ "
@@ -162,8 +171,13 @@ def main(argv: list[str] | None = None) -> int:
         fragments.append(frag)
         print(f"audited {p.name}")
 
-    args.out.write_text("\n".join(fragments))
-    print(f"\nwrote {args.out.relative_to(REPO_ROOT)} ({len(fragments)} sections)")
+    if args.out == AUDIT_SUMMARY_MD:
+        from .shared_outputs import rebuild_audit_summary
+        n = rebuild_audit_summary(AUDIT_DIR, args.out)
+    else:
+        args.out.write_text("\n".join(fragments))
+        n = len(fragments)
+    print(f"\nwrote {args.out.relative_to(REPO_ROOT)} ({n} sections)")
     return 0
 
 

@@ -17,6 +17,7 @@ on:
     branches: [main]
     paths:
       - "data/processed/statements-of-votes/*.csv"
+      - "data/processed/statements-of-votes/provenance.csv"
       - "data/processed/vote-counting/*.csv"
       - "scripts/publish.py"
       - "scripts/concepts.py"
@@ -46,11 +47,9 @@ jobs:
       - name: Sync deps
         run: uv sync
 
-      - name: Rebuild combined tidy CSV
-        # The per-year CSVs are committed; the combined CSV is gitignored.
-        # publish.py reads it directly, so rebuild it now.
-        run: uv run python -m scripts.pipeline run --skip-fetch --no-pdf
-
+      # No pipeline run: publish.py builds elections.db straight from the
+      # committed per-year CSVs (every year, the PDF years included — #19),
+      # so CI never re-parses the originals or needs pdfplumber.
       - name: Build elections.db + metadata.yaml
         run: uv run python -m scripts.pipeline publish
 

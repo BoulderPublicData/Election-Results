@@ -176,7 +176,12 @@ def main(argv: list[str] | None = None) -> int:
         print("No sources match filters.", file=sys.stderr)
         return 2
 
+    from . import reject, shared_outputs
+    from .schema import provenance_record
+
     errors = 0
+    prov_rows: list[dict] = []
+    parsed: list[tuple[str, str]] = []
     for s in pool:
         label = f"{s.year}-{s.election_type}-{s.data_source}"
         try:
@@ -187,12 +192,26 @@ def main(argv: list[str] | None = None) -> int:
             if not args.validate_only:
                 dest = _output_path(s)
                 write_csv(df, dest)
+                prov_rows.append(provenance_record(df, _meta_for(s)))
+                parsed.append((s.data_source, s.local_filename))
                 print(f"OK   {label}  rows={len(df):>6}  -> {dest.relative_to(REPO_ROOT)}")
             else:
                 print(f"OK   {label}  rows={len(df):>6}  (validate-only)")
         except Exception as e:
             print(f"FAIL {label}: {type(e).__name__}: {e}", file=sys.stderr)
             errors += 1
+
+    rejected = reject.drain()
+    if not args.validate_only and parsed:
+        # Keep the sidecars in step with the CSVs just written (#33); both are
+        # upserts, so other files' rows are untouched. The combined CSV is
+        # rebuilt by `pipeline` (or shared_outputs.rebuild_combined()).
+        shared_outputs.upsert_provenance(prov_rows)
+        rej = shared_outputs.upsert_rejects(rejected, parsed)
+        print(f"updated {PROVENANCE_CSV.relative_to(REPO_ROOT)} ({len(prov_rows)} rows) and "
+              f"data/audit/rejected.csv ({len(rej)} rows)")
+    elif len(rejected):
+        print(f"  {len(rejected)} row(s) would be rejected", file=sys.stderr)
 
     return 1 if errors else 0
 

@@ -66,6 +66,21 @@ STATEMENTS_OF_VOTES = PROCESSED / "statements-of-votes"
 VOTE_COUNTING = PROCESSED / "vote-counting"
 
 
+# Cross-dataset publishing artifacts (gitignored; built by scripts/publish.py).
+DATASETTE_DB = PROCESSED / "elections.db"
+DATASETTE_METADATA = PROCESSED / "metadata.yaml"
+
+# Election-night snapshots: screenshots in, tidy CSVs + QA out. The Datalab
+# response cache lives under the processed folder by design (see AGENTS §2.5):
+# it is derived from data/original/, but rebuilding it costs money, so it is
+# committed and the pipeline never re-OCRs.
+VOTE_COUNTING_ORIGINAL = ORIGINAL / "boulder-county" / "vote-counting"
+VOTE_COUNTING_CACHE = VOTE_COUNTING / "datalab"
+VOTE_COUNTING_CONTESTS_CSV = VOTE_COUNTING / "vote-counting-contests.csv"
+VOTE_COUNTING_SUMMARY_CSV = VOTE_COUNTING / "vote-counting-summary.csv"
+VOTE_COUNTING_CORRECTIONS_CSV = REPO_ROOT / "scripts" / "corrections" / "vote-counting.csv"
+
+
 def sov_csv_path(year: int, election_type: str, data_source: str) -> Path:
     """Harmonized per-year CSV: statements-of-votes/{year}-{type}-{source}.csv."""
     ds = data_source.replace("_", "-")
@@ -82,6 +97,8 @@ RECONCILIATION_CANDIDATES_CSV = AUDIT / "reconciliation-candidates.csv"
 VOTE_COUNTING_VS_SOV_CSV = AUDIT / "vote-counting-vs-sov.csv"
 REJECTED_CSV = AUDIT / "rejected.csv"
 AUDIT_SUMMARY_MD = AUDIT / "summary.md"
+VOTE_COUNTING_QA_CSV = AUDIT / "vote-counting-qa.csv"
+VOTE_COUNTING_QA_MD = AUDIT / "vote-counting.md"
 
 # ---------------------------------------------------------------------------
 # HTTP defaults
@@ -98,7 +115,7 @@ HTTP_USER_AGENT = (
 # requests-cache config (see scripts/http.py).
 # - In dev: cache for 1 day so re-running pipeline.py doesn't re-download
 #   files we just downloaded. Saves minutes per iteration.
-# - In CI: short cache or no cache (overridden by ELECTIONS_HTTP_CACHE_HOURS=0).
+# - In CI: the annual-refresh workflow sets ELECTIONS_HTTP_CACHE_HOURS=0.
 HTTP_CACHE_HOURS = int(os.environ.get("ELECTIONS_HTTP_CACHE_HOURS", "24"))
 HTTP_CACHE_PATH = REPO_ROOT / ".cache" / "requests-cache.sqlite"
 
@@ -111,9 +128,11 @@ HTTP_RETRY_MAX_WAIT = 8.0
 # Logging
 # ---------------------------------------------------------------------------
 
-# Set to "json" in CI for parseable logs; "pretty" in interactive runs.
-# scripts/logging_setup.py picks the renderer based on this + tty detection.
+# Diagnostics renderer: "json" for one JSON object per line; anything else
+# (default "auto") renders key=value text. See scripts/logging_setup.py for
+# the print-vs-log convention.
 LOG_FORMAT = os.environ.get("ELECTIONS_LOG_FORMAT", "auto")
+LOG_LEVEL = os.environ.get("ELECTIONS_LOG_LEVEL", "INFO")
 
 
 # Convenience: any code that wants a path can do `config.ORIGINAL / ...` rather
@@ -125,9 +144,14 @@ __all__ = [
     "MANIFEST_PATH", "PROVENANCE_CSV", "COMBINED_CSV",
     "RECONCILIATION_CSV", "RECONCILIATION_MD", "RECONCILIATION_CANDIDATES_CSV",
     "VOTE_COUNTING_VS_SOV_CSV", "REJECTED_CSV", "AUDIT_SUMMARY_MD",
+    "STATEMENTS_OF_VOTES", "VOTE_COUNTING", "sov_csv_path",
+    "DATASETTE_DB", "DATASETTE_METADATA",
+    "VOTE_COUNTING_ORIGINAL", "VOTE_COUNTING_CACHE", "VOTE_COUNTING_CONTESTS_CSV",
+    "VOTE_COUNTING_SUMMARY_CSV", "VOTE_COUNTING_CORRECTIONS_CSV",
+    "VOTE_COUNTING_QA_CSV", "VOTE_COUNTING_QA_MD",
     "HTTP_TIMEOUT", "HTTP_USER_AGENT",
     "HTTP_CACHE_HOURS", "HTTP_CACHE_PATH",
     "HTTP_RETRY_ATTEMPTS", "HTTP_RETRY_MIN_WAIT", "HTTP_RETRY_MAX_WAIT",
-    "LOG_FORMAT",
+    "LOG_FORMAT", "LOG_LEVEL",
     "SOURCES", "BOULDER_COUNTY", "SECRETARY_OF_STATE", "ELECTION_DATES", "Source",
 ]

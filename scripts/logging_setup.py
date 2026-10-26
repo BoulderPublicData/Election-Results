@@ -1,23 +1,27 @@
 """
-structlog configuration. Replaces ad-hoc print() across the pipeline.
+structlog configuration, and the project's output convention.
 
-- **Interactive runs (TTY):** pretty key=value output with timestamps,
-  level coloring, and grouped event names. Good for "what's happening".
-- **CI / piped output:** JSON lines (one event per line) so GitHub Actions
-  log filtering, `jq`, and downstream observability stacks can parse them.
+**Convention (#33).** Two channels, never mixed:
 
-Toggle explicitly with `ELECTIONS_LOG_FORMAT=json` or `=pretty`. Defaults to
-`auto` (TTY → pretty, otherwise → json).
+- **User-facing output** — progress and results (`OK …`, `wrote …`, `skip …`)
+  — is plain ``print()`` to **stdout**; problems the user must act on
+  (`WARN …`, `FAIL …`) are ``print(..., file=sys.stderr)``. This is what the
+  CLIs, the pipeline and the GitHub Actions logs show.
+- **Diagnostics** — retries, stale caches, debug detail — go through
+  structlog to **stderr**. They never repeat a line already printed.
+
+Rendering: key=value lines by default (colored on a TTY). Set
+``ELECTIONS_LOG_FORMAT=json`` for one JSON object per line (log shippers,
+``jq``). ``ELECTIONS_LOG_LEVEL`` (default ``INFO``) sets the threshold.
 
 Every module that wants to log should do:
 
     from .logging_setup import get_logger
     log = get_logger(__name__)
-    log.info("did_thing", count=42, source="boulder_county")
+    log.warning("thing_retried", attempt=2, source="boulder_county")
 
 The keyword args become structured fields. `log.bind(source=...)` returns a
-child logger with that field always attached — useful inside parsers so every
-line carries `(source, vintage)`.
+child logger with that field always attached.
 """
 
 from __future__ import annotations
@@ -33,19 +37,19 @@ _CONFIGURED = False
 
 
 def _pretty_or_json() -> str:
-    fmt = config.LOG_FORMAT.lower()
-    if fmt in {"json", "pretty"}:
-        return fmt
-    # Auto: pretty if stderr is a TTY, JSON otherwise.
-    return "pretty" if sys.stderr.isatty() else "json"
+    # "auto" (the default) and "pretty" both render key=value text; JSON is
+    # opt-in, so diagnostics read like the rest of the CLI output in a
+    # terminal and in CI logs alike.
+    return "json" if config.LOG_FORMAT.lower() == "json" else "pretty"
 
 
-def configure_logging(level: str = "INFO") -> None:
+def configure_logging(level: str | None = None) -> None:
     """Set up structlog. Idempotent — safe to call multiple times."""
     global _CONFIGURED
     if _CONFIGURED:
         return
     _CONFIGURED = True
+    level = level or config.LOG_LEVEL
 
     # Bridge stdlib logging through structlog so requests/urllib3 logs pick up
     # the same format.

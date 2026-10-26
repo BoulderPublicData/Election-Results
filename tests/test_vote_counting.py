@@ -239,3 +239,43 @@ def test_cache_covers_every_screenshot():
     shots = vc.discover()
     missing = [s.source_file for s in shots if not s.cache_path.exists()]
     assert missing == []
+
+
+def test_rcv_reports_sharing_a_timestamp_are_deduped():
+    """#26: 2023 RCV reports 7, 8 and 9 share the final timestamp."""
+    from scripts.vote_counting import _dedupe_rcv
+    rows = []
+    for f in ("(7).pdf", "(8).pdf", "(9).pdf"):
+        for cand, v in (("Aaron Brockett | Final", 16823), ("Bob Yates | Final", 15592)):
+            rows.append({"source_file": f, "last_updated": "2023-11-16T14:26:33",
+                         "candidate_or_option": cand, "votes": v})
+    rows.append({"source_file": "(6).pdf", "last_updated": "2023-11-08T21:23:01",
+                 "candidate_or_option": "Aaron Brockett | Final", "votes": 16000})
+    out, qa = _dedupe_rcv(pd.DataFrame(rows))
+    final = out[out["last_updated"] == "2023-11-16T14:26:33"]
+    assert final["source_file"].unique().tolist() == ["(9).pdf"]
+    assert not final.duplicated(["last_updated", "candidate_or_option"]).any()
+    assert {q["check"] for q in qa} == {"duplicate_dropped"} and len(qa) == 2
+    assert (out["source_file"] == "(6).pdf").sum() == 1
+
+
+def test_election_flag_never_narrows_the_rebuild(monkeypatch):
+    """#33: `--election 2016G` used to rewrite the dataset with one election."""
+    from scripts import vote_counting as vc
+    seen = {}
+    monkeypatch.setattr(vc, "discover", lambda election=None, suffix=".jpeg": [election])
+    monkeypatch.setattr(vc, "build", lambda shots: seen.setdefault("shots", shots) and
+                        (pd.DataFrame(), pd.DataFrame(), pd.DataFrame()))
+    monkeypatch.setattr(vc, "write_outputs", lambda *a: None)
+    assert vc.main(["--election", "2016G"]) == 0
+    assert seen["shots"] == [None]   # discover() with no filter
+
+
+def test_committed_final_snapshots_have_unique_keys():
+    from scripts.config import VOTE_COUNTING_CONTESTS_CSV
+    if not VOTE_COUNTING_CONTESTS_CSV.exists():
+        pytest.skip("vote-counting CSV not built")
+    df = pd.read_csv(VOTE_COUNTING_CONTESTS_CSV, low_memory=False)
+    final = df[df["is_final_snapshot"].astype(bool)]
+    key = ["election_year", "election_type", "last_updated", "contest", "candidate_or_option"]
+    assert not final.duplicated(key).any()
