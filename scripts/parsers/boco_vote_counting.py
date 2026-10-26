@@ -79,11 +79,12 @@ def parse_datetime(text: str) -> str | None:
 # Row stream
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Row:
-    cells: list[str]          # cleaned, non-empty cells (bar-chart cells drop out)
+    cells: list[str]  # cleaned, non-empty cells (bar-chart cells drop out)
     is_table: bool
-    table_start: bool         # first row of a Markdown table
+    table_start: bool  # first row of a Markdown table
 
     @property
     def text(self) -> str:
@@ -122,8 +123,7 @@ SUMMARY_FIELDS: list[tuple[str, re.Pattern]] = [
     ("total_registration", re.compile(r"total (voters )?registered|total registration", re.I)),
     ("active_registered_voters", re.compile(r"active registered", re.I)),
     ("mail_ballots_distributed", re.compile(r"mail ballots distributed", re.I)),
-    ("property_owner_only_ballots_distributed",
-     re.compile(r"property owner only ballots", re.I)),
+    ("property_owner_only_ballots_distributed", re.compile(r"property owner only ballots", re.I)),
     ("expected_turnout", re.compile(r"expected turnout", re.I)),
     ("total_ballots_counted", re.compile(r"total ballots counted", re.I)),
     ("in_person_ballots", re.compile(r"in.?person ballots", re.I)),
@@ -141,13 +141,25 @@ _TOTAL_VOTES = re.compile(r"^total votes:?$", re.I)
 _VOTE_FOR = re.compile(r"\(?\s*vote for (?:not |no )?(?:more than )?(\w+)\s*\)?", re.I)
 # "- Write-in Candidate" (2014-2022), "- Write-In" (2024), "- Certified Write-in Candidate"
 _WRITE_IN = re.compile(r"\s*-\s*(certified\s+)?write-?\s?in(\s+candidate)?\s*$", re.I)
-_NUMBER_WORDS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
-                 "seven": 7, "eight": 8, "nine": 9, "ten": 10}
+_NUMBER_WORDS = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
+}
 _LINK_CARD = re.compile(r"visit our .*results page", re.I)
 # Page chrome that can appear between contests; never part of a contest title.
 _BOILERPLATE = re.compile(
     r"^(view results|voter turnout by precinct|statewide contests|results preview|"
-    r"boulder county elections?|page \d+)", re.I)
+    r"boulder county elections?|page \d+)",
+    re.I,
+)
 
 
 @dataclass
@@ -250,7 +262,7 @@ def parse_snapshot(markdown: str) -> Snapshot:
             if m:
                 snap.results_label = m.group(0).title()
         if snap.last_updated is None and _LAST_UPDATED.search(row.text):
-            for nxt in rows[i:i + 3]:
+            for nxt in rows[i : i + 3]:
                 ts = parse_datetime(nxt.text)
                 if ts:
                     snap.last_updated = ts
@@ -263,15 +275,16 @@ def parse_snapshot(markdown: str) -> Snapshot:
     if split is None:
         # Fall back to the first contest header row.
         split = next((max(i - 1, 0) for i, r in enumerate(rows) if _is_header(r)), len(rows))
-    summary_start = next((i for i, r in enumerate(rows[:split])
-                          if "election summary" in r.text.lower()), None)
+    summary_start = next(
+        (i for i, r in enumerate(rows[:split]) if "election summary" in r.text.lower()), None
+    )
     if summary_start is not None:
         _parse_summary(rows[summary_start:split], snap)
 
     # --- contests: state machine over the row stream ---
     pending: list[str] = []
     current: Contest | None = None
-    for row in rows[split + 1:]:
+    for row in rows[split + 1 :]:
         if row.table_start and current is None and not _is_header(row):
             # A new table that opens with a title row starts a fresh title.
             # (A table that opens with the VOTES/PERCENT header keeps the
@@ -320,6 +333,7 @@ def parse_snapshot(markdown: str) -> Snapshot:
 # Contest / candidate normalization
 # ---------------------------------------------------------------------------
 
+
 def split_title(lines: list[str]) -> tuple[str, int | None]:
     """Join title lines; pull 'Vote for no more than Four' out as an int."""
     title = " ".join(lines)
@@ -328,7 +342,7 @@ def split_title(lines: list[str]) -> tuple[str, int | None]:
     if m:
         word = m.group(1).lower()
         vote_for = int(word) if word.isdigit() else _NUMBER_WORDS.get(word)
-        title = (title[:m.start()] + title[m.end():])
+        title = title[: m.start()] + title[m.end() :]
     title = _WS.sub(" ", title).strip(" :-")
     return title, vote_for
 
@@ -355,8 +369,11 @@ def split_candidate(raw: str) -> tuple[str, str | None, bool]:
 # ---------------------------------------------------------------------------
 
 _RCV_STAMP = re.compile(r"(\d{2}/\d{2}/\d{4}) (\d{2}):(\d{2}):(\d{2})")
-_RCV_SKIP = re.compile(r"^(continuing|blanks|exhausted|overvotes|non transferable|threshold|"
-                       r"round|candidate|votes|\(elimination\)|page|\*)", re.I)
+_RCV_SKIP = re.compile(
+    r"^(continuing|blanks|exhausted|overvotes|non transferable|threshold|"
+    r"round|candidate|votes|\(elimination\)|page|\*)",
+    re.I,
+)
 
 
 def parse_rcv_report(path: Path) -> tuple[str, list[dict]]:
@@ -374,8 +391,9 @@ def parse_rcv_report(path: Path) -> tuple[str, list[dict]]:
     if not m:
         raise ValueError(f"{path.name}: no report timestamp")
     mon, day, year = m.group(1).split("/")
-    stamp = datetime(int(year), int(mon), int(day),
-                     int(m.group(2)), int(m.group(3)), int(m.group(4))).isoformat()
+    stamp = datetime(
+        int(year), int(mon), int(day), int(m.group(2)), int(m.group(3)), int(m.group(4))
+    ).isoformat()
 
     rows: list[dict] = []
     for line in text.splitlines():
@@ -388,10 +406,13 @@ def parse_rcv_report(path: Path) -> tuple[str, list[dict]]:
         if not name or not nums:
             continue
         # (votes, pct) pairs: every token followed by a percentage.
-        rounds = [(int(nums[i].replace(",", "")), float(nums[i + 1].rstrip("%")))
-                  for i in range(len(nums) - 1)
-                  if not nums[i].endswith("%") and nums[i + 1].endswith("%")]
+        rounds = [
+            (int(nums[i].replace(",", "")), float(nums[i + 1].rstrip("%")))
+            for i in range(len(nums) - 1)
+            if not nums[i].endswith("%") and nums[i + 1].endswith("%")
+        ]
         for n, (votes, pct) in enumerate(rounds, start=1):
-            rows.append({"raw": name, "round": n, "votes": votes, "percent": pct,
-                         "final": n == len(rounds)})
+            rows.append(
+                {"raw": name, "round": n, "votes": votes, "percent": pct, "final": n == len(rounds)}
+            )
     return stamp, rows

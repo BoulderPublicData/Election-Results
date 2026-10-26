@@ -42,8 +42,14 @@ class TestSplitRow:
 
 class TestRowTotal:
     def test_trailing_total_column_dropped(self):
-        assert _drop_row_total([137, 26, 102, 96, 102, 13, 618], 6, has_totals=True) == \
-            [137, 26, 102, 96, 102, 13]
+        assert _drop_row_total([137, 26, 102, 96, 102, 13, 618], 6, has_totals=True) == [
+            137,
+            26,
+            102,
+            96,
+            102,
+            13,
+        ]
 
     def test_no_total_column(self):
         assert _drop_row_total([158, 133, 101], 3, has_totals=False) == [158, 133, 101]
@@ -66,15 +72,18 @@ def _source(year):
     return s, path
 
 
-@pytest.mark.parametrize(("year", "pages", "precinct", "candidate", "votes"), [
-    # 2007 p.1: "073 96 96 251 38.25% 41 12 5 24 38 53 44 7" — Macon Cowles is the
-    # 5th candidate (the old parser reported 44 / 40 / 542 for this key).
-    (2007, range(1, 11), "073", "Macon Cowles", 38),
-    # 2007 p.4 (second candidate group, "Continued"): Lisa Morzel is the 5th of 8.
-    (2007, range(1, 11), "073", "Lisa Morzel", 43),
-    # 2009 p.4 (second group on a Continued page, with a Totals column).
-    (2009, range(1, 7), "073", "Barry Siff", 51),
-])
+@pytest.mark.parametrize(
+    ("year", "pages", "precinct", "candidate", "votes"),
+    [
+        # 2007 p.1: "073 96 96 251 38.25% 41 12 5 24 38 53 44 7" — Macon Cowles is the
+        # 5th candidate (the old parser reported 44 / 40 / 542 for this key).
+        (2007, range(1, 11), "073", "Macon Cowles", 38),
+        # 2007 p.4 (second candidate group, "Continued"): Lisa Morzel is the 5th of 8.
+        (2007, range(1, 11), "073", "Lisa Morzel", 43),
+        # 2009 p.4 (second group on a Continued page, with a Totals column).
+        (2009, range(1, 7), "073", "Barry Siff", 51),
+    ],
+)
 def test_golden_values(year, pages, precinct, candidate, votes):
     s, path = _source(year)
     df = boco_pdf.parse(path, _meta_for(s), pages=pages)
@@ -82,11 +91,14 @@ def test_golden_values(year, pages, precinct, candidate, votes):
     assert r["votes"].tolist() == [votes]
 
 
-@pytest.mark.parametrize(("year", "pages"), [
-    (2005, range(53, 56)),   # Lafayette council: a two-line rotated label
-    (2007, range(1, 11)),    # Boulder council: three candidate groups
-    (2009, range(1, 9)),     # Boulder + Lafayette council, Totals-only last page
-])
+@pytest.mark.parametrize(
+    ("year", "pages"),
+    [
+        (2005, range(53, 56)),  # Lafayette council: a two-line rotated label
+        (2007, range(1, 11)),  # Boulder council: three candidate groups
+        (2009, range(1, 9)),  # Boulder + Lafayette council, Totals-only last page
+    ],
+)
 def test_pages_sum_to_printed_totals_without_duplicates(year, pages):
     s, path = _source(year)
     df = boco_pdf.parse(path, _meta_for(s), pages=pages)

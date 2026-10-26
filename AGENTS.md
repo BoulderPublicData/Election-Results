@@ -85,6 +85,8 @@ To recover row-level provenance, join on `(election_year, election_type, data_so
 
 **Why three:** The audit catches null-rate regressions and shape changes. The reconciliation catches vote-count regressions (the thing that would actually mislead an analyst). The notebook is the human-readable doc that explains both.
 
+**Check at the grain you publish.** Until 2026-10, reconcile compared only top-line contest totals. Under it shipped: SOS retention votes 60% missing, 2008 president at 1,005 of 171,763 votes, 1,154–1,448 duplicate keys per PDF year, and wrong measure pass rates. Each of these hid below or behind a total that still matched. So a new parser, source or year isn't done until its contest × candidate keys reconcile, at 0 mismatches, to totals read from the source independently of the parser (the file's own `Totals` rows, the PDF's printed totals, or the raw workbook).
+
 ### 2.5 `data/original/` is immutable
 
 Raw downloads are committed alongside the manifest (sha256 + retrieved_at for every file). Anything else under `data/` is regenerable. **Never edit `data/original/` files in place** — if you find an issue, change the parser, not the raw file. `scripts.fetch` never overwrites an original: an existing file is skipped (or recorded, if it has no manifest entry), a sha256 mismatch is a `FAIL`, and only `--force` re-downloads. `uv run python -m scripts.fetch --verify` checks every hash without the network.
@@ -139,6 +141,19 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at for ev
 | **Election-night snapshots** (`data/processed/vote-counting/`) | Rows are cumulative county-wide totals per snapshot; summing `votes` across snapshots multiplies them, and concatenating with precinct data double-counts. | Use `vote_change` or filter `is_final_snapshot`. Keep the dataset separate (own schema in `schema.py:VOTE_COUNTING_*`). |
 | **Vote-counting OCR fixes** | Editing a cached Datalab JSON hides the fix and is overwritten on re-OCR. | Add a row to `scripts/corrections/vote-counting.csv` (the build fails if its `ocr_value` stops matching). `data/audit/vote-counting.md` must show 0 open issues. |
 | **Combined CSV size** | `all-elections-tidy.csv` is <!-- generated:combined-size -->61 MB<!-- /generated:combined-size -->. Gitignored. | The pipeline regenerates it from per-year files; never check it in. |
+
+### 3a. Long runs and the working tree
+
+`pipeline` rewrites every per-year CSV, the combined CSV, provenance, the audit and the reconciliation reports as it goes. If a commit-on-stop hook or file watcher is active, run against a copy so a half-finished `data/` is never committed, and commit once at the end:
+
+```bash
+mkdir -p /tmp/er && cp -r data /tmp/er/
+ELECTIONS_DATA_DIR=/tmp/er/data uv run python -m scripts.pipeline --skip-fetch
+ELECTIONS_DATA_DIR=/tmp/er/data uv run python -m scripts.reconcile
+cp -r /tmp/er/data/. data/ && git add data && git commit
+```
+
+`ELECTIONS_DATA_DIR` moves every path in `scripts/config.py`; printed paths still read `data/...` (`config.display_path`).
 
 ---
 
@@ -251,7 +266,7 @@ In rough order of value:
 - **Building a path to a raw SoV by hand.** Boulder SoVs live in `data/original/boulder-county/statement-of-votes/`; always go through `config.original_path(data_source, local_filename)`. The same goes for outputs: harmonized SoV CSVs live in `data/processed/statements-of-votes/` — use `config.sov_csv_path(year, election_type, data_source)`, and `config.STATEMENTS_OF_VOTES` / `config.VOTE_COUNTING` for the dataset folders.
 - **Editing `data/original/` instead of the parser.** The raw files are reference. Fix the parser.
 - **Adding a parser without updating `scripts/clean.py`'s router.** The orchestrator picks the parser by year; a new parser orphaned outside the router won't run.
-- **Hardcoding a path.** Everything should resolve from `REPO_ROOT = Path(__file__).resolve().parents[1]`.
+- **Hardcoding a path.** Everything should resolve from `scripts/config.py` (`DATA`, which honors `ELECTIONS_DATA_DIR`, and `REPO_ROOT`). Show paths to people with `config.display_path`, not `relative_to(REPO_ROOT)`, which fails when the data lives in a copy.
 - **Inferring schema from `data/processed/` instead of `scripts/schema.py`.** The schema file is authoritative.
 - **Bypassing `add_provenance()`.** Parsers must still attach the provenance columns — they're in the in-memory schema even though the CSV writer strips them. The audit module and the `provenance.csv` sidecar both depend on them.
 - **Inferring schema from the CSV files.** Per-year CSVs use `CSV_COLUMNS` (16 cols, no provenance); the canonical `COLUMNS` constant in `schema.py` has all 21. Use `CSV_COLUMNS` when validating a CSV; use `COLUMNS` when validating a parser-output frame.
@@ -263,11 +278,22 @@ In rough order of value:
 
 ## 10. Sanity-check before declaring done
 
-After any non-trivial change, run all six:
+Run the cheapest check that can catch a mistake in what you changed, and say in the PR which one you ran. Times are measured on the full dataset.
+
+| Change touches | Run | Time |
+|---|---|---|
+| docs, comments, recipes, CI config | `ruff check .`, `ruff format --check .`, `pytest` | ~25 s |
+| a parser, `clean.py`, `schema.py`, `sources.py`, `data/original/` | + `pipeline --skip-fetch` (with PDFs if a PDF year is affected; `--year`/`--source` while iterating), then `reconcile` | ~5 min (`--no-pdf` saves ~45 s) |
+| `common.py` cues, `PARTY_MAP`, concepts, choice maps | + full `pipeline --skip-fetch`, `reconcile`, `export_lookups` | ~5 min |
+| `vote_counting.py` | + `vote_counting` from the cache (the OCR step is **paid**: ask before `--election` triggers new Datalab calls) | not measured |
+| `Cleaning.ipynb` | + `nbconvert --execute` | ~15 s |
+
+Per-year CSVs should come out byte-identical whenever a change isn't meant to move counts; compare hashes before and after. The full sequence below is the release check, not the per-change one:
 
 ```bash
 uv sync                                                  # installs pytest + ruff (dev group)
 uv run ruff check .                                      # lint (CI enforces it)
+uv run ruff format --check .                             # formatting (CI enforces it; `ruff format .` fixes)
 uv run pytest                                            # all unit tests
 uv run python -m scripts.pipeline --skip-fetch           # rebuilds processed CSVs, PDFs included
 uv run python -m scripts.reconcile                       # top-line + contest × candidate totals

@@ -10,16 +10,28 @@ from scripts.schema import CSV_COLUMNS
 
 
 def _prov(year, etype, source, note):
-    return {"election_year": year, "election_type": etype, "data_source": source,
-            "source_file": f"{year}.xlsx", "source_url": "https://x", "retrieved_at": "t",
-            "extraction_quality": "machine_readable", "extraction_notes": note}
+    return {
+        "election_year": year,
+        "election_type": etype,
+        "data_source": source,
+        "source_file": f"{year}.xlsx",
+        "source_url": "https://x",
+        "retrieved_at": "t",
+        "extraction_quality": "machine_readable",
+        "extraction_notes": note,
+    }
 
 
 def test_upsert_provenance_keeps_other_sources(tmp_path):
     path = tmp_path / "provenance.csv"
-    so.upsert_provenance([_prov(2024, "general", "boulder_county", "old 2024"),
-                          _prov(2025, "coordinated", "boulder_county", "old 2025"),
-                          _prov(2020, "general", "secretary_of_state", "sos")], path)
+    so.upsert_provenance(
+        [
+            _prov(2024, "general", "boulder_county", "old 2024"),
+            _prov(2025, "coordinated", "boulder_county", "old 2025"),
+            _prov(2020, "general", "secretary_of_state", "sos"),
+        ],
+        path,
+    )
     out = so.upsert_provenance([_prov(2025, "coordinated", "boulder_county", "new 2025")], path)
     assert len(out) == 3
     notes = dict(zip(out["election_year"].astype(int), out["extraction_notes"], strict=True))
@@ -30,11 +42,17 @@ def test_upsert_provenance_keeps_other_sources(tmp_path):
 
 def test_upsert_rejects_replaces_only_the_files_parsed(tmp_path):
     path = tmp_path / "rejected.csv"
-    old = pd.DataFrame({"source_file": ["2008.xls", "2008.xls", "2025.xlsx"],
-                        "election_year": [2008, 2008, 2025],
-                        "data_source": ["boulder_county"] * 3,
-                        "row_index": ["1", "2", "3"], "reason": ["r"] * 3,
-                        "detail": [""] * 3, "raw_row": [""] * 3})
+    old = pd.DataFrame(
+        {
+            "source_file": ["2008.xls", "2008.xls", "2025.xlsx"],
+            "election_year": [2008, 2008, 2025],
+            "data_source": ["boulder_county"] * 3,
+            "row_index": ["1", "2", "3"],
+            "reason": ["r"] * 3,
+            "detail": [""] * 3,
+            "raw_row": [""] * 3,
+        }
+    )
     old.to_csv(path, index=False)
     # Re-parsing 2025 with no rejects drops its old row; 2008's rows stay.
     out = so.upsert_rejects(pd.DataFrame(), [("boulder_county", "2025.xlsx")], path)

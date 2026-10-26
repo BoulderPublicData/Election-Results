@@ -32,9 +32,9 @@ from .config import (
     COMBINED_CSV,
     PROVENANCE_CSV,
     REJECTED_CSV,
-    REPO_ROOT,
     SECRETARY_OF_STATE,
     STATEMENTS_OF_VOTES,
+    display_path,
     sov_csv_path,
 )
 from .config import (
@@ -65,6 +65,7 @@ def _epilog() -> str:
 
 def _election_arg(value: str) -> tuple[int, str]:
     from .sources import parse_election_key
+
     try:
         return parse_election_key(value)
     except ValueError as e:
@@ -78,22 +79,36 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     subcommand. The new `main()` below is an argparse-with-subcommands router.
     """
     ap = argparse.ArgumentParser(
-        prog="python -m scripts.pipeline [run]", description=__doc__, epilog=_epilog(),
-        formatter_class=argparse.RawDescriptionHelpFormatter)
+        prog="python -m scripts.pipeline [run]",
+        description=__doc__,
+        epilog=_epilog(),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     ap.add_argument("--year", type=int)
-    ap.add_argument("-e", "--election", type=_election_arg, metavar="KEY",
-                    help="Only this election, as an election key, e.g. 2024-general")
+    ap.add_argument(
+        "-e",
+        "--election",
+        type=_election_arg,
+        metavar="KEY",
+        help="Only this election, as an election key, e.g. 2024-general",
+    )
     ap.add_argument("--since", type=int)
-    ap.add_argument("--source", choices=["boulder_county", "secretary_of_state", "all"],
-                    default="all")
+    ap.add_argument(
+        "--source", choices=["boulder_county", "secretary_of_state", "all"], default="all"
+    )
     ap.add_argument("--no-pdf", action="store_true")
-    ap.add_argument("--skip-fetch", action="store_true",
-                    help="Don't try to download; assume files already present.")
-    ap.add_argument("--discover", action="store_true",
-                    help="Also scrape upstream landing pages for sources not in "
-                         "the static registry (e.g. a newly published year)")
-    ap.add_argument("--combined-out", type=Path,
-                    default=COMBINED_CSV)
+    ap.add_argument(
+        "--skip-fetch",
+        action="store_true",
+        help="Don't try to download; assume files already present.",
+    )
+    ap.add_argument(
+        "--discover",
+        action="store_true",
+        help="Also scrape upstream landing pages for sources not in "
+        "the static registry (e.g. a newly published year)",
+    )
+    ap.add_argument("--combined-out", type=Path, default=COMBINED_CSV)
     args = ap.parse_args(argv)
 
     if args.source == "boulder_county":
@@ -106,13 +121,16 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     if args.discover:
         try:
             from .discover import discover, merge_with_registry
+
             discovered = discover()
             new = merge_with_registry(discovered, only_new=True)
             if args.source != "all":
                 new = [s for s in new if s.data_source == args.source]
             for s in new:
-                print(f"discover  +{s.year}-{s.election_type}-{s.data_source}  {s.url}",
-                      file=sys.stderr)
+                print(
+                    f"discover  +{s.year}-{s.election_type}-{s.data_source}  {s.url}",
+                    file=sys.stderr,
+                )
             pool.extend(new)
         except Exception as e:
             print(f"WARN discovery failed: {e}", file=sys.stderr)
@@ -128,10 +146,13 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
 
     if not args.skip_fetch:
         from .fetch import fetch_many
+
         fetch_errors = fetch_many(pool)
         if fetch_errors:
-            print(f"WARN: {fetch_errors} fetch error(s); continuing with files on disk",
-                  file=sys.stderr)
+            print(
+                f"WARN: {fetch_errors} fetch error(s); continuing with files on disk",
+                file=sys.stderr,
+            )
 
     STATEMENTS_OF_VOTES.mkdir(parents=True, exist_ok=True)
     per_year: list[pd.DataFrame] = []
@@ -158,25 +179,32 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     # Whole-dataset outputs: rebuilt from every per-year CSV on disk or
     # upserted by key, never replaced by just this run's subset (#18).
     combined = shared_outputs.rebuild_combined(STATEMENTS_OF_VOTES, args.combined_out)
-    print(f"\nwrote {args.combined_out.relative_to(REPO_ROOT)} "
-          f"({len(combined):,} rows, "
-          f"{combined['election_year'].nunique()} years, "
-          f"{combined['data_source'].nunique()} sources)")
+    print(
+        f"\nwrote {display_path(args.combined_out)} "
+        f"({len(combined):,} rows, "
+        f"{combined['election_year'].nunique()} years, "
+        f"{combined['data_source'].nunique()} sources)"
+    )
 
     # Provenance sidecar — one row per source file. The per-year CSVs drop
     # these 5 columns to keep file sizes down (they're constant for every row
     # from a given file); the sidecar preserves the info so nothing's lost.
     prov_df = shared_outputs.upsert_provenance(prov_rows, PROVENANCE_CSV)
-    print(f"wrote {PROVENANCE_CSV.relative_to(REPO_ROOT)} "
-          f"({len(prov_df)} source files; {len(prov_rows)} updated this run)")
+    print(
+        f"wrote {display_path(PROVENANCE_CSV)} "
+        f"({len(prov_df)} source files; {len(prov_rows)} updated this run)"
+    )
 
     # Reject port — drain the per-parser rejection buffers and upsert them by
     # source file. Any non-zero count is a signal that a parser dropped rows;
     # the row_index column points back into the source file.
     from .reject import drain as _drain_rejects
+
     rejected = shared_outputs.upsert_rejects(_drain_rejects(), parsed, REJECTED_CSV)
-    print(f"wrote {REJECTED_CSV.relative_to(REPO_ROOT)} ({len(rejected)} rejected rows"
-          + (" — investigate before publishing)" if len(rejected) else ")"))
+    print(
+        f"wrote {display_path(REJECTED_CSV)} ({len(rejected)} rejected rows"
+        + (" — investigate before publishing)" if len(rejected) else ")")
+    )
 
     # Election-night vote counting — rebuilt from the committed Datalab cache
     # only (never calls the API; run `pipeline vote-counting --ocr` for new
@@ -185,11 +213,14 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
         print("\n--- vote counting ---")
         try:
             from . import vote_counting
+
             vc_contests, vc_summary, vc_qa = vote_counting.build(vote_counting.discover())
             vote_counting.write_outputs(vc_contests, vc_summary, vc_qa)
             if (vc_qa["status"] == "open").any():
-                print("  WARN: open vote-counting QA issues — see data/audit/vote-counting.md",
-                      file=sys.stderr)
+                print(
+                    "  WARN: open vote-counting QA issues — see data/audit/vote-counting.md",
+                    file=sys.stderr,
+                )
         except Exception as e:
             print(f"  vote-counting FAIL: {type(e).__name__}: {e}", file=sys.stderr)
             errors += 1
@@ -200,6 +231,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     # the whole dataset.
     print("\n--- reconcile ---")
     from . import reconcile
+
     if reconcile.main([]) != 0:
         errors += 1
 
@@ -207,16 +239,18 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     # carry provenance), then summary.md rebuilt from every fragment on disk.
     print("\n--- audit ---")
     from .audit import audit_frame
+
     AUDIT.mkdir(parents=True, exist_ok=True)
     for df, prov in zip(per_year, prov_rows, strict=True):
-        stem = sov_csv_path(int(prov["election_year"]), str(prov["election_type"]),
-                            str(prov["data_source"])).stem
+        stem = sov_csv_path(
+            int(prov["election_year"]), str(prov["election_type"]), str(prov["data_source"])
+        ).stem
         try:
             (AUDIT / f"{stem}.md").write_text(audit_frame(df, stem, provenance=prov))
         except Exception as e:
             print(f"  audit FAIL {stem}: {e}", file=sys.stderr)
     n = shared_outputs.rebuild_audit_summary(AUDIT, AUDIT_SUMMARY_MD)
-    print(f"wrote {AUDIT_SUMMARY_MD.relative_to(REPO_ROOT)} ({n} sections)")
+    print(f"wrote {display_path(AUDIT_SUMMARY_MD)} ({n} sections)")
 
     return 1 if errors else 0
 
@@ -224,6 +258,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
 # ---------------------------------------------------------------------------
 # Subcommand CLI — one entry point that dispatches to per-module mains.
 # ---------------------------------------------------------------------------
+
 
 def main(argv: list[str] | None = None) -> int:
     """Dispatch to a subcommand. Backwards-compat: `python -m scripts.pipeline`
@@ -240,11 +275,11 @@ def main(argv: list[str] | None = None) -> int:
         return _run_end_to_end(rest)
 
     import importlib
+
     module_name = SUBCOMMANDS[sub][0]
     module = importlib.import_module(module_name)
     if not hasattr(module, "main"):
-        print(f"{module_name} has no main() — can't run subcommand `{sub}`",
-              file=sys.stderr)
+        print(f"{module_name} has no main() — can't run subcommand `{sub}`", file=sys.stderr)
         return 2
     # All module main()s accept argv as their first positional arg.
     return int(module.main(rest) or 0)

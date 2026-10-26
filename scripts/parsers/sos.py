@@ -39,7 +39,9 @@ def _normalize_county(series: pd.Series) -> pd.Series:
     return series.astype("string").str.strip().str.upper()
 
 
-def _parse_unified(df: pd.DataFrame, target_county: str, rejector: Rejector | None = None) -> pd.DataFrame:
+def _parse_unified(
+    df: pd.DataFrame, target_county: str, rejector: Rejector | None = None
+) -> pd.DataFrame:
     """2004-2010 schema: one Votes column, candidates and Yes/No mixed."""
     # Standardize column names.
     rename = {}
@@ -72,12 +74,15 @@ def _parse_unified(df: pd.DataFrame, target_county: str, rejector: Rejector | No
     out["active_voters"] = pd.NA
     out["ballots_cast"] = pd.NA
     out["contest_type"] = [
-        infer_contest_type(c, ch) for c, ch in zip(out["contest"], out["candidate_or_option"], strict=True)
+        infer_contest_type(c, ch)
+        for c, ch in zip(out["contest"], out["candidate_or_option"], strict=True)
     ]
     return out
 
 
-def _parse_split(df: pd.DataFrame, target_county: str, rejector: Rejector | None = None) -> pd.DataFrame:
+def _parse_split(
+    df: pd.DataFrame, target_county: str, rejector: Rejector | None = None
+) -> pd.DataFrame:
     """2012-2020 schema: candidate votes vs. yes/no votes in separate columns.
 
     Every row in these files has all three vote columns filled, with ``0``
@@ -139,8 +144,11 @@ def _parse_split(df: pd.DataFrame, target_county: str, rejector: Rejector | None
     pair = (
         sub[named]
         .groupby(["_contest", "_candidate"], dropna=False)
-        .agg(yn=("_yn_total", "sum"), cv=("_cv_total", "sum"),
-             has_party=("_party", lambda s: s.notna().any()))
+        .agg(
+            yn=("_yn_total", "sum"),
+            cv=("_cv_total", "sum"),
+            has_party=("_party", lambda s: s.notna().any()),
+        )
     )
 
     def _is_yesno(r) -> bool:
@@ -151,7 +159,9 @@ def _parse_split(df: pd.DataFrame, target_county: str, rejector: Rejector | None
         return bool(RETENTION_RE.search(str(r.name[0])))
 
     yesno_pairs = {k for k, r in pair.iterrows() if _is_yesno(r)}
-    pair_key = pd.Series(list(zip(sub["_contest"], sub["_candidate"], strict=True)), index=sub.index)
+    pair_key = pd.Series(
+        list(zip(sub["_contest"], sub["_candidate"], strict=True)), index=sub.index
+    )
     is_yesno_row = ~named | pair_key.map(lambda k: k in yesno_pairs)
 
     rows: list[pd.DataFrame] = []
@@ -221,12 +231,18 @@ def parse(path: Path, meta: SourceMeta, target_county: str = "Boulder") -> pd.Da
     # detail. They don't fit the harmonized schema, so we emit an empty frame
     # with a provenance note so downstream tools know we saw the file but
     # couldn't extract candidate rows.
-    candidate_cols = {"candidate", "candidate/yes or no", "office/issue/judgeship",
-                      "office/ballot issue", "office/question"}
+    candidate_cols = {
+        "candidate",
+        "candidate/yes or no",
+        "office/issue/judgeship",
+        "office/ballot issue",
+        "office/question",
+    }
     if not (cols & candidate_cols):
         empty = pd.DataFrame()
         return add_provenance(
-            empty, meta,
+            empty,
+            meta,
             extraction_notes=(
                 f"{path.name} is a turnout-only file (no candidate or contest "
                 "columns); harmonized schema requires candidate-level detail. "

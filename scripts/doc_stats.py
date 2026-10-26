@@ -42,11 +42,16 @@ from .config import (
     sov_csv_path,
 )
 
-DOCS = [REPO_ROOT / "README.md", REPO_ROOT / "AGENTS.md",
-        REPO_ROOT / "docs" / "data-dictionary.md", REPO_ROOT / "docs" / "architecture-review.md"]
+DOCS = [
+    REPO_ROOT / "README.md",
+    REPO_ROOT / "AGENTS.md",
+    REPO_ROOT / "docs" / "data-dictionary.md",
+    REPO_ROOT / "docs" / "architecture-review.md",
+]
 
-_MARKER = re.compile(r"(<!-- generated:(?P<name>[a-z-]+) -->)(?P<body>.*?)(<!-- /generated:(?P=name) -->)",
-                     re.DOTALL)
+_MARKER = re.compile(
+    r"(<!-- generated:(?P<name>[a-z-]+) -->)(?P<body>.*?)(<!-- /generated:(?P=name) -->)", re.DOTALL
+)
 
 
 def _mb(path: Path) -> str | None:
@@ -55,8 +60,13 @@ def _mb(path: Path) -> str | None:
 
 def count_tests() -> str | None:
     try:
-        out = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-q"],
-                             cwd=REPO_ROOT, capture_output=True, text=True, check=False).stdout
+        out = subprocess.run(
+            [sys.executable, "-m", "pytest", "--collect-only", "-q"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        ).stdout
     except OSError:
         return None
     m = re.search(r"(\d+) tests? collected", out)
@@ -71,22 +81,31 @@ def sov_table() -> str | None:
     quality = {}
     if PROVENANCE_CSV.exists():
         prov = pd.read_csv(PROVENANCE_CSV, dtype=str)
-        quality = {(r.election_year, r.election_type, r.data_source): r.extraction_quality
-                   for r in prov.itertuples(index=False)}
-    rows = ["| Year | Source | Election | Rows | Contests | Precincts | Pseudo-precinct rows | Quality |",
-            "|---|---|---|---|---|---|---|---|"]
+        quality = {
+            (r.election_year, r.election_type, r.data_source): r.extraction_quality
+            for r in prov.itertuples(index=False)
+        }
+    rows = [
+        "| Year | Source | Election | Rows | Contests | Precincts | Pseudo-precinct rows | Quality |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
     found = False
     for s in sorted(SOURCES, key=lambda s: (s.year, s.data_source)):
         p = sov_csv_path(s.year, s.election_type, s.data_source)
         if not p.exists():
             continue
         found = True
-        df = pd.read_csv(p, dtype={"precinct_id": "string", "is_pseudo_precinct": "boolean"},
-                         usecols=["contest", "precinct_id", "is_pseudo_precinct"])
+        df = pd.read_csv(
+            p,
+            dtype={"precinct_id": "string", "is_pseudo_precinct": "boolean"},
+            usecols=["contest", "precinct_id", "is_pseudo_precinct"],
+        )
         q = quality.get((str(s.year), s.election_type, s.data_source), "—")
-        rows.append(f"| {s.year} | {_label(s.data_source)} | {s.election_type} | {len(df):,} | "
-                    f"{df['contest'].nunique()} | {df['precinct_id'].nunique()} | "
-                    f"{int(df['is_pseudo_precinct'].sum()):,} | `{q}` |")
+        rows.append(
+            f"| {s.year} | {_label(s.data_source)} | {s.election_type} | {len(df):,} | "
+            f"{df['contest'].nunique()} | {df['precinct_id'].nunique()} | "
+            f"{int(df['is_pseudo_precinct'].sum()):,} | `{q}` |"
+        )
     return "\n" + "\n".join(rows) + "\n" if found else None
 
 
@@ -115,12 +134,14 @@ def rewrite(text: str, vals: dict[str, str | None]) -> str:
     def repl(m: re.Match) -> str:
         v = vals.get(m.group("name"))
         return m.group(0) if v is None else f"{m.group(1)}{v}{m.group(4)}"
+
     return _MARKER.sub(repl, text)
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("--check", action="store_true", help="Report stale values; don't write")
     args = ap.parse_args(argv)
     vals = values()

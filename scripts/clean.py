@@ -26,11 +26,11 @@ from .config import (
     MANIFEST_PATH,
     ORIGINAL,
     PROVENANCE_CSV,
-    REPO_ROOT,
     SECRETARY_OF_STATE,
     SOURCES,
     STATEMENTS_OF_VOTES,
     Source,
+    display_path,
     original_path,
     sov_csv_path,
 )
@@ -62,8 +62,11 @@ def _recorded_retrieved_at() -> dict[tuple[str, str], str]:
     if not PROVENANCE_CSV.exists():
         return {}
     prov = pd.read_csv(PROVENANCE_CSV, dtype=str, keep_default_na=False)
-    return {(r.data_source, r.source_file): r.retrieved_at
-            for r in prov.itertuples(index=False) if r.retrieved_at}
+    return {
+        (r.data_source, r.source_file): r.retrieved_at
+        for r in prov.itertuples(index=False)
+        if r.retrieved_at
+    }
 
 
 def _retrieved_at_for(source_file: str, data_source: str) -> str:
@@ -141,12 +144,14 @@ def write_csv(df: pd.DataFrame, dest: Path) -> None:
     instead, which the pipeline regenerates from the in-memory frames.
     """
     from .schema import to_csv_frame
+
     dest.parent.mkdir(parents=True, exist_ok=True)
     to_csv_frame(df).to_csv(dest, index=False)
 
 
 def _election_arg(value: str) -> tuple[int, str]:
     from .sources import parse_election_key
+
     try:
         return parse_election_key(value)
     except ValueError as e:
@@ -156,16 +161,25 @@ def _election_arg(value: str) -> tuple[int, str]:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--year", type=int, help="Only this year")
-    ap.add_argument("-e", "--election", type=_election_arg, metavar="KEY",
-                    help="Only this election, as an election key, e.g. 2024-general")
+    ap.add_argument(
+        "-e",
+        "--election",
+        type=_election_arg,
+        metavar="KEY",
+        help="Only this election, as an election key, e.g. 2024-general",
+    )
     ap.add_argument("--since", type=int, help="This year and later")
-    ap.add_argument("--source",
-                    choices=["boulder_county", "secretary_of_state", "all"],
-                    default="all")
-    ap.add_argument("--no-pdf", action="store_true",
-                    help="Skip PDF-sourced years (2005/2007/2009). PDF parse can take minutes.")
-    ap.add_argument("--validate-only", action="store_true",
-                    help="Parse + validate but don't write CSVs.")
+    ap.add_argument(
+        "--source", choices=["boulder_county", "secretary_of_state", "all"], default="all"
+    )
+    ap.add_argument(
+        "--no-pdf",
+        action="store_true",
+        help="Skip PDF-sourced years (2005/2007/2009). PDF parse can take minutes.",
+    )
+    ap.add_argument(
+        "--validate-only", action="store_true", help="Parse + validate but don't write CSVs."
+    )
     args = ap.parse_args(argv)
 
     if args.source == "boulder_county":
@@ -206,7 +220,7 @@ def main(argv: list[str] | None = None) -> int:
                 write_csv(df, dest)
                 prov_rows.append(provenance_record(df, _meta_for(s)))
                 parsed.append((s.data_source, s.local_filename))
-                print(f"OK   {label}  rows={len(df):>6}  -> {dest.relative_to(REPO_ROOT)}")
+                print(f"OK   {label}  rows={len(df):>6}  -> {display_path(dest)}")
             else:
                 print(f"OK   {label}  rows={len(df):>6}  (validate-only)")
         except Exception as e:
@@ -220,8 +234,10 @@ def main(argv: list[str] | None = None) -> int:
         # rebuilt by `pipeline` (or shared_outputs.rebuild_combined()).
         shared_outputs.upsert_provenance(prov_rows)
         rej = shared_outputs.upsert_rejects(rejected, parsed)
-        print(f"updated {PROVENANCE_CSV.relative_to(REPO_ROOT)} ({len(prov_rows)} rows) and "
-              f"data/audit/rejected.csv ({len(rej)} rows)")
+        print(
+            f"updated {display_path(PROVENANCE_CSV)} ({len(prov_rows)} rows) and "
+            f"data/audit/rejected.csv ({len(rej)} rows)"
+        )
     elif len(rejected):
         print(f"  {len(rejected)} row(s) would be rejected", file=sys.stderr)
 

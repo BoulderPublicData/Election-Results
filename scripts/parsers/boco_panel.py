@@ -74,10 +74,18 @@ def _find_panel_starts(raw: pd.DataFrame) -> list[int]:
 
 
 _BOILERPLATE_PREFIXES = (
-    "precinct", "early voting", "election day", "absentee",
-    "total number of voters", "precincts reporting",
-    "boulder county", "canvass report", "general election",
-    "coordinated election", "primary election", "page ",
+    "precinct",
+    "early voting",
+    "election day",
+    "absentee",
+    "total number of voters",
+    "precincts reporting",
+    "boulder county",
+    "canvass report",
+    "general election",
+    "coordinated election",
+    "primary election",
+    "page ",
 )
 
 
@@ -114,6 +122,7 @@ def _contest_title(raw: pd.DataFrame, start: int) -> str:
 # ---------------------------------------------------------------------------
 # Header labels
 # ---------------------------------------------------------------------------
+
 
 def _label_kind(label: str) -> str:
     """Classify a cleaned header label: precinct / ballots_cast / active_voters /
@@ -155,31 +164,56 @@ _PARTY_CODES = {k for k in PARTY_MAP if re.fullmatch(r"[A-Z]{2,4}", k)} | {"NR"}
 
 # Full party names that trail a label, as printed (some are truncated by the
 # export). Longest first so "American Constitution" wins over "Constitution".
-_TRAILING_PARTY_NAMES = sorted({
-    "Democratic", "Republican", "Libertarian", "Green", "Unaffiliated", "Unity",
-    "Constitution", "American Constitution", "American", "Prohibition",
-    "Socialist Workers", "Boston Tea", "America's", "Socialism and",
-    "U.S. Pacifist", "Socialist, USA", "Objectivist", "HeartQuake '08",
-    "Justice", "Peace and Freedom", "American Third", "We the People",
-    "Socialist Equality", "Independent /",
-}, key=len, reverse=True)
+_TRAILING_PARTY_NAMES = sorted(
+    {
+        "Democratic",
+        "Republican",
+        "Libertarian",
+        "Green",
+        "Unaffiliated",
+        "Unity",
+        "Constitution",
+        "American Constitution",
+        "American",
+        "Prohibition",
+        "Socialist Workers",
+        "Boston Tea",
+        "America's",
+        "Socialism and",
+        "U.S. Pacifist",
+        "Socialist, USA",
+        "Objectivist",
+        "HeartQuake '08",
+        "Justice",
+        "Peace and Freedom",
+        "American Third",
+        "We the People",
+        "Socialist Equality",
+        "Independent /",
+    },
+    key=len,
+    reverse=True,
+)
 
 # Labels the export truncated, resolved per year against the SOS file for the
 # same election (which prints the party in full).
 _TRUNCATED_PARTY: dict[int, dict[str, str]] = {
-    2008: {"America's": "America's Independent",           # Alan Keyes
-           "Socialism and": "Socialism and Liberation"},
-    2010: {"Not": "NR"},                                     # Peter J. Carr (SOS: NR)
-    2012: {"America's": "America's Party",                   # Tom Hoefling
-           "Socialism and": "Socialism and Liberation",
-           "American Third": "American Third Position",
-           "American": "American Constitution",              # Virgil H. Goode Jr.
-           "Independent /": "Independent / Republican"},     # Randall Terry
+    2008: {
+        "America's": "America's Independent",  # Alan Keyes
+        "Socialism and": "Socialism and Liberation",
+    },
+    2010: {"Not": "NR"},  # Peter J. Carr (SOS: NR)
+    2012: {
+        "America's": "America's Party",  # Tom Hoefling
+        "Socialism and": "Socialism and Liberation",
+        "American Third": "American Third Position",
+        "American": "American Constitution",  # Virgil H. Goode Jr.
+        "Independent /": "Independent / Republican",
+    },  # Randall Terry
 }
 
 _LEADING_CODE_RE = re.compile(r"^\s*([A-Z]{2,4})\s*[\r\n]+\s*(.+?)\s*$", re.DOTALL)
-_TRAILING_CODE_RE = re.compile(
-    r"^(.+?)\s+-\s+([A-Za-z]{2,4}(?:\s*/\s*[A-Z]{2,4})*)\s*$", re.DOTALL)
+_TRAILING_CODE_RE = re.compile(r"^(.+?)\s+-\s+([A-Za-z]{2,4}(?:\s*/\s*[A-Z]{2,4})*)\s*$", re.DOTALL)
 
 
 def split_party(label: str, year: int | None = None) -> tuple[str, object]:
@@ -252,7 +286,7 @@ class Panel:
     start: int
     contest: str
     labels: list[str]
-    rows: list[tuple[int, list[object]]] = field(default_factory=list)   # (raw row, cells)
+    rows: list[tuple[int, list[object]]] = field(default_factory=list)  # (raw row, cells)
     totals: list[object] | None = None
     bad_rows: list[tuple[int, list[object]]] = field(default_factory=list)
 
@@ -292,7 +326,7 @@ def walk_panels(raw: pd.DataFrame) -> list[Panel]:
         else:
             last_title = title
         panel = Panel(start=start, contest=title, labels=_header_labels(raw, start))
-        pending: tuple[int, object] | None = None   # precinct printed alone
+        pending: tuple[int, object] | None = None  # precinct printed alone
         for i in range(start + 1, stop):
             row_i = i
             cells = _row_cells(list(values[i]))
@@ -313,8 +347,10 @@ def walk_panels(raw: pd.DataFrame) -> list[Panel]:
                     # Banner / title / footer text — unless it is a full-width
                     # row of numbers under a non-numeric code: the property-
                     # owner pseudo-precincts ("FMFPD", 2010) of special districts.
-                    if not (len(cells) == len(panel.labels)
-                            and all(_to_number(c) is not None for c in cells[1:])):
+                    if not (
+                        len(cells) == len(panel.labels)
+                        and all(_to_number(c) is not None for c in cells[1:])
+                    ):
                         continue
                 if len(cells) == 1:
                     pending = (i, cells[0])
@@ -340,7 +376,9 @@ def _panel_frame(panel: Panel, year: int | None) -> pd.DataFrame:
     p_i = kinds.index("precinct")
     b_i = kinds.index("ballots_cast") if "ballots_cast" in kinds else None
     a_i = kinds.index("active_voters") if "active_voters" in kinds else None
-    cand = [(j, *split_party(panel.labels[j], year)) for j, k in enumerate(kinds) if k == "candidate"]
+    cand = [
+        (j, *split_party(panel.labels[j], year)) for j, k in enumerate(kinds) if k == "candidate"
+    ]
     recs = []
     for row_i, cells in panel.rows:
         precinct = str(cells[p_i]).strip()
@@ -349,17 +387,19 @@ def _panel_frame(panel: Panel, year: int | None) -> pd.DataFrame:
         ballots = _to_number(cells[b_i]) if b_i is not None else None
         active = _to_number(cells[a_i]) if a_i is not None else None
         for j, name, party in cand:
-            recs.append({
-                "_row": row_i,
-                "precinct_id": precinct,
-                "precinct_name": pd.NA,
-                "contest": panel.contest,
-                "candidate_or_option": name,
-                "party": party,
-                "votes": _to_number(cells[j]),
-                "active_voters": active,
-                "ballots_cast": ballots,
-            })
+            recs.append(
+                {
+                    "_row": row_i,
+                    "precinct_id": precinct,
+                    "precinct_name": pd.NA,
+                    "contest": panel.contest,
+                    "candidate_or_option": name,
+                    "party": party,
+                    "votes": _to_number(cells[j]),
+                    "active_voters": active,
+                    "ballots_cast": ballots,
+                }
+            )
     return pd.DataFrame(recs)
 
 
@@ -376,8 +416,14 @@ def published_totals(path: Path, year: int | None = None) -> pd.DataFrame:
             if k != "candidate":
                 continue
             name, party = split_party(panel.labels[j], year)
-            recs.append({"contest": panel.contest, "candidate_or_option": name,
-                         "party": party, "votes": _to_number(panel.totals[j])})
+            recs.append(
+                {
+                    "contest": panel.contest,
+                    "candidate_or_option": name,
+                    "party": party,
+                    "votes": _to_number(panel.totals[j]),
+                }
+            )
     if not recs:
         return pd.DataFrame(columns=["contest", "candidate_or_option", "party", "votes"])
     return pd.DataFrame(recs)
@@ -405,8 +451,10 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
             rejector.add(
                 row_index=f"row {row_i + 1}",
                 reason="panel_row_width_mismatch",
-                detail=(f"{panel.contest}: {len(cells)} values for {len(panel.labels)} "
-                        "header labels; not aligned"),
+                detail=(
+                    f"{panel.contest}: {len(cells)} values for {len(panel.labels)} "
+                    "header labels; not aligned"
+                ),
                 raw_row={"cells": [str(c) for c in cells]},
             )
         f = _panel_frame(panel, meta.election_year)
@@ -437,18 +485,22 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
     dup = final.duplicated(key, keep=False)
     if dup.any():
         for rec in final[dup].to_dict("records"):
-            rejector.add(row_index=f"{rec['precinct_id']}|{rec['contest']}",
-                         reason="duplicate_key",
-                         detail="same precinct/contest/candidate in two panels",
-                         raw_row={k: v for k, v in rec.items() if pd.notna(v)})
+            rejector.add(
+                row_index=f"{rec['precinct_id']}|{rec['contest']}",
+                reason="duplicate_key",
+                detail="same precinct/contest/candidate in two panels",
+                raw_row={k: v for k, v in rec.items() if pd.notna(v)},
+            )
         final = final[~dup]
         notes.append(f"{int(dup.sum())} rows with duplicate keys rejected")
 
     if n_bad:
         notes.append(f"{n_bad} panel row(s) whose width didn't match the header were rejected")
     if final["precinct_id"].astype("string").str.match(_LANDOWNER_RE).any():
-        notes.append("includes 'Landowner' pseudo-precinct rows (property-owner ballots in "
-                     "special-district contests; no precinct geography)")
+        notes.append(
+            "includes 'Landowner' pseudo-precinct rows (property-owner ballots in "
+            "special-district contests; no precinct geography)"
+        )
     if (final["contest"].astype("string").str.startswith("<unknown contest")).any():
         n = (final["contest"].astype("string").str.startswith("<unknown contest")).sum()
         notes.append(f"{n} rows have unknown contest title — review needed")

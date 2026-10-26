@@ -13,7 +13,7 @@ import json
 from datetime import UTC, datetime
 
 from .concepts import CONCEPTS
-from .config import ELECTION_DATES, LOOKUPS, REPO_ROOT
+from .config import ELECTION_DATES, LOOKUPS, display_path
 from .config import SOURCES as ALL_SOURCES
 from .parsers.common import CHOICE_MAP, PARTY_MAP
 from .schema import (
@@ -140,11 +140,20 @@ def export_schema() -> None:
             {"value": "measure", "description": "Yes/No ballot measure, referendum, or amendment."},
             {"value": "retention", "description": "Judicial retention (Yes/No to retain a judge)."},
             {"value": "recall", "description": "Recall question (Yes/No)."},
-            {"value": "ranked_choice", "description": "RCV contest — candidate_or_option suffixed with `| Round N` or `| Final`."},
+            {
+                "value": "ranked_choice",
+                "description": "RCV contest — candidate_or_option suffixed with `| Round N` or `| Final`.",
+            },
         ],
         "extraction_quality_values": [
-            {"value": "machine_readable", "description": "Parsed from XLS/XLSX with structured columns."},
-            {"value": "pdf_text_layer", "description": "Parsed from a PDF text layer via pdfplumber; contest titles + candidate names extracted, but spot-check against source PDF before publishing."},
+            {
+                "value": "machine_readable",
+                "description": "Parsed from XLS/XLSX with structured columns.",
+            },
+            {
+                "value": "pdf_text_layer",
+                "description": "Parsed from a PDF text layer via pdfplumber; contest titles + candidate names extracted, but spot-check against source PDF before publishing.",
+            },
             {"value": "pdf_ocr", "description": "Reserved — not currently produced."},
             {"value": "manual", "description": "Reserved — for hand-entered records."},
         ],
@@ -165,11 +174,16 @@ def export_vote_counting_schema() -> None:
         ),
         "$generated_by": "scripts/export_lookups.py from scripts/schema.py",
         "$generated_at": _now(),
-        "contests": {"file": "data/processed/vote-counting/vote-counting-contests.csv",
-                     "columns": VOTE_COUNTING_COLUMNS, "dtypes": VOTE_COUNTING_DTYPES},
-        "summary": {"file": "data/processed/vote-counting/vote-counting-summary.csv",
-                    "columns": VOTE_COUNTING_SUMMARY_COLUMNS,
-                    "dtypes": VOTE_COUNTING_SUMMARY_DTYPES},
+        "contests": {
+            "file": "data/processed/vote-counting/vote-counting-contests.csv",
+            "columns": VOTE_COUNTING_COLUMNS,
+            "dtypes": VOTE_COUNTING_DTYPES,
+        },
+        "summary": {
+            "file": "data/processed/vote-counting/vote-counting-summary.csv",
+            "columns": VOTE_COUNTING_SUMMARY_COLUMNS,
+            "dtypes": VOTE_COUNTING_SUMMARY_DTYPES,
+        },
     }
     (LOOKUPS / "vote-counting-schema.json").write_text(json.dumps(payload, indent=2) + "\n")
 
@@ -202,7 +216,7 @@ def main(argv: list[str] | None = None) -> int:
     export_schema()
     export_concepts()
     export_vote_counting_schema()
-    print(f"wrote 7 lookup files under {LOOKUPS.relative_to(REPO_ROOT)}/")
+    print(f"wrote 7 lookup files under {display_path(LOOKUPS)}/")
     return 0
 
 

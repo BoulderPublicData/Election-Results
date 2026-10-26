@@ -46,21 +46,18 @@ SOS_ARCHIVES_PAGE = "https://www.coloradosos.gov/pubs/elections/Results/Archives
 # Filename patterns that identify a real Statement of Votes file. We accept
 # .xlsx, .xls, and .pdf so historical years still work. We *reject* summary,
 # canvass, sample-ballot, TABOR, and similar publications.
-_BOCO_FILENAME_RE = re.compile(
-    r"(?i)/(\d{4})[^/]*statement.of.vote[^/]*\.(xls|xlsx|pdf)$"
-)
+_BOCO_FILENAME_RE = re.compile(r"(?i)/(\d{4})[^/]*statement.of.vote[^/]*\.(xls|xlsx|pdf)$")
 # "recount" is NOT rejected: the registered 2023 file is a Recount SoV, and a
 # recount (or amended) SoV supersedes the original when both are published —
 # see discover_boulder_county's ranking.
-_BOCO_REJECT_RE = re.compile(
-    r"(?i)(summary|sample|tabor|canvass|notice|cvr|cure)"
-)
+_BOCO_REJECT_RE = re.compile(r"(?i)(summary|sample|tabor|canvass|notice|cvr|cure)")
 _SUPERSEDING_RE = re.compile(r"(?i)(recount|amended)")
 
 _SOS_FILENAME_RE = re.compile(
     r"(?i)/(\d{4})/?\d*(General|Coordinated|Primary)?[A-Za-z]*"
     r"(Precinct|Turnout|BallotsCast)[A-Za-z]*\.xlsx?$"
 )
+
 
 def _fetch_html(url: str) -> str:
     """Fetch a page via the shared cached+retrying HTTP session."""
@@ -150,12 +147,17 @@ def discover_boulder_county(
         rank = (ext == "pdf", not _SUPERSEDING_RE.search(url), fmt_rank.get(ext, 99))
         key = (year, etype)
         src = Source(
-            year=year, election_type=etype, data_source="boulder_county",
-            url=url, local_filename=f"{year}-{etype}-sov.{ext}",
+            year=year,
+            election_type=etype,
+            data_source="boulder_county",
+            url=url,
+            local_filename=f"{year}-{etype}-sov.{ext}",
         )
         if key not in candidates or rank < candidates[key][0]:
             candidates[key] = (rank, src)
-    return [src for _, src in sorted(candidates.values(), key=lambda x: (x[1].year, x[1].election_type))]
+    return [
+        src for _, src in sorted(candidates.values(), key=lambda x: (x[1].year, x[1].election_type))
+    ]
 
 
 def discover_secretary_of_state(
@@ -183,10 +185,15 @@ def discover_secretary_of_state(
             continue
         seen.add(key)
         filename = f"{year}-{etype}-precinct-results.xlsx"
-        out.append(Source(
-            year=year, election_type=etype, data_source="secretary_of_state",
-            url=url, local_filename=filename,
-        ))
+        out.append(
+            Source(
+                year=year,
+                election_type=etype,
+                data_source="secretary_of_state",
+                url=url,
+                local_filename=filename,
+            )
+        )
     return out
 
 
@@ -196,8 +203,9 @@ def discover(
     sos_html: str | None = None,
     years: Iterable[int] | None = None,
 ) -> list[Source]:
-    return discover_boulder_county(html=boco_html, years=years) + \
-           discover_secretary_of_state(html=sos_html, years=years)
+    return discover_boulder_county(html=boco_html, years=years) + discover_secretary_of_state(
+        html=sos_html, years=years
+    )
 
 
 def merge_with_registry(
@@ -214,6 +222,7 @@ def merge_with_registry(
     have been verified, and discovery URLs can change as the upstream sites
     are reorganized.
     """
+
     def key(s: Source) -> tuple[int, str, str]:
         return (s.year, s.election_type, s.data_source)
 
@@ -228,6 +237,7 @@ def merge_with_registry(
 
 def _election_arg(value: str) -> tuple[int, str]:
     from .sources import parse_election_key
+
     try:
         return parse_election_key(value)
     except ValueError as e:
@@ -237,17 +247,26 @@ def _election_arg(value: str) -> tuple[int, str]:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--year", type=int, help="Only consider this year")
-    ap.add_argument("-e", "--election", type=_election_arg, metavar="KEY",
-                    help="Only this election, as an election key, e.g. 2024-general")
+    ap.add_argument(
+        "-e",
+        "--election",
+        type=_election_arg,
+        metavar="KEY",
+        help="Only this election, as an election key, e.g. 2024-general",
+    )
     ap.add_argument("--since", type=int, help="This year and later")
-    ap.add_argument("--source",
-                    choices=["boulder_county", "secretary_of_state", "all"],
-                    default="all")
-    ap.add_argument("--all", action="store_true",
-                    help="Include sources already in the static registry "
-                         "(default: only show newly discovered entries)")
-    ap.add_argument("--json", action="store_true",
-                    help="Emit JSON instead of the human-readable summary")
+    ap.add_argument(
+        "--source", choices=["boulder_county", "secretary_of_state", "all"], default="all"
+    )
+    ap.add_argument(
+        "--all",
+        action="store_true",
+        help="Include sources already in the static registry "
+        "(default: only show newly discovered entries)",
+    )
+    ap.add_argument(
+        "--json", action="store_true", help="Emit JSON instead of the human-readable summary"
+    )
     args = ap.parse_args(argv)
 
     try:
@@ -272,6 +291,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.json:
         import json
+
         payload = [dataclasses.asdict(s) for s in new_sources]
         print(json.dumps(payload, indent=2))
     else:

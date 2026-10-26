@@ -100,6 +100,7 @@ def _match_canonical(text: object, patterns: list[ContestPattern]) -> str | None
 
 # ----- Original-file readers (lightweight; just enough to sum totals) -----
 
+
 def _read_sos_original(path: Path) -> pd.DataFrame | None:
     """SOS files are already long-form; just need to load and filter Boulder.
     Returns None for turnout-only files (no contest column), which have no
@@ -127,8 +128,11 @@ def _read_sos_original(path: Path) -> pd.DataFrame | None:
     contest = sub[contest_col].astype("string").str.strip().fillna("")
     cand_col = cols.get("candidate") or cols.get("candidate/yes or no")
 
-    cand = (sub[cand_col].astype("string").str.strip().replace("", pd.NA)
-            if cand_col else pd.Series(pd.NA, index=sub.index, dtype="string"))
+    cand = (
+        sub[cand_col].astype("string").str.strip().replace("", pd.NA)
+        if cand_col
+        else pd.Series(pd.NA, index=sub.index, dtype="string")
+    )
 
     # One frame per vote column, keyed the way the harmonized data keys them.
     # Candidate votes keep the candidate's name. Yes/No columns become
@@ -140,20 +144,32 @@ def _read_sos_original(path: Path) -> pd.DataFrame | None:
     frames: list[pd.DataFrame] = []
     if votes_col:
         m = sub[votes_col].notna()
-        frames.append(pd.DataFrame({
-            "contest": contest[m],
-            "candidate_or_option": cand[m].fillna("") if cand_col else "",
-            "party": sub.loc[m, party_col].astype("string").str.strip() if party_col else None,
-            "votes": pd.to_numeric(sub.loc[m, votes_col], errors="coerce"),
-        }))
+        frames.append(
+            pd.DataFrame(
+                {
+                    "contest": contest[m],
+                    "candidate_or_option": cand[m].fillna("") if cand_col else "",
+                    "party": sub.loc[m, party_col].astype("string").str.strip()
+                    if party_col
+                    else None,
+                    "votes": pd.to_numeric(sub.loc[m, votes_col], errors="coerce"),
+                }
+            )
+        )
     yn_contest = contest.where(cand.isna(), contest + " - " + cand.fillna(""))
     for col, label in ((yes_col, "Yes"), (no_col, "No")):
         if col:
             m = sub[col].notna()
-            frames.append(pd.DataFrame({
-                "contest": yn_contest[m], "candidate_or_option": label, "party": None,
-                "votes": pd.to_numeric(sub.loc[m, col], errors="coerce"),
-            }))
+            frames.append(
+                pd.DataFrame(
+                    {
+                        "contest": yn_contest[m],
+                        "candidate_or_option": label,
+                        "party": None,
+                        "votes": pd.to_numeric(sub.loc[m, col], errors="coerce"),
+                    }
+                )
+            )
     if not frames:
         return pd.DataFrame(columns=["contest", "candidate_or_option", "party", "votes"])
     return pd.concat(frames, ignore_index=True)
@@ -178,12 +194,16 @@ def _read_boco_tidy_original(path: Path) -> pd.DataFrame:
         votes_col = cols_lower.get("total votes")
         if not (contest_col and choice_col and votes_col):
             continue
-        out = pd.DataFrame({
-            "contest": df[contest_col].astype("string").str.strip(),
-            "candidate_or_option": df[choice_col].astype("string").str.strip(),
-            "party": df[cols_lower["party"]].astype("string").str.strip() if "party" in cols_lower else None,
-            "votes": pd.to_numeric(df[votes_col], errors="coerce"),
-        })
+        out = pd.DataFrame(
+            {
+                "contest": df[contest_col].astype("string").str.strip(),
+                "candidate_or_option": df[choice_col].astype("string").str.strip(),
+                "party": df[cols_lower["party"]].astype("string").str.strip()
+                if "party" in cols_lower
+                else None,
+                "votes": pd.to_numeric(df[votes_col], errors="coerce"),
+            }
+        )
         frames.append(out.dropna(subset=["contest", "candidate_or_option"]))
     if not frames:
         return pd.DataFrame(columns=["contest", "candidate_or_option", "party", "votes"])
@@ -223,8 +243,9 @@ def _read_processed(source: Source) -> pd.DataFrame | None:
 _MISSING = object()
 
 
-def reconcile_source(source: Source, patterns: list[ContestPattern],
-                     orig: object = _MISSING) -> pd.DataFrame:
+def reconcile_source(
+    source: Source, patterns: list[ContestPattern], orig: object = _MISSING
+) -> pd.DataFrame:
     """Return a per-canonical-contest reconciliation frame for one source.
     Pass `orig` (from _read_original) to avoid re-reading the raw file."""
     proc = _read_processed(source)
@@ -247,8 +268,9 @@ def reconcile_source(source: Source, patterns: list[ContestPattern],
     )
     proc_sum = (
         proc_for_sum.dropna(subset=["canonical"])
-            .groupby("canonical")["votes"].sum()
-            .astype("Int64")
+        .groupby("canonical")["votes"]
+        .sum()
+        .astype("Int64")
     )
 
     if orig is None:
@@ -260,9 +282,7 @@ def reconcile_source(source: Source, patterns: list[ContestPattern],
     else:
         orig = orig.assign(canonical=orig["contest"].map(lambda t: _match_canonical(t, patterns)))
         orig_sum = (
-            orig.dropna(subset=["canonical"])
-                .groupby("canonical")["votes"].sum()
-                .astype("Int64")
+            orig.dropna(subset=["canonical"]).groupby("canonical")["votes"].sum().astype("Int64")
         )
         out = pd.concat(
             [orig_sum.rename("original_total"), proc_sum.rename("processed_total")],
@@ -272,17 +292,30 @@ def reconcile_source(source: Source, patterns: list[ContestPattern],
         out["status"] = out["delta"].apply(
             lambda d: "match" if d == 0 else ("near_match" if abs(int(d)) < 50 else "mismatch")
         )
-        out.loc[out["original_total"].isna() & out["processed_total"].isna(), "status"] = "not_in_file"
+        out.loc[out["original_total"].isna() & out["processed_total"].isna(), "status"] = (
+            "not_in_file"
+        )
 
     out = out.reset_index().rename(columns={"index": "canonical"})
     out["year"] = source.year
     out["election_type"] = source.election_type
     out["data_source"] = source.data_source
-    return out[["year", "election_type", "data_source", "canonical",
-                "original_total", "processed_total", "delta", "status"]]
+    return out[
+        [
+            "year",
+            "election_type",
+            "data_source",
+            "canonical",
+            "original_total",
+            "processed_total",
+            "delta",
+            "status",
+        ]
+    ]
 
 
 # ----- Contest × candidate reconciliation -----
+
 
 def _status(delta: int) -> str:
     return "match" if delta == 0 else ("near_match" if abs(int(delta)) < 50 else "mismatch")
@@ -300,7 +333,8 @@ def _final_rcv_only(proc: pd.DataFrame) -> pd.DataFrame:
     final = opt.str.contains(r"\|\s*Final\s*$", na=False, regex=True)
     out = proc[~rcv | final].copy()
     out.loc[rcv & final, "candidate_or_option"] = opt[rcv & final].str.replace(
-        r"\s*\|\s*Final\s*$", "", regex=True)
+        r"\s*\|\s*Final\s*$", "", regex=True
+    )
     return out
 
 
@@ -314,16 +348,30 @@ def structural_checks(proc: pd.DataFrame) -> dict[str, object]:
     plain = proc[proc["contest_type"] != "ranked_choice"]
     opts = plain.groupby("contest")["candidate_or_option"].agg(lambda s: set(s.dropna()))
     mixed = sorted(c for c, v in opts.items() if (v & {"Yes", "No"}) and (v - {"Yes", "No"}))
-    return {"duplicate_keys": dup, "mixed_contests": len(mixed),
-            "mixed_examples": "; ".join(mixed[:3])}
+    return {
+        "duplicate_keys": dup,
+        "mixed_contests": len(mixed),
+        "mixed_examples": "; ".join(mixed[:3]),
+    }
 
 
-CANDIDATE_COLUMNS = ["year", "election_type", "data_source", "contest", "candidate_or_option",
-                     "original_votes", "processed_votes", "delta", "status", "note"]
+CANDIDATE_COLUMNS = [
+    "year",
+    "election_type",
+    "data_source",
+    "contest",
+    "candidate_or_option",
+    "original_votes",
+    "processed_votes",
+    "delta",
+    "status",
+    "note",
+]
 
 
-def reconcile_candidates(source: Source, orig: object = _MISSING
-                         ) -> tuple[pd.DataFrame, dict[str, object]]:
+def reconcile_candidates(
+    source: Source, orig: object = _MISSING
+) -> tuple[pd.DataFrame, dict[str, object]]:
     """Contest × candidate comparison for one source.
 
     Returns (rows, checks): one row per (contest, candidate_or_option) key with
@@ -344,11 +392,14 @@ def reconcile_candidates(source: Source, orig: object = _MISSING
 
     def _keyed(df: pd.DataFrame) -> pd.DataFrame:
         df = df.dropna(subset=["contest", "candidate_or_option"])
-        df = df.assign(ck=df["contest"].map(_name_key),
-                       kk=df["candidate_or_option"].map(_option_key))
+        df = df.assign(
+            ck=df["contest"].map(_name_key), kk=df["candidate_or_option"].map(_option_key)
+        )
         return df.groupby(["ck", "kk"]).agg(
-            contest=("contest", "first"), candidate_or_option=("candidate_or_option", "first"),
-            votes=("votes", "sum"))
+            contest=("contest", "first"),
+            candidate_or_option=("candidate_or_option", "first"),
+            votes=("votes", "sum"),
+        )
 
     o = _keyed(orig)
     p = _keyed(_final_rcv_only(proc))
@@ -388,27 +439,36 @@ def candidate_markdown(cand: pd.DataFrame, checks: list[dict]) -> list[str]:
     by_file = {(c["year"], c["election_type"], c["data_source"]): c for c in checks}
     for k in sorted(by_file):
         c = by_file[k]
-        g = cand[(cand["year"] == k[0]) & (cand["election_type"] == k[1])
-                 & (cand["data_source"] == k[2])]
+        g = cand[
+            (cand["year"] == k[0]) & (cand["election_type"] == k[1]) & (cand["data_source"] == k[2])
+        ]
         n = g["status"].value_counts()
         if c.get("status") == "no_original":
             counts = "— | — | — | —"
         else:
-            counts = (f"{len(g):,} | {n.get('match', 0):,} | {n.get('near_match', 0):,} | "
-                      f"{n.get('mismatch', 0):,}")
-        lines.append(f"| {k[0]} {k[1]} {k[2]} | {counts} | {c['duplicate_keys']:,} | "
-                     f"{c['mixed_contests']:,} |")
+            counts = (
+                f"{len(g):,} | {n.get('match', 0):,} | {n.get('near_match', 0):,} | "
+                f"{n.get('mismatch', 0):,}"
+            )
+        lines.append(
+            f"| {k[0]} {k[1]} {k[2]} | {counts} | {c['duplicate_keys']:,} | "
+            f"{c['mixed_contests']:,} |"
+        )
     lines.append("")
     bad = cand[cand["status"] != "match"]
     if not bad.empty:
-        lines += [f"### Keys that differ ({len(bad):,})", "",
-                  "| file | contest | candidate / option | original | processed | delta | status |",
-                  "|---|---|---|---|---|---|---|"]
+        lines += [
+            f"### Keys that differ ({len(bad):,})",
+            "",
+            "| file | contest | candidate / option | original | processed | delta | status |",
+            "|---|---|---|---|---|---|---|",
+        ]
         for r in bad.head(200).itertuples(index=False):
             lines.append(
                 f"| {r.year} {r.election_type} {r.data_source} | {r.contest} | "
                 f"{r.candidate_or_option} | {r.original_votes:,} | {r.processed_votes:,} | "
-                f"{r.delta:+,} | `{r.status}`{' (' + r.note + ')' if r.note else ''} |")
+                f"{r.delta:+,} | `{r.status}`{' (' + r.note + ')' if r.note else ''} |"
+            )
         if len(bad) > 200:
             lines.append(f"| … {len(bad) - 200:,} more in the CSV | | | | | | |")
         lines.append("")
@@ -416,6 +476,7 @@ def candidate_markdown(cand: pd.DataFrame, checks: list[dict]) -> list[str]:
 
 
 # ----- Cross-source: Boulder County SoV vs. the SOS file for the same election -----
+
 
 def reconcile_cross_source() -> pd.DataFrame:
     """For each general election both sources publish, compare Boulder's and the
@@ -437,18 +498,29 @@ def reconcile_cross_source() -> pd.DataFrame:
         totals = []
         for df in (pb, ps):
             df = _final_rcv_only(df)
-            totals.append(df.assign(ck=df["contest"].map(_name_key),
-                                    kk=df["candidate_or_option"].map(_option_key))
-                          .groupby(["ck", "kk"])["votes"].sum())
+            totals.append(
+                df.assign(
+                    ck=df["contest"].map(_name_key), kk=df["candidate_or_option"].map(_option_key)
+                )
+                .groupby(["ck", "kk"])["votes"]
+                .sum()
+            )
         j = pd.concat(totals, axis=1, keys=["boulder", "sos"]).dropna()
         j = j[(j["boulder"] != 0) | (j["sos"] != 0)]
         d = (j["boulder"] - j["sos"]).abs()
-        rows.append({"year": b.year, "election_type": b.election_type,
-                     "keys_matched_by_name": len(j),
-                     "contests_matched_by_name": j.index.get_level_values(0).nunique(),
-                     "exact": int((d == 0).sum()), "near_match": int(((d > 0) & (d < 50)).sum()),
-                     "differ": int((d >= 50).sum()),
-                     "boulder_votes": int(j["boulder"].sum()), "sos_votes": int(j["sos"].sum())})
+        rows.append(
+            {
+                "year": b.year,
+                "election_type": b.election_type,
+                "keys_matched_by_name": len(j),
+                "contests_matched_by_name": j.index.get_level_values(0).nunique(),
+                "exact": int((d == 0).sum()),
+                "near_match": int(((d > 0) & (d < 50)).sum()),
+                "differ": int((d >= 50).sum()),
+                "boulder_votes": int(j["boulder"].sum()),
+                "sos_votes": int(j["sos"].sum()),
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -467,14 +539,17 @@ def cross_source_markdown(xs: pd.DataFrame) -> list[str]:
         "|---|---|---|---|---|---|---|---|",
     ]
     for r in xs.itertuples(index=False):
-        lines.append(f"| {r.year} {r.election_type} | {r.contests_matched_by_name} | "
-                     f"{r.keys_matched_by_name} | {r.exact} | {r.near_match} | {r.differ} | "
-                     f"{r.boulder_votes:,} | {r.sos_votes:,} |")
+        lines.append(
+            f"| {r.year} {r.election_type} | {r.contests_matched_by_name} | "
+            f"{r.keys_matched_by_name} | {r.exact} | {r.near_match} | {r.differ} | "
+            f"{r.boulder_votes:,} | {r.sos_votes:,} |"
+        )
     lines.append("")
     return lines
 
 
 # ----- Election-night snapshots vs. the certified Statement of Votes -----
+
 
 def _name_key(text: object) -> str:
     return re.sub(r"[^a-z0-9]", "", str(text).lower())
@@ -499,32 +574,47 @@ def reconcile_vote_counting() -> pd.DataFrame:
     web = pd.read_csv(path, low_memory=False)
     web = web[web["is_final_snapshot"].astype(bool)]
     # RCV: compare the final-round tallies (the SoV's '| Final' rows).
-    web = web[(web["contest_type"] != "ranked_choice")
-              | web["candidate_or_option"].str.endswith("| Final")]
+    web = web[
+        (web["contest_type"] != "ranked_choice")
+        | web["candidate_or_option"].str.endswith("| Final")
+    ]
 
     rows: list[dict] = []
     for (year, etype), w in web.groupby(["election_year", "election_type"]):
         sov_path = sov_csv_path(year, etype, "boulder_county")
         if not sov_path.exists():
             continue
-        sov = pd.read_csv(sov_path, low_memory=False,
-                          usecols=["contest", "contest_type", "candidate_or_option", "votes"])
-        sov = sov[(sov["contest_type"] != "ranked_choice")
-                  | sov["candidate_or_option"].astype("string").str.endswith("| Final")]
+        sov = pd.read_csv(
+            sov_path,
+            low_memory=False,
+            usecols=["contest", "contest_type", "candidate_or_option", "votes"],
+        )
+        sov = sov[
+            (sov["contest_type"] != "ranked_choice")
+            | sov["candidate_or_option"].astype("string").str.endswith("| Final")
+        ]
         # SoV candidate cells sometimes carry "Name  Party" (double space).
-        sov["cand_key"] = sov["candidate_or_option"].astype("string").str.split("  ").str[0] \
-            .map(_name_key)
+        sov["cand_key"] = (
+            sov["candidate_or_option"].astype("string").str.split("  ").str[0].map(_name_key)
+        )
         sov["contest_key"] = sov["contest"].map(_name_key)
         sov_tot = sov.groupby(["contest_key", "cand_key"])["votes"].sum()
         sov_contests = dict(zip(sov["contest_key"], sov["contest"], strict=False))
 
-        w = w.assign(contest_key=w["contest"].map(_name_key),
-                     cand_key=w["candidate_or_option"].map(_name_key))
+        w = w.assign(
+            contest_key=w["contest"].map(_name_key),
+            cand_key=w["candidate_or_option"].map(_name_key),
+        )
         snapshot = w.loc[w["contest_type"] != "ranked_choice", "last_updated"].max()
         for ckey, cw in w.groupby("contest_key", sort=False):
-            match = ckey if ckey in sov_contests else next(
-                iter(difflib.get_close_matches(ckey, list(sov_contests), n=1, cutoff=0.85)),
-                None)
+            match = (
+                ckey
+                if ckey in sov_contests
+                else next(
+                    iter(difflib.get_close_matches(ckey, list(sov_contests), n=1, cutoff=0.85)),
+                    None,
+                )
+            )
             if match is None:
                 # The web card often appends the measure's subtitle to the SoV
                 # title ("Ballot Issue 1A" + "Open Space Sales and Use Tax ...").
@@ -532,19 +622,31 @@ def reconcile_vote_counting() -> pd.DataFrame:
                 match = max(prefixes, key=len) if prefixes else None
             for r in cw.itertuples(index=False):
                 sov_votes = sov_tot.get((match, r.cand_key)) if match else None
-                status = ("contest_not_in_sov" if match is None else
-                          "candidate_not_in_sov" if sov_votes is None else
-                          "match" if sov_votes == r.votes else
-                          "near_match" if abs(sov_votes - r.votes) < 50 else "differs")
-                rows.append({
-                    "year": year, "election_type": etype, "final_snapshot": snapshot,
-                    "contest": r.contest, "sov_contest": sov_contests.get(match, pd.NA),
-                    "candidate_or_option": r.candidate_or_option,
-                    "snapshot_votes": r.votes,
-                    "sov_votes": pd.NA if sov_votes is None else int(sov_votes),
-                    "delta": pd.NA if sov_votes is None else int(r.votes - sov_votes),
-                    "status": status,
-                })
+                status = (
+                    "contest_not_in_sov"
+                    if match is None
+                    else "candidate_not_in_sov"
+                    if sov_votes is None
+                    else "match"
+                    if sov_votes == r.votes
+                    else "near_match"
+                    if abs(sov_votes - r.votes) < 50
+                    else "differs"
+                )
+                rows.append(
+                    {
+                        "year": year,
+                        "election_type": etype,
+                        "final_snapshot": snapshot,
+                        "contest": r.contest,
+                        "sov_contest": sov_contests.get(match, pd.NA),
+                        "candidate_or_option": r.candidate_or_option,
+                        "snapshot_votes": r.votes,
+                        "sov_votes": pd.NA if sov_votes is None else int(sov_votes),
+                        "delta": pd.NA if sov_votes is None else int(r.votes - sov_votes),
+                        "status": status,
+                    }
+                )
     return pd.DataFrame(rows)
 
 
@@ -572,7 +674,8 @@ def vote_counting_markdown(vc: pd.DataFrame) -> list[str]:
             f"| {year} {etype} | {g['final_snapshot'].iloc[0]} | {n.get('match', 0)} | "
             f"{n.get('near_match', 0)} | {n.get('differs', 0)} | "
             f"{n.get('contest_not_in_sov', 0) + n.get('candidate_not_in_sov', 0)} | "
-            f"{int(both['snapshot_votes'].sum()):,} | {int(both['sov_votes'].sum()):,} |")
+            f"{int(both['snapshot_votes'].sum()):,} | {int(both['sov_votes'].sum()):,} |"
+        )
     lines.append("")
     return lines
 
@@ -598,25 +701,39 @@ def run(pool: list[Source]) -> tuple[pd.DataFrame, pd.DataFrame, list[dict]]:
         if not r.empty:
             top.append(r)
         if chk:
-            checks.append({"year": s.year, "election_type": s.election_type,
-                           "data_source": s.data_source, **chk})
+            checks.append(
+                {
+                    "year": s.year,
+                    "election_type": s.election_type,
+                    "data_source": s.data_source,
+                    **chk,
+                }
+            )
         if not c.empty:
             cand.append(c)
-        print(f"OK   {label}  contests={len(r)}  mismatches={(r['status'] == 'mismatch').sum() if not r.empty else 0}"
-              f"  candidate-keys={len(c)}  candidate-mismatches={(c['status'] == 'mismatch').sum()}"
-              f"  dup-keys={chk.get('duplicate_keys', 0)}  mixed={chk.get('mixed_contests', 0)}")
+        print(
+            f"OK   {label}  contests={len(r)}  mismatches={(r['status'] == 'mismatch').sum() if not r.empty else 0}"
+            f"  candidate-keys={len(c)}  candidate-mismatches={(c['status'] == 'mismatch').sum()}"
+            f"  dup-keys={chk.get('duplicate_keys', 0)}  mixed={chk.get('mixed_contests', 0)}"
+        )
     top_df = pd.concat(top, ignore_index=True) if top else pd.DataFrame()
-    cand_df = pd.concat(cand, ignore_index=True) if cand else pd.DataFrame(columns=CANDIDATE_COLUMNS)
+    cand_df = (
+        pd.concat(cand, ignore_index=True) if cand else pd.DataFrame(columns=CANDIDATE_COLUMNS)
+    )
     return top_df, cand_df, checks
 
 
 def _key_set(df: pd.DataFrame) -> pd.Series:
-    return pd.Series(list(zip(df["year"].astype(int), df["election_type"], df["data_source"],
-                              strict=True)), index=df.index, dtype=object)
+    return pd.Series(
+        list(zip(df["year"].astype(int), df["election_type"], df["data_source"], strict=True)),
+        index=df.index,
+        dtype=object,
+    )
 
 
-def _merge_with_existing(pool: list[Source], top: pd.DataFrame, cand: pd.DataFrame,
-                         checks: list[dict]) -> tuple[pd.DataFrame, pd.DataFrame, list[dict]]:
+def _merge_with_existing(
+    pool: list[Source], top: pd.DataFrame, cand: pd.DataFrame, checks: list[dict]
+) -> tuple[pd.DataFrame, pd.DataFrame, list[dict]]:
     done = {(s.year, s.election_type, s.data_source) for s in pool}
     order = {(s.year, s.election_type, s.data_source): i for i, s in enumerate(ALL_SOURCES)}
 
@@ -643,14 +760,25 @@ def _merge_with_existing(pool: list[Source], top: pd.DataFrame, cand: pd.DataFra
         proc = _read_processed(s)
         if proc is None:
             continue
-        checks.append({"year": s.year, "election_type": s.election_type,
-                       "data_source": s.data_source, **structural_checks(proc),
-                       "status": "compared" if key in compared else "no_original"})
+        checks.append(
+            {
+                "year": s.year,
+                "election_type": s.election_type,
+                "data_source": s.data_source,
+                **structural_checks(proc),
+                "status": "compared" if key in compared else "no_original",
+            }
+        )
     return top, cand, checks
 
 
-def report_markdown(all_recon: pd.DataFrame, cand: pd.DataFrame, checks: list[dict],
-                    vc: pd.DataFrame, xs: pd.DataFrame | None = None) -> str:
+def report_markdown(
+    all_recon: pd.DataFrame,
+    cand: pd.DataFrame,
+    checks: list[dict],
+    vc: pd.DataFrame,
+    xs: pd.DataFrame | None = None,
+) -> str:
     n_cand_bad = int((cand["status"] == "mismatch").sum())
     n_struct = sum(int(c["duplicate_keys"]) + int(c["mixed_contests"]) for c in checks)
     md_lines = [
@@ -701,9 +829,7 @@ def report_markdown(all_recon: pd.DataFrame, cand: pd.DataFrame, checks: list[di
             orig = f"{int(r['original_total']):,}" if pd.notna(r["original_total"]) else "—"
             proc = f"{int(r['processed_total']):,}" if pd.notna(r["processed_total"]) else "—"
             delta = f"{int(r['delta']):+,}" if pd.notna(r["delta"]) else "—"
-            md_lines.append(
-                f"| {r['canonical']} | {orig} | {proc} | {delta} | `{r['status']}` |"
-            )
+            md_lines.append(f"| {r['canonical']} | {orig} | {proc} | {delta} | `{r['status']}` |")
         md_lines.append("")
 
     if xs is not None:
@@ -714,6 +840,7 @@ def report_markdown(all_recon: pd.DataFrame, cand: pd.DataFrame, checks: list[di
 
 def _election_arg(value: str) -> tuple[int, str]:
     from .sources import parse_election_key
+
     try:
         return parse_election_key(value)
     except ValueError as e:
@@ -721,16 +848,26 @@ def _election_arg(value: str) -> tuple[int, str]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("--year", type=int)
-    ap.add_argument("-e", "--election", type=_election_arg, metavar="KEY",
-                    help="Only this election, as an election key, e.g. 2024-general")
-    ap.add_argument("--source", choices=["boulder_county", "secretary_of_state", "all"],
-                    default="all")
-    ap.add_argument("--check", action="store_true",
-                    help="Write nothing; exit 1 if any top-line or contest × candidate "
-                         "`mismatch`, duplicate key or mixed contest is found (CI uses this)")
+    ap.add_argument(
+        "-e",
+        "--election",
+        type=_election_arg,
+        metavar="KEY",
+        help="Only this election, as an election key, e.g. 2024-general",
+    )
+    ap.add_argument(
+        "--source", choices=["boulder_county", "secretary_of_state", "all"], default="all"
+    )
+    ap.add_argument(
+        "--check",
+        action="store_true",
+        help="Write nothing; exit 1 if any top-line or contest × candidate "
+        "`mismatch`, duplicate key or mixed contest is found (CI uses this)",
+    )
     args = ap.parse_args(argv)
 
     if args.source == "boulder_county":
@@ -755,9 +892,11 @@ def main(argv: list[str] | None = None) -> int:
         n_struct = sum(int(c["duplicate_keys"]) + int(c["mixed_contests"]) for c in checks)
         print(f"mismatches: top-line={n_bad} candidate={n_cand_bad} structural={n_struct}")
         for r in cand[cand["status"] == "mismatch"].head(20).itertuples(index=False):
-            print(f"FAIL  {r.year} {r.election_type} {r.data_source}: {r.contest} / "
-                  f"{r.candidate_or_option}: {r.original_votes} → {r.processed_votes}",
-                  file=sys.stderr)
+            print(
+                f"FAIL  {r.year} {r.election_type} {r.data_source}: {r.contest} / "
+                f"{r.candidate_or_option}: {r.original_votes} → {r.processed_votes}",
+                file=sys.stderr,
+            )
         return 1 if (n_bad or n_cand_bad or n_struct) else 0
     if len(pool) < len(ALL_SOURCES):
         # A filtered run updates its own sources' rows and keeps everyone
@@ -770,16 +909,20 @@ def main(argv: list[str] | None = None) -> int:
     vc = reconcile_vote_counting()
     if not vc.empty:
         vc.to_csv(VOTE_COUNTING_VS_SOV_CSV, index=False)
-        print(f"vote-counting vs SoV: {len(vc)} candidate rows "
-              f"({(vc['status'] == 'match').sum()} exact matches; report only)")
+        print(
+            f"vote-counting vs SoV: {len(vc)} candidate rows "
+            f"({(vc['status'] == 'match').sum()} exact matches; report only)"
+        )
 
     xs = reconcile_cross_source()
     RECONCILIATION_MD.write_text(report_markdown(all_recon, cand, checks, vc, xs))
     n_bad = int((all_recon["status"] == "mismatch").sum())
     n_cand_bad = int((cand["status"] == "mismatch").sum())
     n_struct = sum(int(c["duplicate_keys"]) + int(c["mixed_contests"]) for c in checks)
-    print(f"\nwrote data/audit/reconciliation.md, reconciliation.csv ({len(all_recon)} rows) "
-          f"and reconciliation-candidates.csv ({len(cand)} rows)")
+    print(
+        f"\nwrote data/audit/reconciliation.md, reconciliation.csv ({len(all_recon)} rows) "
+        f"and reconciliation-candidates.csv ({len(cand)} rows)"
+    )
     print(f"mismatches: top-line={n_bad} candidate={n_cand_bad} structural={n_struct}")
     return 0
 

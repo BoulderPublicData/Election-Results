@@ -42,6 +42,10 @@ jobs:
         # Rules are configured in pyproject.toml [tool.ruff].
         run: uv run ruff check --output-format=github .
 
+      - name: Format check (ruff)
+        # Run `uv run ruff format .` before pushing; the one-time reformat is in .git-blame-ignore-revs.
+        run: uv run ruff format --check .
+
       - name: Run pytest
         run: uv run pytest -v --tb=short
 

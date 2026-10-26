@@ -40,10 +40,10 @@ from .config import (
     DATASETTE_RECENT_DB,
     EXCEL_ZIP,
     PROVENANCE_CSV,
-    REPO_ROOT,
     STATEMENTS_OF_VOTES,
     VOTE_COUNTING_CONTESTS_CSV,
     VOTE_COUNTING_SUMMARY_CSV,
+    display_path,
 )
 from .logging_setup import get_logger
 from .schema import (
@@ -75,13 +75,14 @@ def export_excel_csvs(out: Path = EXCEL_ZIP) -> Path:
     with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         for p in per_year_csvs(STATEMENTS_OF_VOTES) + [PROVENANCE_CSV]:
             zf.writestr(p.name, "\ufeff" + p.read_text(encoding="utf-8"))
-    print(f"wrote {out.relative_to(REPO_ROOT)}")
+    print(f"wrote {display_path(out)}")
     return out
 
 
 # ---------------------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------------------
+
 
 def _load_combined() -> pd.DataFrame:
     """Every committed per-year CSV, concatenated (#19).
@@ -95,17 +96,16 @@ def _load_combined() -> pd.DataFrame:
         raise FileNotFoundError(
             f"no per-year CSVs under {STATEMENTS_OF_VOTES} — run `python -m scripts.pipeline` first"
         )
-    frames = [pd.read_csv(p, dtype={c: DTYPES[c] for c in CSV_COLUMNS}, low_memory=False)
-              for p in paths]
+    frames = [
+        pd.read_csv(p, dtype={c: DTYPES[c] for c in CSV_COLUMNS}, low_memory=False) for p in paths
+    ]
     return pd.concat([f for f in frames if not f.empty], ignore_index=True)
 
 
 def _load_provenance() -> pd.DataFrame:
     prov = PROVENANCE_CSV
     if not prov.exists():
-        raise FileNotFoundError(
-            f"{prov} missing — run `python -m scripts.pipeline run` first"
-        )
+        raise FileNotFoundError(f"{prov} missing — run `python -m scripts.pipeline run` first")
     return pd.read_csv(prov, dtype=PROVENANCE_DTYPES)
 
 
@@ -122,14 +122,19 @@ def _records(frame: pd.DataFrame) -> list[dict]:
 
 
 def _concepts_frame() -> pd.DataFrame:
-    return pd.DataFrame([{
-        "name": c.name,
-        "description": c.description,
-        "tier": c.tier,
-        "boulder_county_patterns": "|".join(c.boulder_county_patterns),
-        "secretary_of_state_patterns": "|".join(c.secretary_of_state_patterns),
-        "caveats": c.caveats,
-    } for c in CONCEPTS])
+    return pd.DataFrame(
+        [
+            {
+                "name": c.name,
+                "description": c.description,
+                "tier": c.tier,
+                "boulder_county_patterns": "|".join(c.boulder_county_patterns),
+                "secretary_of_state_patterns": "|".join(c.secretary_of_state_patterns),
+                "caveats": c.caveats,
+            }
+            for c in CONCEPTS
+        ]
+    )
 
 
 def build(db_path: Path = DB_PATH, since: int | None = None) -> Path:
@@ -154,8 +159,14 @@ def build(db_path: Path = DB_PATH, since: int | None = None) -> Path:
         _records(elections),
         batch_size=10_000,
     )
-    for col in ("election_year", "data_source", "election_type", "contest_type",
-                "precinct_id", "party"):
+    for col in (
+        "election_year",
+        "data_source",
+        "election_type",
+        "contest_type",
+        "precinct_id",
+        "party",
+    ):
         if col in elections.columns:
             db["elections"].create_index([col])
 
@@ -176,16 +187,22 @@ def build(db_path: Path = DB_PATH, since: int | None = None) -> Path:
     # union it with `elections`.
     for table, path in VOTE_COUNTING_TABLES.items():
         if not path.exists():
-            log.warning("publish.vote_counting_missing", path=str(path.relative_to(REPO_ROOT)))
+            log.warning("publish.vote_counting_missing", path=str(display_path(path)))
             continue
-        dtypes = VOTE_COUNTING_DTYPES if table == "vote_counting_contests" \
+        dtypes = (
+            VOTE_COUNTING_DTYPES
+            if table == "vote_counting_contests"
             else VOTE_COUNTING_SUMMARY_DTYPES
+        )
         frame = pd.read_csv(path, dtype=dtypes, low_memory=False)
         if since is not None:
             frame = frame[frame["election_year"] >= since]
         db[table].insert_all(_records(frame), batch_size=10_000)
-        index_cols = ("election_year", "contest") if table == "vote_counting_contests" \
+        index_cols = (
+            ("election_year", "contest")
+            if table == "vote_counting_contests"
             else ("election_year",)
+        )
         for col in index_cols:
             db[table].create_index([col])
 
@@ -204,9 +221,11 @@ def build(db_path: Path = DB_PATH, since: int | None = None) -> Path:
         replace=True,
     )
 
-    print(f"wrote {db_path.relative_to(REPO_ROOT)}: elections={len(elections):,} rows "
-          f"({elections['election_year'].nunique()} years), provenance={len(provenance)}, "
-          f"concepts={len(concepts)}")
+    print(
+        f"wrote {display_path(db_path)}: elections={len(elections):,} rows "
+        f"({elections['election_year'].nunique()} years), provenance={len(provenance)}, "
+        f"concepts={len(concepts)}"
+    )
     return db_path
 
 
@@ -232,8 +251,8 @@ _COLUMN_DESCRIPTIONS: dict[str, str] = {
     "active_voters": "Active registered voters in the precinct. Null on SOS rows.",
     "ballots_cast": "Ballots cast in the precinct. Null on SOS rows.",
     "is_pseudo_precinct": "1 when precinct_id is, or includes, a unit with no precinct geography "
-                          "(property-owner / landowner ballots, SOS SUM / Provisional rows). "
-                          "Keep these rows for contest totals; drop them before spatial joins.",
+    "(property-owner / landowner ballots, SOS SUM / Provisional rows). "
+    "Keep these rows for contest totals; drop them before spatial joins.",
 }
 
 
@@ -274,7 +293,7 @@ def build_metadata(out: Path = METADATA_PATH) -> Path:
             "data-dictionary.md</a>."
         ),
         "license": "MIT (code and harmonized data) — see repo LICENSE. The underlying "
-                   "election results are public records.",
+        "election results are public records.",
         "license_url": "https://github.com/BoulderPublicData/Election-Results/blob/main/LICENSE",
         "source": "Boulder County Elections + Colorado Secretary of State",
         "source_url": "https://bouldercounty.gov/elections/results/",
@@ -295,8 +314,12 @@ def build_metadata(out: Path = METADATA_PATH) -> Path:
                         ),
                         "columns": _COLUMN_DESCRIPTIONS,
                         "facets": [
-                            "election_year", "data_source", "election_type",
-                            "contest_type", "party", "is_pseudo_precinct",
+                            "election_year",
+                            "data_source",
+                            "election_type",
+                            "contest_type",
+                            "party",
+                            "is_pseudo_precinct",
                         ],
                         "size": 100,
                     },
@@ -391,7 +414,7 @@ def build_metadata(out: Path = METADATA_PATH) -> Path:
         },
     }
     out.write_text(yaml.safe_dump(metadata, sort_keys=False, allow_unicode=True))
-    print(f"wrote {out.relative_to(REPO_ROOT)}")
+    print(f"wrote {display_path(out)}")
     return out
 
 
@@ -399,11 +422,15 @@ def build_metadata(out: Path = METADATA_PATH) -> Path:
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     sub = ap.add_subparsers(dest="cmd")
-    sub.add_parser("build", help="Build elections.db, elections-recent.db, metadata.yaml "
-                                 "and the Excel-friendly CSV zip.")
+    sub.add_parser(
+        "build",
+        help="Build elections.db, elections-recent.db, metadata.yaml "
+        "and the Excel-friendly CSV zip.",
+    )
     sub.add_parser("metadata-only", help="Re-emit metadata.yaml without rebuilding the DB.")
     sub.add_parser("excel", help="Only write the Excel-friendly (UTF-8 with BOM) CSV zip.")
     args = ap.parse_args(argv)
@@ -421,12 +448,8 @@ def main(argv: list[str] | None = None) -> int:
     md = build_metadata()
     export_excel_csvs()
     for path in (db, recent):
-        print(f"  {path.relative_to(REPO_ROOT)}: {path.stat().st_size / 1e6:.0f} MB")
-    print(
-        f"\nPreview locally:\n"
-        f"  uv run datasette serve {db.relative_to(REPO_ROOT)} "
-        f"-m {md.relative_to(REPO_ROOT)}"
-    )
+        print(f"  {display_path(path)}: {path.stat().st_size / 1e6:.0f} MB")
+    print(f"\nPreview locally:\n  uv run datasette serve {display_path(db)} -m {display_path(md)}")
     return 0
 
 

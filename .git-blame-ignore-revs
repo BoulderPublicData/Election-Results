@@ -1,0 +1,3 @@
+# Mechanical reformat with `ruff format` (2026-10-26 AAR, P2-2).
+# Configure locally: git config blame.ignoreRevsFile .git-blame-ignore-revs
+df4775b55cd9039ce621633aa554ef39c1b82d5b

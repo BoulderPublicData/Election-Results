@@ -25,5 +25,6 @@ def test_data_dictionary_table_matches_the_csvs():
     if table is None:
         pytest.skip("processed CSVs not present")
     text = (REPO_ROOT / "docs" / "data-dictionary.md").read_text()
-    assert doc_stats.rewrite(text, {"sov-table": table, "row-count": doc_stats.row_count()}) \
-        == text, "run `uv run python -m scripts.doc_stats`"
+    assert (
+        doc_stats.rewrite(text, {"sov-table": table, "row-count": doc_stats.row_count()}) == text
+    ), "run `uv run python -m scripts.doc_stats`"

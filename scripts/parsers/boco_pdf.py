@@ -72,9 +72,9 @@ _BOILERPLATE_PREFIXES = (
     "Page ",
     "Total Number of Voters",
     "Precincts Reporting",
-    "Canvass Report",                 # 2007 banner
-    "Colorado Canvass Report",        # 2005 banner
-    "Precinct ",                      # column-header line (page with no title)
+    "Canvass Report",  # 2007 banner
+    "Colorado Canvass Report",  # 2005 banner
+    "Precinct ",  # column-header line (page with no title)
 )
 
 # Match a data row: precinct followed by whitespace-separated tokens.
@@ -103,10 +103,7 @@ def _looks_char_reversed(text: str) -> bool:
     words = _REVERSED_WORD_RE.findall(text)
     if not words:
         return False
-    reversed_looking = sum(
-        1 for w in words
-        if len(w) > 1 and w[0].islower() and w[-1].isupper()
-    )
+    reversed_looking = sum(1 for w in words if len(w) > 1 and w[0].islower() and w[-1].isupper())
     return reversed_looking * 2 > len(words)
 
 
@@ -140,11 +137,20 @@ def _is_known_meta_header(unrotated: str) -> bool:
 
     These are NOT candidates and shouldn't generate result rows."""
     s = unrotated.lower().replace("\n", " ")
-    return any(kw in s for kw in (
-        "ballots cast", "ballotscast", "registered voters",
-        "percent turnout", "absentee voting", "early voting",
-        "election day", "mail ballots", "provisional",
-    ))
+    return any(
+        kw in s
+        for kw in (
+            "ballots cast",
+            "ballotscast",
+            "registered voters",
+            "percent turnout",
+            "absentee voting",
+            "early voting",
+            "election day",
+            "mail ballots",
+            "provisional",
+        )
+    )
 
 
 def _classify_choice_label(label: str) -> str:
@@ -235,8 +241,12 @@ def _extract_header(page) -> tuple[list[str], bool]:
     merged: list[tuple[int, str]] = []
     for x, label in clusters:
         special = label.lower() in {"totals", "total", "continued"}
-        if (merged and x - merged[-1][0] < _WRAP_GAP_PT and not special
-                and merged[-1][1].lower() not in {"totals", "total", "continued"}):
+        if (
+            merged
+            and x - merged[-1][0] < _WRAP_GAP_PT
+            and not special
+            and merged[-1][1].lower() not in {"totals", "total", "continued"}
+        ):
             merged[-1] = (x, f"{merged[-1][1]} {label}")
         else:
             merged.append((x, label))
@@ -291,14 +301,15 @@ def _split_row(line: str) -> tuple[str, list[str], list[int | None]] | None:
     if pct is None or pct < 2:
         return None
     meta = tokens[: pct + 1]
-    values = [_to_int(t) for t in tokens[pct + 1:]]
+    values = [_to_int(t) for t in tokens[pct + 1 :]]
     if any(v is None for v in values):
         return None
     return precinct, meta, values
 
 
-def _parse_data_row(line: str, n_candidates: int, has_totals: bool = False
-                    ) -> tuple[str, dict[str, int | None], list[int | None]] | None:
+def _parse_data_row(
+    line: str, n_candidates: int, has_totals: bool = False
+) -> tuple[str, dict[str, int | None], list[int | None]] | None:
     """Decode one precinct row into (precinct_id, meta_values, candidate_votes),
     or None if it isn't a data row or its width doesn't fit ``n_candidates``."""
     split = _split_row(line)
@@ -391,35 +402,46 @@ def parse(path: Path, meta: SourceMeta, pages: Iterable[int] | None = None) -> p
                     rejector.add(
                         row_index=f"page {page_no}:line {line_no}",
                         reason="pdf_row_width_mismatch",
-                        detail=(f"{title}: {len(values)} values for {len(labels)} "
-                                f"candidate labels {labels}"),
+                        detail=(
+                            f"{title}: {len(values)} values for {len(labels)} "
+                            f"candidate labels {labels}"
+                        ),
                         raw_row={"line": line},
                     )
                     continue
                 for cand_label, v in zip(labels, votes, strict=True):
-                    rows.append({
-                        "precinct_id": precinct_id_str(precinct),
-                        "precinct_name": pd.NA,
-                        "contest": title,
-                        "candidate_or_option": cand_label,
-                        "party": pd.NA,
-                        "votes": v,
-                        "active_voters": _to_int(meta_tokens[-2]),
-                        "ballots_cast": _to_int(meta_tokens[-3]),
-                        "_where": f"page {page_no}:line {line_no}",
-                    })
+                    rows.append(
+                        {
+                            "precinct_id": precinct_id_str(precinct),
+                            "precinct_name": pd.NA,
+                            "contest": title,
+                            "candidate_or_option": cand_label,
+                            "party": pd.NA,
+                            "votes": v,
+                            "active_voters": _to_int(meta_tokens[-2]),
+                            "ballots_cast": _to_int(meta_tokens[-3]),
+                            "_where": f"page {page_no}:line {line_no}",
+                        }
+                    )
             pages_parsed += 1
 
     if not rows:
         return add_provenance(
-            pd.DataFrame(columns=[
-                "precinct_id", "precinct_name", "contest", "candidate_or_option",
-                "party", "votes", "active_voters", "ballots_cast",
-            ]),
+            pd.DataFrame(
+                columns=[
+                    "precinct_id",
+                    "precinct_name",
+                    "contest",
+                    "candidate_or_option",
+                    "party",
+                    "votes",
+                    "active_voters",
+                    "ballots_cast",
+                ]
+            ),
             meta,
             extraction_notes=(
-                f"pdfplumber found no parseable panels in {path.name}; "
-                "manual extraction required"
+                f"pdfplumber found no parseable panels in {path.name}; manual extraction required"
             ),
         )
 
@@ -431,13 +453,17 @@ def parse(path: Path, meta: SourceMeta, pages: Iterable[int] | None = None) -> p
     dup = df.duplicated(key, keep=False)
     n_dup = int(dup.sum())
     for rec in df[dup].to_dict("records"):
-        rejector.add(row_index=rec["_where"], reason="duplicate_key",
-                     detail=f"{rec['contest']} / {rec['candidate_or_option']} printed twice "
-                            f"for precinct {rec['precinct_id']}",
-                     raw_row={k: v for k, v in rec.items() if pd.notna(v)})
+        rejector.add(
+            row_index=rec["_where"],
+            reason="duplicate_key",
+            detail=f"{rec['contest']} / {rec['candidate_or_option']} printed twice "
+            f"for precinct {rec['precinct_id']}",
+            raw_row={k: v for k, v in rec.items() if pd.notna(v)},
+        )
     df = df[~dup].drop(columns=["_where"])
     df["contest_type"] = [
-        infer_contest_type(c, ch) for c, ch in zip(df["contest"], df["candidate_or_option"], strict=True)
+        infer_contest_type(c, ch)
+        for c, ch in zip(df["contest"], df["candidate_or_option"], strict=True)
     ]
 
     notes = [
@@ -448,8 +474,10 @@ def parse(path: Path, meta: SourceMeta, pages: Iterable[int] | None = None) -> p
         "spot-check a sample of precincts against the source PDF before publishing",
     ]
     if len(rejector):
-        notes.append(f"{len(rejector)} row(s) sent to data/audit/rejected.csv"
-                     + (f" ({n_dup} with duplicate keys)" if n_dup else ""))
+        notes.append(
+            f"{len(rejector)} row(s) sent to data/audit/rejected.csv"
+            + (f" ({n_dup} with duplicate keys)" if n_dup else "")
+        )
     return add_provenance(df, meta, extraction_notes="; ".join(notes))
 
 
@@ -482,10 +510,12 @@ def published_totals(path: Path, pages: Iterable[int] | None = None) -> pd.DataF
                     continue
                 toks = m.group(1).split()
                 # The Totals line omits the Percent Turnout cell.
-                values = [_to_int(t) for t in toks[n_meta - 1:]]
+                values = [_to_int(t) for t in toks[n_meta - 1 :]]
                 values = _drop_row_total(values, len(labels), has_totals)
                 if values is None:
                     continue
-                recs.extend({"contest": title, "candidate_or_option": lab, "votes": v}
-                            for lab, v in zip(labels, values, strict=True))
+                recs.extend(
+                    {"contest": title, "candidate_or_option": lab, "votes": v}
+                    for lab, v in zip(labels, values, strict=True)
+                )
     return pd.DataFrame(recs, columns=["contest", "candidate_or_option", "votes"])

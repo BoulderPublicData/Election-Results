@@ -36,9 +36,9 @@ class RejectedRow:
     source_file: str
     election_year: int | None
     data_source: str
-    row_index: str        # "sheet:row" or "page:line" — best-effort, never None
-    reason: str           # short tag, e.g. "missing_required_field"
-    detail: str           # free-text explanation
+    row_index: str  # "sheet:row" or "page:line" — best-effort, never None
+    reason: str  # short tag, e.g. "missing_required_field"
+    detail: str  # free-text explanation
     raw_row: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -62,17 +62,25 @@ class Rejector:
         self.data_source = data_source
         self._rows: list[RejectedRow] = []
 
-    def add(self, *, row_index: str, reason: str, detail: str = "",
-            raw_row: dict[str, Any] | None = None) -> None:
-        self._rows.append(RejectedRow(
-            source_file=self.source_file,
-            election_year=self.election_year,
-            data_source=self.data_source,
-            row_index=row_index,
-            reason=reason,
-            detail=detail,
-            raw_row=raw_row or {},
-        ))
+    def add(
+        self,
+        *,
+        row_index: str,
+        reason: str,
+        detail: str = "",
+        raw_row: dict[str, Any] | None = None,
+    ) -> None:
+        self._rows.append(
+            RejectedRow(
+                source_file=self.source_file,
+                election_year=self.election_year,
+                data_source=self.data_source,
+                row_index=row_index,
+                reason=reason,
+                detail=detail,
+                raw_row=raw_row or {},
+            )
+        )
 
     def drop_na_with_reject(
         self,
@@ -99,7 +107,10 @@ class Rejector:
             else:
                 indices = [str(i) for i in bad.index]
             for rec, row_index, na_row in zip(
-                bad.to_dict("records"), indices, na[mask].to_numpy(), strict=True,
+                bad.to_dict("records"),
+                indices,
+                na[mask].to_numpy(),
+                strict=True,
             ):
                 missing = [c for c, is_na in zip(required, na_row, strict=True) if is_na]
                 self.add(
@@ -115,10 +126,17 @@ class Rejector:
 
     def to_frame(self) -> pd.DataFrame:
         if not self._rows:
-            return pd.DataFrame(columns=[
-                "source_file", "election_year", "data_source", "row_index",
-                "reason", "detail", "raw_row",
-            ])
+            return pd.DataFrame(
+                columns=[
+                    "source_file",
+                    "election_year",
+                    "data_source",
+                    "row_index",
+                    "reason",
+                    "detail",
+                    "raw_row",
+                ]
+            )
         return pd.DataFrame([r.to_dict() for r in self._rows])
 
 
@@ -135,17 +153,31 @@ def drain() -> pd.DataFrame:
     """Pop all registered rejectors and return their union as a single frame."""
     global _BUFFER
     if not _BUFFER:
-        return pd.DataFrame(columns=[
-            "source_file", "election_year", "data_source", "row_index",
-            "reason", "detail", "raw_row",
-        ])
+        return pd.DataFrame(
+            columns=[
+                "source_file",
+                "election_year",
+                "data_source",
+                "row_index",
+                "reason",
+                "detail",
+                "raw_row",
+            ]
+        )
     frames = [r.to_frame() for r in _BUFFER if len(r) > 0]
     _BUFFER = []
     if not frames:
-        return pd.DataFrame(columns=[
-            "source_file", "election_year", "data_source", "row_index",
-            "reason", "detail", "raw_row",
-        ])
+        return pd.DataFrame(
+            columns=[
+                "source_file",
+                "election_year",
+                "data_source",
+                "row_index",
+                "reason",
+                "detail",
+                "raw_row",
+            ]
+        )
     return pd.concat(frames, ignore_index=True)
 
 

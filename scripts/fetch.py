@@ -32,10 +32,10 @@ from . import http
 from .config import (
     BOULDER_COUNTY,
     MANIFEST_PATH,
-    REPO_ROOT,
     SECRETARY_OF_STATE,
     SOURCES,
     Source,
+    display_path,
     original_path,
 )
 from .logging_setup import get_logger
@@ -75,6 +75,7 @@ def _published_retrieved_at(s: Source) -> str | None:
     import pandas as pd
 
     from .config import PROVENANCE_CSV
+
     if not PROVENANCE_CSV.exists():
         return None
     prov = pd.read_csv(PROVENANCE_CSV, dtype=str, keep_default_na=False)
@@ -168,8 +169,10 @@ def fetch_one(s: Source, *, force: bool = False, dry_run: bool = False) -> tuple
         if _sha256(dest) == record.get("sha256"):
             log.debug("fetch.skip", key=key, reason="sha256 matches manifest")
             return False, f"skip  {key}  (sha256 matches manifest)"
-        return False, (f"FAIL  {key}  sha256 differs from the manifest; not overwriting "
-                       "an original — inspect it, then re-run with --force to re-download")
+        return False, (
+            f"FAIL  {key}  sha256 differs from the manifest; not overwriting "
+            "an original — inspect it, then re-run with --force to re-download"
+        )
 
     if dry_run:
         return False, f"would-fetch  {key}  <- {s.url}"
@@ -201,6 +204,7 @@ def fetch_many(sources: list[Source], *, force: bool = False, dry_run: bool = Fa
 
 def _election_arg(value: str) -> tuple[int, str]:
     from .sources import parse_election_key
+
     try:
         return parse_election_key(value)
     except ValueError as e:
@@ -210,31 +214,47 @@ def _election_arg(value: str) -> tuple[int, str]:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--year", type=int, help="Only this year")
-    ap.add_argument("-e", "--election", type=_election_arg, metavar="KEY",
-                    help="Only this election, as an election key, e.g. 2024-general")
+    ap.add_argument(
+        "-e",
+        "--election",
+        type=_election_arg,
+        metavar="KEY",
+        help="Only this election, as an election key, e.g. 2024-general",
+    )
     ap.add_argument("--since", type=int, help="This year and later")
-    ap.add_argument("--source",
-                    choices=["boulder_county", "secretary_of_state", "all"],
-                    default="all")
-    ap.add_argument("--force", action="store_true",
-                    help="Re-download even if the file is on disk (re-records the manifest)")
+    ap.add_argument(
+        "--source", choices=["boulder_county", "secretary_of_state", "all"], default="all"
+    )
+    ap.add_argument(
+        "--force",
+        action="store_true",
+        help="Re-download even if the file is on disk (re-records the manifest)",
+    )
     ap.add_argument("--dry-run", action="store_true")
-    ap.add_argument("--verify", action="store_true",
-                    help="Check every manifest entry against data/original/ (no network)")
-    ap.add_argument("--backfill-manifest", action="store_true",
-                    help="Record every registry file on disk that has no manifest entry")
-    ap.add_argument("--discover", action="store_true",
-                    help="Also scrape upstream landing pages for sources not in "
-                         "the static registry (e.g. years more recent than the "
-                         "last hand-recorded entry)")
+    ap.add_argument(
+        "--verify",
+        action="store_true",
+        help="Check every manifest entry against data/original/ (no network)",
+    )
+    ap.add_argument(
+        "--backfill-manifest",
+        action="store_true",
+        help="Record every registry file on disk that has no manifest entry",
+    )
+    ap.add_argument(
+        "--discover",
+        action="store_true",
+        help="Also scrape upstream landing pages for sources not in "
+        "the static registry (e.g. years more recent than the "
+        "last hand-recorded entry)",
+    )
     args = ap.parse_args(argv)
 
     if args.verify:
         problems = verify_manifest()
         for p in problems:
             print(f"FAIL  {p}", file=sys.stderr)
-        print(f"verified {MANIFEST_PATH.relative_to(REPO_ROOT)}: "
-              f"{len(problems)} problem(s)")
+        print(f"verified {display_path(MANIFEST_PATH)}: {len(problems)} problem(s)")
         return 1 if problems else 0
     if args.backfill_manifest:
         n = backfill_manifest(list(SOURCES))
@@ -251,13 +271,16 @@ def main(argv: list[str] | None = None) -> int:
     if args.discover:
         try:
             from .discover import discover, merge_with_registry
+
             discovered = discover()
             new = merge_with_registry(discovered, only_new=True)
             if args.source != "all":
                 new = [s for s in new if s.data_source == args.source]
             for s in new:
-                print(f"discover  +{s.year}-{s.election_type}-{s.data_source}  {s.url}",
-                      file=sys.stderr)
+                print(
+                    f"discover  +{s.year}-{s.election_type}-{s.data_source}  {s.url}",
+                    file=sys.stderr,
+                )
             pool.extend(new)
         except Exception as e:
             print(f"WARN discovery failed: {e}", file=sys.stderr)

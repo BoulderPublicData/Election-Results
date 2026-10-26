@@ -60,8 +60,11 @@ def test_no_contest_mixes_yes_no_with_candidates(path):
     assert not mixed, f"{path.name}: {mixed[:3]}"
 
 
-PANEL_FILES = [p for p in ALL_FILES if p.name[:4] in {"2008", "2010", "2011", "2012"}
-               and "boulder-county" in p.name]
+PANEL_FILES = [
+    p
+    for p in ALL_FILES
+    if p.name[:4] in {"2008", "2010", "2011", "2012"} and "boulder-county" in p.name
+]
 
 
 @pytest.mark.parametrize("path", PANEL_FILES, ids=lambda p: p.name)
@@ -104,11 +107,14 @@ def test_provenance_sidecar_present_and_complete():
     assert keys.notna().all().all(), "provenance sidecar has a null key"
     assert keys.apply(tuple, axis=1).is_unique, "provenance sidecar has duplicate keys"
     from scripts.sources import ALL_SOURCES
+
     want = {(str(s.year), s.election_type, s.data_source) for s in ALL_SOURCES}
     assert set(keys.apply(tuple, axis=1)) == want, "provenance sidecar doesn't cover the registry"
 
 
-INT_COLUMNS = [c for c in CSV_COLUMNS if c in {"election_year", "votes", "active_voters", "ballots_cast"}]
+INT_COLUMNS = [
+    c for c in CSV_COLUMNS if c in {"election_year", "votes", "active_voters", "ballots_cast"}
+]
 
 
 @pytest.mark.parametrize("path", sorted(PROCESSED.glob("[0-9]*.csv")), ids=lambda p: p.name)
@@ -125,8 +131,12 @@ def test_integer_columns_written_as_integers(path):
 def test_composite_ids_use_one_separator_and_pseudo_flag_matches(path):
     """#27: composite IDs mixed ',', ', ', ' + ' and '+'."""
     from scripts.parsers.common import is_pseudo_precinct
-    df = pd.read_csv(path, dtype={"precinct_id": "string", "is_pseudo_precinct": "boolean"},
-                     usecols=["precinct_id", "is_pseudo_precinct"]).drop_duplicates()
+
+    df = pd.read_csv(
+        path,
+        dtype={"precinct_id": "string", "is_pseudo_precinct": "boolean"},
+        usecols=["precinct_id", "is_pseudo_precinct"],
+    ).drop_duplicates()
     ids = df["precinct_id"].dropna()
     assert not ids.str.contains(r"\+|,(?! )|\s{2,}", regex=True).any(), path.name
     assert df["is_pseudo_precinct"].notna().all()
