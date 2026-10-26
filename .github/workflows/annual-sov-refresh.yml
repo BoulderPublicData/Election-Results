@@ -22,6 +22,10 @@ on:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    env:
+      # Always hit upstream: a stale cached landing page would hide a newly
+      # published SoV (see scripts/http.py).
+      ELECTIONS_HTTP_CACHE_HOURS: "0"
     permissions:
       contents: write
       pull-requests: write
@@ -48,10 +52,12 @@ jobs:
         env:
           INPUT_YEAR: ${{ inputs.year }}
         run: |
+          # Default: the previous calendar year. The job runs on January 6, so
+          # the previous "1 day ago" computation still gave the *current* year (#22).
           if [ -n "$INPUT_YEAR" ]; then
             echo "year=$INPUT_YEAR" >> "$GITHUB_OUTPUT"
           else
-            echo "year=$(date -u -d 'yesterday' +'%Y' 2>/dev/null || date -v-1d +'%Y')" >> "$GITHUB_OUTPUT"
+            echo "year=$(( $(date -u +%Y) - 1 ))" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Fetch new SOV files (with upstream discovery)
@@ -80,15 +86,13 @@ jobs:
             uv run python -m scripts.pipeline --skip-fetch --discover --no-pdf --year "$YEAR"
           fi
 
-      - name: Reconcile top-line totals
+      - name: Reconcile (top-line and contest × candidate)
         id: reconcile
-        env:
-          YEAR: ${{ steps.year.outputs.year }}
-        # Writes data/audit/reconciliation.{md,csv} for the target year and
-        # exposes the mismatch count so the PR body can flag regressions.
+        # The pipeline step above already rewrote the full report (it always
+        # reconciles every source, so a one-year run can't shrink it — #18).
+        # Expose the mismatch counts so the PR body can flag regressions.
         run: |
-          uv run python -m scripts.reconcile --year "$YEAR" || true
-          mismatches=$(uv run python -c "import pandas as pd; r = pd.read_csv('data/audit/reconciliation.csv'); print(int((r['status'] == 'mismatch').sum()))" 2>/dev/null || echo "unknown")
+          mismatches=$(uv run python -c "import pandas as pd; r = pd.read_csv('data/audit/reconciliation.csv'); c = pd.read_csv('data/audit/reconciliation-candidates.csv'); print(f\"{int((r['status'] == 'mismatch').sum())} top-line, {int((c['status'] == 'mismatch').sum())} contest × candidate\")" 2>/dev/null || echo "unknown")
           echo "mismatches=$mismatches" >> "$GITHUB_OUTPUT"
 
       - name: Capture changes
@@ -113,7 +117,7 @@ jobs:
           {
             echo "Automated annual refresh for **$YEAR**."
             echo ""
-            echo "**Reconciliation:** $MISMATCHES top-line \`mismatch\` row(s) — see \`data/audit/reconciliation.md\`. Anything above 0 must be explained before merging."
+            echo "**Reconciliation:** \`mismatch\` rows: $MISMATCHES — see \`data/audit/reconciliation.md\`. Anything above 0 must be explained before merging."
             echo ""
             echo "**Fetch log:**"
             echo '```'

@@ -34,7 +34,15 @@ import pandas as pd
 import yaml
 
 from .concepts import CONCEPTS
-from .config import COMBINED_CSV, PROCESSED, PROVENANCE_CSV, REPO_ROOT, VOTE_COUNTING
+from .config import (
+    DATASETTE_DB,
+    DATASETTE_METADATA,
+    PROVENANCE_CSV,
+    REPO_ROOT,
+    STATEMENTS_OF_VOTES,
+    VOTE_COUNTING_CONTESTS_CSV,
+    VOTE_COUNTING_SUMMARY_CSV,
+)
 from .logging_setup import get_logger
 from .schema import (
     CSV_COLUMNS,
@@ -43,11 +51,12 @@ from .schema import (
     VOTE_COUNTING_DTYPES,
     VOTE_COUNTING_SUMMARY_DTYPES,
 )
+from .shared_outputs import per_year_csvs
 
 log = get_logger(__name__)
 
-DB_PATH = PROCESSED / "elections.db"
-METADATA_PATH = PROCESSED / "metadata.yaml"
+DB_PATH = DATASETTE_DB
+METADATA_PATH = DATASETTE_METADATA
 
 
 # ---------------------------------------------------------------------------
@@ -55,12 +64,20 @@ METADATA_PATH = PROCESSED / "metadata.yaml"
 # ---------------------------------------------------------------------------
 
 def _load_combined() -> pd.DataFrame:
-    combined = COMBINED_CSV
-    if not combined.exists():
+    """Every committed per-year CSV, concatenated (#19).
+
+    Built from the per-year files rather than the gitignored
+    all-elections-tidy.csv, so the database always holds every year on disk —
+    the PDF years included — without re-running the parsers (or needing
+    pdfplumber) in CI."""
+    paths = per_year_csvs(STATEMENTS_OF_VOTES)
+    if not paths:
         raise FileNotFoundError(
-            f"{combined} missing — run `python -m scripts.pipeline run` first"
+            f"no per-year CSVs under {STATEMENTS_OF_VOTES} — run `python -m scripts.pipeline` first"
         )
-    return pd.read_csv(combined, dtype={c: DTYPES[c] for c in CSV_COLUMNS}, low_memory=False)
+    frames = [pd.read_csv(p, dtype={c: DTYPES[c] for c in CSV_COLUMNS}, low_memory=False)
+              for p in paths]
+    return pd.concat([f for f in frames if not f.empty], ignore_index=True)
 
 
 def _load_provenance() -> pd.DataFrame:
@@ -73,8 +90,8 @@ def _load_provenance() -> pd.DataFrame:
 
 
 VOTE_COUNTING_TABLES = {
-    "vote_counting_contests": VOTE_COUNTING / "vote-counting-contests.csv",
-    "vote_counting_summary": VOTE_COUNTING / "vote-counting-summary.csv",
+    "vote_counting_contests": VOTE_COUNTING_CONTESTS_CSV,
+    "vote_counting_summary": VOTE_COUNTING_SUMMARY_CSV,
 }
 
 
@@ -161,11 +178,9 @@ def build(db_path: Path = DB_PATH) -> Path:
         replace=True,
     )
 
-    log.info("publish.build_done",
-             db=str(db_path.relative_to(REPO_ROOT)),
-             elections_rows=len(elections),
-             provenance_rows=len(provenance),
-             concepts_rows=len(concepts))
+    print(f"wrote {db_path.relative_to(REPO_ROOT)}: elections={len(elections):,} rows "
+          f"({elections['election_year'].nunique()} years), provenance={len(provenance)}, "
+          f"concepts={len(concepts)}")
     return db_path
 
 
@@ -229,7 +244,8 @@ def build_metadata(out: Path = METADATA_PATH) -> Path:
             "Methodology: <a href='https://github.com/BoulderPublicData/Election-Results/blob/main/docs/data-dictionary.md'>"
             "data-dictionary.md</a>."
         ),
-        "license": "Public domain (election results) — see repo LICENSE.",
+        "license": "MIT (code and harmonized data) — see repo LICENSE. The underlying "
+                   "election results are public records.",
         "license_url": "https://github.com/BoulderPublicData/Election-Results/blob/main/LICENSE",
         "source": "Boulder County Elections + Colorado Secretary of State",
         "source_url": "https://bouldercounty.gov/elections/results/",
@@ -346,7 +362,7 @@ def build_metadata(out: Path = METADATA_PATH) -> Path:
         },
     }
     out.write_text(yaml.safe_dump(metadata, sort_keys=False, allow_unicode=True))
-    log.info("publish.metadata_done", path=str(out.relative_to(REPO_ROOT)))
+    print(f"wrote {out.relative_to(REPO_ROOT)}")
     return out
 
 

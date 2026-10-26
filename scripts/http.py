@@ -5,7 +5,8 @@ User-Agent baked in. Every module that does GET requests should go through
 
 - **Caching** via requests-cache (SQLite-backed). Cache lifetime is
   `config.HTTP_CACHE_HOURS` (24h by default). Set
-  `ELECTIONS_HTTP_CACHE_HOURS=0` to disable entirely (CI does this).
+  `ELECTIONS_HTTP_CACHE_HOURS=0` to disable entirely (the annual-refresh
+  workflow does this).
 - **Retries** via tenacity. 3 attempts, exponential 1s → 2s → 4s, on
   RequestException + 5xx + 429. Network blips no longer kill a refresh PR.
 - **User-Agent** comes from config.HTTP_USER_AGENT — one place to update.

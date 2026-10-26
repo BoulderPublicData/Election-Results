@@ -53,7 +53,7 @@ from .config import (
     RECONCILIATION_CSV,
     RECONCILIATION_MD,
     SECRETARY_OF_STATE,
-    VOTE_COUNTING,
+    VOTE_COUNTING_CONTESTS_CSV,
     VOTE_COUNTING_VS_SOV_CSV,
     Source,
     original_path,
@@ -119,7 +119,7 @@ def _read_sos_original(path: Path) -> pd.DataFrame | None:
     yes_col = cols.get("yes votes")
     no_col = cols.get("no votes")
     if county_col and not contest_col:
-        log.info("reconcile.turnout_only", file=path.name)
+        log.debug("reconcile.turnout_only", file=path.name)
         return None
     if not (county_col and contest_col):
         raise ValueError(f"{path.name}: missing county/contest columns; have={list(df.columns)}")
@@ -493,7 +493,7 @@ def reconcile_vote_counting() -> pd.DataFrame:
     """
     import difflib
 
-    path = VOTE_COUNTING / "vote-counting-contests.csv"
+    path = VOTE_COUNTING_CONTESTS_CSV
     if not path.exists():
         return pd.DataFrame()
     web = pd.read_csv(path, low_memory=False)
@@ -610,6 +610,45 @@ def run(pool: list[Source]) -> tuple[pd.DataFrame, pd.DataFrame, list[dict]]:
     return top_df, cand_df, checks
 
 
+def _key_set(df: pd.DataFrame) -> pd.Series:
+    return pd.Series(list(zip(df["year"].astype(int), df["election_type"], df["data_source"],
+                              strict=True)), index=df.index, dtype=object)
+
+
+def _merge_with_existing(pool: list[Source], top: pd.DataFrame, cand: pd.DataFrame,
+                         checks: list[dict]) -> tuple[pd.DataFrame, pd.DataFrame, list[dict]]:
+    done = {(s.year, s.election_type, s.data_source) for s in pool}
+    order = {(s.year, s.election_type, s.data_source): i for i, s in enumerate(ALL_SOURCES)}
+
+    def merge(path: Path, new: pd.DataFrame) -> pd.DataFrame:
+        if not path.exists():
+            return new
+        old = pd.read_csv(path, keep_default_na=False, na_values=[""])
+        if old.empty:
+            return new
+        old = old[~_key_set(old).isin(done)]
+        out = pd.concat([old, new], ignore_index=True) if len(new) else old
+        rank = _key_set(out).map(lambda k: order.get(k, len(order)))
+        return out.assign(_r=rank).sort_values("_r", kind="stable").drop(columns="_r")
+
+    top = merge(RECONCILIATION_CSV, top)
+    cand = merge(RECONCILIATION_CANDIDATES_CSV, cand)
+    if "note" in cand.columns:
+        cand["note"] = cand["note"].fillna("")
+    compared = set(_key_set(cand)) if len(cand) else set()
+    for s in ALL_SOURCES:
+        key = (s.year, s.election_type, s.data_source)
+        if key in done:
+            continue
+        proc = _read_processed(s)
+        if proc is None:
+            continue
+        checks.append({"year": s.year, "election_type": s.election_type,
+                       "data_source": s.data_source, **structural_checks(proc),
+                       "status": "compared" if key in compared else "no_original"})
+    return top, cand, checks
+
+
 def report_markdown(all_recon: pd.DataFrame, cand: pd.DataFrame, checks: list[dict],
                     vc: pd.DataFrame, xs: pd.DataFrame | None = None) -> str:
     n_cand_bad = int((cand["status"] == "mismatch").sum())
@@ -692,9 +731,13 @@ def main(argv: list[str] | None = None) -> int:
 
     AUDIT.mkdir(parents=True, exist_ok=True)
     all_recon, cand, checks = run(pool)
-    if all_recon.empty:
+    if all_recon.empty and cand.empty:
         print("No reconciliation rows generated.", file=sys.stderr)
         return 2
+    if len(pool) < len(ALL_SOURCES):
+        # A filtered run updates its own sources' rows and keeps everyone
+        # else's, so the shared report always covers the whole dataset (#18).
+        all_recon, cand, checks = _merge_with_existing(pool, all_recon, cand, checks)
 
     all_recon.to_csv(RECONCILIATION_CSV, index=False)
     cand.to_csv(RECONCILIATION_CANDIDATES_CSV, index=False)

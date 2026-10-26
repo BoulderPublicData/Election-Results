@@ -43,7 +43,8 @@ The architecture is codified in the [`data-liberation`](https://github.com/brian
 ## Quickstart
 
 ```bash
-# 1. Install (uv handles Python and dependencies)
+# 1. Install (uv handles Python 3.11 — pinned in .python-version — and the
+#    dependencies, including the pytest + ruff dev group)
 uv sync
 
 # 2. Run the full pipeline — fetch, clean, audit, reconcile
@@ -53,8 +54,9 @@ uv run python -m scripts.pipeline
 #    then fetch + clean them (handles years missing from sources.py)
 uv run python -m scripts.pipeline --discover
 
-# 4. Just clean what's already on disk (no network; ~2 minutes)
-uv run python -m scripts.pipeline --skip-fetch --no-pdf
+# 4. Just clean what's already on disk (no network; ~2 minutes; add --no-pdf
+#    to skip the slower PDF years — the shared outputs keep every year either way)
+uv run python -m scripts.pipeline --skip-fetch
 
 # 5. Run the test suite
 uv run pytest

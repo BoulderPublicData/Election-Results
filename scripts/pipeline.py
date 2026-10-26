@@ -1,10 +1,18 @@
 """
-End-to-end driver: fetch (if needed) → clean → audit → emit all-elections-tidy.csv.
+End-to-end driver: fetch (if needed) → clean → vote counting → reconcile →
+audit, plus one entry point for every per-stage command.
 
 Typical use:
   uv run python -m scripts.pipeline                 # full refresh
   uv run python -m scripts.pipeline --no-pdf        # skip the slow PDF years
   uv run python -m scripts.pipeline --year 2024     # one year only
+  uv run python -m scripts.pipeline reconcile       # one stage (see below)
+
+A filtered run (--year / --since / --source / --no-pdf) re-parses only the
+matching source files. The whole-dataset outputs — all-elections-tidy.csv,
+provenance.csv, rejected.csv, summary.md and the reconciliation report — are
+rebuilt from every file on disk or upserted by key (scripts/shared_outputs.py),
+so they never shrink to the subset (#18).
 """
 
 from __future__ import annotations
@@ -15,22 +23,44 @@ from pathlib import Path
 
 import pandas as pd
 
+from . import shared_outputs
 from .clean import BOCO_PDF_YEARS, _meta_for, _output_path, clean_source, write_csv
 from .config import (
+    AUDIT,
+    AUDIT_SUMMARY_MD,
     BOULDER_COUNTY,
     COMBINED_CSV,
     PROVENANCE_CSV,
+    REJECTED_CSV,
     REPO_ROOT,
     SECRETARY_OF_STATE,
     STATEMENTS_OF_VOTES,
+    sov_csv_path,
 )
 from .config import (
     SOURCES as ALL_SOURCES,
 )
-from .logging_setup import get_logger
 from .schema import provenance_record, validate
 
-log = get_logger(__name__)
+# Subcommand → module whose main(argv) implements it.
+SUBCOMMANDS: dict[str, tuple[str | None, str]] = {
+    "run": (None, "the full pipeline (the default when no subcommand is given)"),
+    "discover": ("scripts.discover", "list SoV files upstream that the registry doesn't have"),
+    "fetch": ("scripts.fetch", "download raw files into data/original/ (+ manifest)"),
+    "clean": ("scripts.clean", "parse raw files into the per-year CSVs"),
+    "audit": ("scripts.audit", "per-file summary statistics → data/audit/"),
+    "reconcile": ("scripts.reconcile", "compare processed totals with the originals"),
+    "export-lookups": ("scripts.export_lookups", "regenerate data/lookups/*.json"),
+    "publish": ("scripts.publish", "build elections.db + metadata.yaml for Datasette"),
+    "vote-counting": ("scripts.vote_counting", "rebuild the election-night dataset"),
+}
+
+
+def _epilog() -> str:
+    width = max(len(k) for k in SUBCOMMANDS)
+    lines = ["subcommands (`python -m scripts.pipeline <subcommand> --help` for each):"]
+    lines += [f"  {name:<{width}}  {desc}" for name, (_, desc) in SUBCOMMANDS.items()]
+    return "\n".join(lines)
 
 
 def _run_end_to_end(argv: list[str] | None = None) -> int:
@@ -39,7 +69,9 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     This used to be `main()`; it's now the implementation of the `run`
     subcommand. The new `main()` below is an argparse-with-subcommands router.
     """
-    ap = argparse.ArgumentParser(description=__doc__)
+    ap = argparse.ArgumentParser(
+        prog="python -m scripts.pipeline [run]", description=__doc__, epilog=_epilog(),
+        formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--year", type=int)
     ap.add_argument("--since", type=int)
     ap.add_argument("--source", choices=["boulder_county", "secretary_of_state", "all"],
@@ -92,6 +124,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     STATEMENTS_OF_VOTES.mkdir(parents=True, exist_ok=True)
     per_year: list[pd.DataFrame] = []
     prov_rows: list[dict] = []
+    parsed: list[tuple[str, str]] = []
     errors = 0
     for s in pool:
         label = f"{s.year}-{s.election_type}-{s.data_source}"
@@ -108,40 +141,30 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
         print(f"OK   {label}  rows={len(df):>6}")
         per_year.append(df)
         prov_rows.append(provenance_record(df, _meta_for(s)))
+        parsed.append((s.data_source, s.local_filename))
 
-    if per_year:
-        combined = pd.concat(per_year, ignore_index=True)
-        write_csv(combined, args.combined_out)
-        print(f"\nwrote {args.combined_out.relative_to(REPO_ROOT)} "
-              f"({len(combined):,} rows, "
-              f"{combined['election_year'].nunique()} years, "
-              f"{combined['data_source'].nunique()} sources)")
+    # Whole-dataset outputs: rebuilt from every per-year CSV on disk or
+    # upserted by key, never replaced by just this run's subset (#18).
+    combined = shared_outputs.rebuild_combined(STATEMENTS_OF_VOTES, args.combined_out)
+    print(f"\nwrote {args.combined_out.relative_to(REPO_ROOT)} "
+          f"({len(combined):,} rows, "
+          f"{combined['election_year'].nunique()} years, "
+          f"{combined['data_source'].nunique()} sources)")
 
-        # Provenance sidecar — one row per source file. The per-year CSVs
-        # drop these 5 columns to keep file sizes down (they're constant for
-        # every row from a given file); the sidecar preserves the info so
-        # nothing's lost.
-        prov_df = pd.DataFrame(prov_rows)
-        prov_path = PROVENANCE_CSV
-        prov_df.to_csv(prov_path, index=False)
-        print(f"wrote {prov_path.relative_to(REPO_ROOT)} "
-              f"({len(prov_df)} source files; provenance for the slim per-year CSVs)")
+    # Provenance sidecar — one row per source file. The per-year CSVs drop
+    # these 5 columns to keep file sizes down (they're constant for every row
+    # from a given file); the sidecar preserves the info so nothing's lost.
+    prov_df = shared_outputs.upsert_provenance(prov_rows, PROVENANCE_CSV)
+    print(f"wrote {PROVENANCE_CSV.relative_to(REPO_ROOT)} "
+          f"({len(prov_df)} source files; {len(prov_rows)} updated this run)")
 
-    # Reject port — drain the per-parser rejection buffers and emit a single
-    # CSV. Any non-zero count here is a signal that the parser dropped rows;
+    # Reject port — drain the per-parser rejection buffers and upsert them by
+    # source file. Any non-zero count is a signal that a parser dropped rows;
     # the row_index column points back into the source file.
-    from .config import REJECTED_CSV
     from .reject import drain as _drain_rejects
-    rejected = _drain_rejects()
-    REJECTED_CSV.parent.mkdir(parents=True, exist_ok=True)
-    rejected.to_csv(REJECTED_CSV, index=False)
-    if len(rejected):
-        log.warning("pipeline.rejected_rows",
-                    count=len(rejected), path=str(REJECTED_CSV.relative_to(REPO_ROOT)))
-        print(f"wrote {REJECTED_CSV.relative_to(REPO_ROOT)} "
-              f"({len(rejected)} rejected rows — investigate before publishing)")
-    else:
-        print(f"wrote {REJECTED_CSV.relative_to(REPO_ROOT)} (0 rejected rows)")
+    rejected = shared_outputs.upsert_rejects(_drain_rejects(), parsed, REJECTED_CSV)
+    print(f"wrote {REJECTED_CSV.relative_to(REPO_ROOT)} ({len(rejected)} rejected rows"
+          + (" — investigate before publishing)" if len(rejected) else ")"))
 
     # Election-night vote counting — rebuilt from the committed Datalab cache
     # only (never calls the API; run `pipeline vote-counting --ocr` for new
@@ -168,28 +191,20 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     if reconcile.main([]) != 0:
         errors += 1
 
-    # Audit — runs on the IN-MEMORY frames (which still carry provenance)
-    # so we don't have to re-read the slim CSVs + join the sidecar.
+    # Audit — per-file fragments for this run's IN-MEMORY frames (which still
+    # carry provenance), then summary.md rebuilt from every fragment on disk.
     print("\n--- audit ---")
-    from .audit import AUDIT_DIR, audit_frame
-    AUDIT_DIR.mkdir(parents=True, exist_ok=True)
-    fragments: list[str] = []
-    for df in per_year:
-        if df.empty:
-            continue
-        # Recover the per-file stem from the per-row schema columns.
-        year = df["election_year"].iloc[0]
-        etype = df["election_type"].iloc[0]
-        ds = df["data_source"].iloc[0].replace("_", "-")
-        stem = f"{year}-{etype}-{ds}"
+    from .audit import audit_frame
+    AUDIT.mkdir(parents=True, exist_ok=True)
+    for df, prov in zip(per_year, prov_rows, strict=True):
+        stem = sov_csv_path(int(prov["election_year"]), str(prov["election_type"]),
+                            str(prov["data_source"])).stem
         try:
-            frag = audit_frame(df, stem)
-            (AUDIT_DIR / f"{stem}.md").write_text(frag)
-            fragments.append(frag)
+            (AUDIT / f"{stem}.md").write_text(audit_frame(df, stem, provenance=prov))
         except Exception as e:
             print(f"  audit FAIL {stem}: {e}", file=sys.stderr)
-    (AUDIT_DIR / "summary.md").write_text("\n".join(fragments))
-    print(f"wrote data/audit/summary.md ({len(fragments)} sections)")
+    n = shared_outputs.rebuild_audit_summary(AUDIT, AUDIT_SUMMARY_MD)
+    print(f"wrote {AUDIT_SUMMARY_MD.relative_to(REPO_ROOT)} ({n} sections)")
 
     return 1 if errors else 0
 
@@ -204,20 +219,7 @@ def main(argv: list[str] | None = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
 
-    # Backwards compat: no subcommand → run the full pipeline as before.
-    subcommands = {
-        "discover": "scripts.discover",
-        "fetch": "scripts.fetch",
-        "clean": "scripts.clean",
-        "audit": "scripts.audit",
-        "reconcile": "scripts.reconcile",
-        "export-lookups": "scripts.export_lookups",
-        "publish": "scripts.publish",
-        "vote-counting": "scripts.vote_counting",
-        "run": None,  # handled inline
-    }
-
-    if not argv or argv[0] not in subcommands:
+    if not argv or argv[0] not in SUBCOMMANDS:
         # No subcommand given — treat as `run` for backwards compatibility.
         return _run_end_to_end(argv)
 
@@ -226,7 +228,7 @@ def main(argv: list[str] | None = None) -> int:
         return _run_end_to_end(rest)
 
     import importlib
-    module_name = subcommands[sub]
+    module_name = SUBCOMMANDS[sub][0]
     module = importlib.import_module(module_name)
     if not hasattr(module, "main"):
         print(f"{module_name} has no main() — can't run subcommand `{sub}`",

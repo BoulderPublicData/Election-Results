@@ -27,8 +27,8 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Sync deps (incl. dev)
-        run: uv sync --all-extras
+      - name: Sync deps (the default `dev` group brings pytest + ruff)
+        run: uv sync
 
       - name: Lint (ruff)
         # Rules are configured in pyproject.toml [tool.ruff].

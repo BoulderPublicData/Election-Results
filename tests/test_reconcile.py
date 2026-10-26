@@ -125,3 +125,23 @@ def test_status_thresholds():
     assert reconcile._status(0) == "match"
     assert reconcile._status(-49) == "near_match"
     assert reconcile._status(50) == "mismatch"
+
+
+def test_filtered_run_keeps_other_sources_rows(tmp_path, monkeypatch):
+    """#18: `reconcile --year 2025` used to rewrite the report with one year."""
+    top_path = tmp_path / "reconciliation.csv"
+    cand_path = tmp_path / "reconciliation-candidates.csv"
+    monkeypatch.setattr(reconcile, "RECONCILIATION_CSV", top_path)
+    monkeypatch.setattr(reconcile, "RECONCILIATION_CANDIDATES_CSV", cand_path)
+    monkeypatch.setattr(reconcile, "_read_processed", lambda s: None)
+    row = {"election_type": "general", "data_source": "secretary_of_state",
+           "canonical": "x", "original_total": 1, "processed_total": 1, "delta": 0,
+           "status": "match"}
+    pd.DataFrame([{"year": 2020, **row}, {"year": 2016, **row}]).to_csv(top_path, index=False)
+    pd.DataFrame(columns=reconcile.CANDIDATE_COLUMNS).to_csv(cand_path, index=False)
+    src = next(s for s in reconcile.SECRETARY_OF_STATE if s.year == 2020)
+    new = pd.DataFrame([{"year": 2020, **row, "status": "mismatch"}])
+    top, cand, _ = reconcile._merge_with_existing(
+        [src], new, pd.DataFrame(columns=reconcile.CANDIDATE_COLUMNS), [])
+    assert sorted(top["year"].tolist()) == [2016, 2020]
+    assert top.loc[top["year"] == 2020, "status"].tolist() == ["mismatch"]
