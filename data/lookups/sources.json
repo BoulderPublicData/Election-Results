@@ -1,8 +1,8 @@
 {
-  "$schema_version": "1.1.0",
+  "$schema_version": "1.2.0",
   "$description": "Source URL registry. One entry per (year, data_source). `local_filename` is the file under data/original/boulder-county/statement-of-votes/ (Boulder County) or data/original/secretary-of-state/ (SOS).",
   "$generated_by": "scripts/export_lookups.py from scripts/sources.py:ALL_SOURCES",
-  "$generated_at": "2026-10-25T22:38:20+00:00",
+  "$generated_at": "2026-10-26T05:04:41+00:00",
   "sources": [
     {
       "year": 2004,

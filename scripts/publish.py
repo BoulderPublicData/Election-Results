@@ -37,6 +37,8 @@ from .concepts import CONCEPTS
 from .config import (
     DATASETTE_DB,
     DATASETTE_METADATA,
+    DATASETTE_RECENT_DB,
+    EXCEL_ZIP,
     PROVENANCE_CSV,
     REPO_ROOT,
     STATEMENTS_OF_VOTES,
@@ -57,6 +59,24 @@ log = get_logger(__name__)
 
 DB_PATH = DATASETTE_DB
 METADATA_PATH = DATASETTE_METADATA
+# A lighter database for Datasette Lite, which downloads the whole file into
+# the browser (#33): the last four general elections and everything since.
+RECENT_SINCE = 2018
+RECENT_DB_PATH = DATASETTE_RECENT_DB
+
+
+def export_excel_csvs(out: Path = EXCEL_ZIP) -> Path:
+    """Zip of the per-year CSVs re-encoded as UTF-8 *with* a byte-order mark,
+    so double-clicking one opens it in Excel with accented names intact
+    (plain UTF-8 CSVs are read as Windows-1252 and garble "Mónica Olguín")."""
+    import zipfile
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for p in per_year_csvs(STATEMENTS_OF_VOTES) + [PROVENANCE_CSV]:
+            zf.writestr(p.name, "\ufeff" + p.read_text(encoding="utf-8"))
+    print(f"wrote {out.relative_to(REPO_ROOT)}")
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -112,8 +132,9 @@ def _concepts_frame() -> pd.DataFrame:
     } for c in CONCEPTS])
 
 
-def build(db_path: Path = DB_PATH) -> Path:
-    """Build elections.db from the per-year CSVs + sidecar + concepts."""
+def build(db_path: Path = DB_PATH, since: int | None = None) -> Path:
+    """Build elections.db from the per-year CSVs + sidecar + concepts.
+    `since` keeps only elections from that year on (the slim "recent" DB)."""
     import sqlite_utils
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -124,6 +145,9 @@ def build(db_path: Path = DB_PATH) -> Path:
     elections = _load_combined()
     provenance = _load_provenance()
     concepts = _concepts_frame()
+    if since is not None:
+        elections = elections[elections["election_year"] >= since]
+        provenance = provenance[provenance["election_year"] >= since]
 
     # `elections` table — facetable columns indexed for query speed.
     db["elections"].insert_all(
@@ -157,6 +181,8 @@ def build(db_path: Path = DB_PATH) -> Path:
         dtypes = VOTE_COUNTING_DTYPES if table == "vote_counting_contests" \
             else VOTE_COUNTING_SUMMARY_DTYPES
         frame = pd.read_csv(path, dtype=dtypes, low_memory=False)
+        if since is not None:
+            frame = frame[frame["election_year"] >= since]
         db[table].insert_all(_records(frame), batch_size=10_000)
         index_cols = ("election_year", "contest") if table == "vote_counting_contests" \
             else ("election_year",)
@@ -196,7 +222,7 @@ _COLUMN_DESCRIPTIONS: dict[str, str] = {
     "data_source": "Which agency published the file (boulder_county or secretary_of_state).",
     "jurisdiction_level": "county / state / city / school_district / special_district.",
     "jurisdiction_name": "Always 'Boulder County' in this project.",
-    "precinct_id": "10-digit Boulder/Colorado precinct identifier (string, preserves leading zeros). Composite IDs (2015, 2022) appear comma-joined. 'Property Owner' / 'Landowner' rows are property-owner ballots with no precinct geography.",
+    "precinct_id": "Precinct identifier (string, preserves leading zeros): 10 digits for SOS and Boulder 2005/2013+, 3 digits for Boulder 2007-2012. Composite reporting units (2010-2025) join their IDs with ', '. Pseudo-precincts ('Property Owner', 'Landowner', 'RMFPD', …) are flagged by is_pseudo_precinct.",
     "precinct_name": "Short-form (3-digit) precinct code. Null for SOS rows.",
     "contest": "Contest title as published.",
     "contest_type": "candidate / measure / retention / recall / ranked_choice.",
@@ -205,6 +231,9 @@ _COLUMN_DESCRIPTIONS: dict[str, str] = {
     "votes": "Vote tally. May be negative for RCV intermediate rounds.",
     "active_voters": "Active registered voters in the precinct. Null on SOS rows.",
     "ballots_cast": "Ballots cast in the precinct. Null on SOS rows.",
+    "is_pseudo_precinct": "1 when precinct_id is, or includes, a unit with no precinct geography "
+                          "(property-owner / landowner ballots, SOS SUM / Provisional rows). "
+                          "Keep these rows for contest totals; drop them before spatial joins.",
 }
 
 
@@ -267,7 +296,7 @@ def build_metadata(out: Path = METADATA_PATH) -> Path:
                         "columns": _COLUMN_DESCRIPTIONS,
                         "facets": [
                             "election_year", "data_source", "election_type",
-                            "contest_type", "party",
+                            "contest_type", "party", "is_pseudo_precinct",
                         ],
                         "size": 100,
                     },
@@ -373,21 +402,26 @@ def build_metadata(out: Path = METADATA_PATH) -> Path:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     sub = ap.add_subparsers(dest="cmd")
-    sub.add_parser("build", help="Build elections.db + metadata.yaml.")
+    sub.add_parser("build", help="Build elections.db, elections-recent.db, metadata.yaml "
+                                 "and the Excel-friendly CSV zip.")
     sub.add_parser("metadata-only", help="Re-emit metadata.yaml without rebuilding the DB.")
+    sub.add_parser("excel", help="Only write the Excel-friendly (UTF-8 with BOM) CSV zip.")
     args = ap.parse_args(argv)
 
     cmd = args.cmd or "build"
     if cmd == "metadata-only":
         build_metadata()
-        print(f"wrote {METADATA_PATH.relative_to(REPO_ROOT)}")
+        return 0
+    if cmd == "excel":
+        export_excel_csvs()
         return 0
 
     db = build()
+    recent = build(RECENT_DB_PATH, since=RECENT_SINCE)
     md = build_metadata()
-    size_mb = db.stat().st_size / (1024 * 1024)
-    print(f"wrote {db.relative_to(REPO_ROOT)}  ({size_mb:.1f} MB)")
-    print(f"wrote {md.relative_to(REPO_ROOT)}")
+    export_excel_csvs()
+    for path in (db, recent):
+        print(f"  {path.relative_to(REPO_ROOT)}: {path.stat().st_size / 1e6:.0f} MB")
     print(
         f"\nPreview locally:\n"
         f"  uv run datasette serve {db.relative_to(REPO_ROOT)} "

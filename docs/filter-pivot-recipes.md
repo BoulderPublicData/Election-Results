@@ -7,9 +7,17 @@ how to do the most common civic-data tasks in **pandas**, **tidyverse**,
 **Excel pivot tables**, and **DuckDB** (SQL straight against the CSV — no load
 step).
 
-> **Just want to explore in the browser?** Open the
-> [Datasette Lite link in the README](../README.md#-datasette-lite) — same data,
+> **Just want to explore in the browser?** Use the
+> [Datasette Lite links at the top of the README](../README.md#election-results) — same data,
 > same SQL editor as the DuckDB column below, zero setup.
+>
+> **Opening a CSV in Excel?** Double-clicking a plain UTF-8 CSV makes Excel guess the
+> wrong encoding and garble accented names (`MÃ³nica` for `Mónica`). Either download
+> `statements-of-votes-excel.zip` from the
+> [latest release](https://github.com/BoulderPublicData/Election-Results/releases/tag/latest)
+> (the same CSVs saved with a UTF-8 byte-order mark, which Excel detects), or in Excel use
+> **Data → From Text/CSV**, pick **65001: Unicode (UTF-8)** as the file origin, and set
+> `precinct_id` to **Text** so leading zeros survive.
 
 Load the file first (DuckDB doesn't need a load — see its column):
 
@@ -97,43 +105,49 @@ GROUP BY precinct_id;
 
 > *"How has total ballots-cast changed in each Boulder precinct from 2014 to 2024?"*
 
+`ballots_cast` and `active_voters` repeat on every row of a precinct, and they are
+reported **per contest**: a precinct split between two districts shows smaller numbers on
+the district contests. The precinct's own turnout is the **largest** value across its
+contests, so take the max — never the sum, and not an arbitrary first row.
+
 **pandas**
 ```python
-# active_voters/ballots_cast are constant per (year, precinct), so dedupe before summing.
 turnout = (
-    df[df.data_source == "boulder_county"]
-    .drop_duplicates(["election_year", "precinct_id"])
+    df[(df.data_source == "boulder_county") & ~df.is_pseudo_precinct]
     .pivot_table(index="precinct_id", columns="election_year",
-                 values="ballots_cast", aggfunc="first")
+                 values="ballots_cast", aggfunc="max")
 )
 ```
 
 **tidyverse**
 ```r
 turnout <- df |>
-  filter(data_source == "boulder_county") |>
-  distinct(election_year, precinct_id, .keep_all = TRUE) |>
-  pivot_wider(id_cols = precinct_id, names_from = election_year,
-              values_from = ballots_cast)
+  filter(data_source == "boulder_county", !is_pseudo_precinct) |>
+  group_by(precinct_id, election_year) |>
+  summarise(ballots_cast = max(ballots_cast, na.rm = TRUE), .groups = "drop") |>
+  pivot_wider(names_from = election_year, values_from = ballots_cast)
 ```
 
 **DuckDB**
 ```sql
 PIVOT (
-    SELECT DISTINCT precinct_id, election_year, ballots_cast
+    SELECT precinct_id, election_year, ballots_cast
     FROM 'data/processed/statements-of-votes/all-elections-tidy.csv'
-    WHERE data_source = 'boulder_county'
+    WHERE data_source = 'boulder_county' AND NOT is_pseudo_precinct
 )
 ON election_year
-USING ANY_VALUE(ballots_cast)  -- "first non-null" for the (precinct, year) cell
+USING MAX(ballots_cast)
 GROUP BY precinct_id;
 ```
 
 **Excel**
-- **Filters:** `data_source = boulder_county`
+- **Filters:** `data_source = boulder_county`, `is_pseudo_precinct = FALSE`
 - **Rows:** `precinct_id`
 - **Columns:** `election_year`
-- **Values:** Max of `ballots_cast` (Max ≈ First when values are constant per group; use Average if you want to be sure)
+- **Values:** Max of `ballots_cast`
+
+Precinct IDs are 3-digit codes in Boulder 2007-2012 and 10-digit from 2013, so a precinct
+won't line up across that boundary by ID alone.
 
 ---
 
@@ -384,10 +398,10 @@ LEFT JOIN 'data/processed/statements-of-votes/provenance.csv' p
 ## Common gotchas
 
 - **`precinct_id` is a string** — `"01000123"` is not `1000123`. Load as text in Excel (paste-special), or use `dtype={"precinct_id": "string"}` in pandas / `col_character()` in R.
-- **Active voters and ballots cast are precinct-level, not per-row** — they repeat across every contest/candidate row for the same (year, precinct). Use `drop_duplicates(["year","precinct_id"])` before summing them. Excel: use `Max` (or `First`), not `Sum`.
+- **Active voters and ballots cast repeat on every row, and are reported per contest** — a precinct split between districts shows smaller numbers on its district contests. For one value per precinct take the max: `df.groupby(["election_year", "election_type", "data_source", "precinct_id"])[["active_voters", "ballots_cast"]].max()` (R: `group_by(...) |> summarise(across(c(active_voters, ballots_cast), max))`). Never sum them across rows. Excel: use `Max`, not `Sum`.
 - **Negative votes only appear in RCV intermediate rounds** — they represent ballots transferring *away* from an eliminated candidate. Use the `Round` suffix to filter for `Final` rows when you want final totals.
 - **`data_source` matters** — Boulder SoV reports all Boulder precincts; SOS reports only precincts that recorded votes. Counts differ slightly. When in doubt, prefer Boulder SoV for Boulder-specific analysis and SOS for state-level comparisons.
 - **Pre-2013 panel-format years** — 2008-2012 Boulder precinct IDs are 3-digit codes (`073`), not the 10-digit IDs used from 2013, so exact-match precinct filters don't carry across that boundary.
-- **Property-owner pseudo-precincts** — some special-district contests (2015, 2023, 2025) include rows whose `precinct_id` is `Property Owner` or `Landowner`. Keep them when summing contest totals (they are part of the certified count); drop them before joining to precinct geography.
+- **Pseudo-precincts** — special-district contests include property-owner / landowner ballots on rows whose `precinct_id` is a code rather than a precinct: `Landowner` / `LANDOWNER` (most Boulder years 2005-2022), `Landowner CCCPR` … (2011), `FMFPD` / `SLFPD` / `RMFPD` / `NCLD` (2009-2010), `Property Owner` (2023, 2025); the SOS files add `SUM` (2006) and `Provisional` (2008). `is_pseudo_precinct` is `True` on all of them. Keep them when summing contest totals (they are part of the certified count); filter `~is_pseudo_precinct` before joining to precinct geography.
 - **Election-night snapshots are a different dataset** — `data/processed/vote-counting/` holds county-wide totals per results-site update, not precinct rows. Don't concatenate it with `all-elections-tidy.csv`, and don't sum `votes` across snapshots (they're cumulative); filter `is_final_snapshot` or use `vote_change`. See [`data-dictionary.md` §8](data-dictionary.md#8-election-night-incremental-results-dataprocessedvote-counting).
-- **Composite precincts** — in 2015 and 2022, some `precinct_id` values are comma-joined (e.g. `"2181007800, 2181207403"`). These represent ballots tallied jointly across two underlying precincts. If you're joining to precinct geography, split first.
+- **Composite precincts** — in every Boulder year from 2010 to 2025 some reporting units combine several precincts, written as one `precinct_id` joined with `", "` (e.g. `"2181007800, 2181207403"`, `"073, 74"`). Their tallies are joint, so never split the votes between members; to map them, join each member ID to its geography and treat the group as one area. A few 2010 units are written as a dash range (`"002-004"`). Some composites include a pseudo-precinct (`"2181307910, Landowner"`) and are flagged by `is_pseudo_precinct`.

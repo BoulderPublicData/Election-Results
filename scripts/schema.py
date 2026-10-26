@@ -15,7 +15,10 @@ from typing import Literal
 
 import pandas as pd
 
-SCHEMA_VERSION = "1.1.0"
+# 1.2.0 (2026-10): added `is_pseudo_precinct` (appended after ballots_cast, so
+# the first 15 CSV columns keep their positions); composite precinct IDs use
+# one ", " separator.
+SCHEMA_VERSION = "1.2.0"
 
 # Canonical column order. Parsers MUST return these columns in this order.
 COLUMNS: list[str] = [
@@ -34,6 +37,7 @@ COLUMNS: list[str] = [
     "votes",
     "active_voters",
     "ballots_cast",
+    "is_pseudo_precinct",
     "source_file",
     "source_url",
     "retrieved_at",
@@ -59,6 +63,7 @@ DTYPES: dict[str, str] = {
     "votes": "Int64",
     "active_voters": "Int64",
     "ballots_cast": "Int64",
+    "is_pseudo_precinct": "boolean",  # precinct_id is/includes a no-geography unit
     "source_file": "string",
     "source_url": "string",
     "retrieved_at": "string",  # ISO 8601 UTC
@@ -161,6 +166,11 @@ def coerce(df: pd.DataFrame) -> pd.DataFrame:
     if extra:
         print(f"  WARN coerce() dropping unknown columns: {extra}", file=sys.stderr)
 
+    if "is_pseudo_precinct" not in df.columns and "precinct_id" in df.columns:
+        # Derived column: frames built outside add_provenance() get it too.
+        from .parsers.common import is_pseudo_precinct
+        df = df.assign(is_pseudo_precinct=df["precinct_id"].map(is_pseudo_precinct))
+
     out = pd.DataFrame()
     for col in COLUMNS:
         if col in df.columns:
@@ -170,6 +180,10 @@ def coerce(df: pd.DataFrame) -> pd.DataFrame:
         try:
             if DTYPES[col].startswith("Int"):
                 series = pd.to_numeric(series, errors="coerce").astype(DTYPES[col])
+            elif DTYPES[col] == "boolean" and series.dtype == object:
+                series = series.map(
+                    lambda v: pd.NA if pd.isna(v) else str(v).strip().lower() in {"true", "1"}
+                    if isinstance(v, str) else bool(v)).astype("boolean")
             else:
                 series = series.astype(DTYPES[col])
         except (ValueError, TypeError) as e:

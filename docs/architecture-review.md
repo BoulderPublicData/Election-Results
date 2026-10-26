@@ -10,13 +10,21 @@ against that template and proposes a tiered set of changes, ranked by value-to-e
 
 Use this as the working agenda for what to land next. Each tier lands as its own PR.
 
+> **Status (2026-10).** This is a snapshot from May 2026, kept for its reasoning. Several of
+> its gaps have since closed: the Publish phase exists (a Datasette database plus Datasette
+> Lite links, rebuilt on every push to `main`), the reject port, concept catalog, pandera
+> schemas and central `config.py` landed, and reconciliation now covers every contest ×
+> candidate key. Current counts: <!-- generated:test-count -->431 tests<!-- /generated:test-count -->;
+> 175 top-line and about 3,200 contest × candidate reconciliation rows, 0 mismatches. Where
+> a line below disagrees with the code, the code and `AGENTS.md` win.
+
 ---
 
 ## TL;DR
 
 The repo **already implements 4 of the skill's 6 phases cleanly**: Survey (README + Cleaning.ipynb), Scaffold (matching layout), Extract (per-vintage parsers + idempotent fetch), Tidy (15-column slim CSVs + provenance sidecar), Audit (audit + reconcile). The two gaps are:
 
-1. **Publish** is entirely missing — no Datasette, no Quarto site, no Git LFS, no DocumentCloud.
+1. **Publish** was entirely missing — no Datasette, no Quarto site, no Git LFS, no DocumentCloud. *(Since 2026-05: Datasette database + Datasette Lite links; Quarto / LFS / DocumentCloud still open.)*
 2. **A handful of skill conventions** (concept catalog, reject port, pandera at the boundary, central `config.py`, AGENTS.md naming, DuckDB recipes) are below-the-bar.
 
 Tier 1 closes the easy gaps in a single afternoon. Tier 2 is a week's work and yields a much more robust pipeline. Tier 3 is the Publish phase — the largest scope but also where the project goes from "an internal harmonized dataset" to "a public civic asset with a queryable API and a docs site."
@@ -34,11 +42,11 @@ Tier 1 closes the easy gaps in a single afternoon. Tier 2 is a week's work and y
 | Per-vintage parsers under `scripts/parsers/` | ✅ `boco_tidy.py`, `boco_panel.py`, `boco_pdf.py`, `sos.py` |
 | `Source` dataclass + registry | ✅ `scripts/sources.py:Source` + `ALL_SOURCES` |
 | Discovery scraper | ✅ `scripts/discover.py` for new vintages on upstream pages |
-| Reconciliation against authoritative totals | ✅ `scripts/reconcile.py` — 153 cross-checks, 0 mismatches |
+| Reconciliation against authoritative totals | ✅ `scripts/reconcile.py` — top-line and contest × candidate checks, 0 mismatches (153 top-line cross-checks at the time of review) |
 | Audit module producing diff-able Markdown | ✅ `scripts/audit.py` → `data/audit/summary.md` |
 | Single end-to-end driver | ✅ `scripts/pipeline.py` |
 | JSON lookups exported from Python source-of-truth | ✅ `scripts/export_lookups.py` → 5 JSON files |
-| pytest suite + CI workflow | ✅ 74 tests + `.github/workflows/tests.yml` |
+| pytest suite + CI workflow | ✅ tests + `.github/workflows/tests.yml` (74 at the time of review) |
 | Cron-driven refresh PR | ✅ `.github/workflows/annual-sov-refresh.yml` (every Jan 6) |
 | Data dictionary + filter-pivot recipes | ✅ `docs/data-dictionary.md` + `docs/filter-pivot-recipes.md` |
 | Movement-context note | ✅ README mentions BoulderPublicData |
@@ -184,7 +192,7 @@ The "Baked Data" architecture (rebuild SQLite on every deploy; no app-layer writ
 
 Notable: the existing Cleaning.ipynb (the rewritten public-data-oped notebook) becomes a Quarto page directly. No content rewrite needed.
 
-**T3.3 — Git LFS for source PDFs + the combined CSV.** The 3 source PDFs (2005, 2007, 2009) are ~10MB each; the combined `all-elections-tidy.csv` is 49MB. Currently committed (PDFs) or gitignored (combined). LFS lets us commit both without bloating the git history. `.gitattributes`:
+**T3.3 — Git LFS for source PDFs + the combined CSV.** The 3 source PDFs (2005, 2007, 2009) are about 300 KB each; the combined `all-elections-tidy.csv` is <!-- generated:combined-size -->61 MB<!-- /generated:combined-size -->. Currently committed (PDFs) or gitignored (combined). LFS lets us commit both without bloating the git history. `.gitattributes`:
 
 ```
 *.pdf filter=lfs diff=lfs merge=lfs -text

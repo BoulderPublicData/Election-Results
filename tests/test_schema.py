@@ -19,7 +19,12 @@ from scripts.schema import (
 
 
 def test_column_count():
-    assert len(COLUMNS) == 20, "Schema is 20 columns; bumping it is a major change"
+    # 1.2.0 added is_pseudo_precinct. Changing the column set is a schema-
+    # version change (AGENTS §7); additions are appended after ballots_cast so
+    # the earlier CSV columns keep their positions.
+    assert len(COLUMNS) == 21, "Schema is 21 columns; changing it needs a SCHEMA_VERSION bump"
+    assert CSV_COLUMNS[-1] == "is_pseudo_precinct"
+    assert SCHEMA_VERSION == "1.2.0"
 
 
 def test_csv_columns_excludes_provenance():

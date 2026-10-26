@@ -136,7 +136,9 @@ data/processed/statements-of-votes/all-elections-tidy.csv
 # Datasette Lite link in README (released as GitHub Release artifacts on each
 # main merge). Locally generated; not committed.
 data/processed/elections.db
+data/processed/elections-recent.db
 data/processed/metadata.yaml
+data/processed/statements-of-votes-excel.zip
 
 # requests-cache SQLite (per-developer dev cache; not commit-worthy).
 .cache/

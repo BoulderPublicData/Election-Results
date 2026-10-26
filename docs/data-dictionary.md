@@ -7,21 +7,39 @@ It also documents the cross-walks between Boulder County SoV files, Colorado
 Secretary of State precinct-results files, and the harmonized long-form schema
 used throughout `data/processed/statements-of-votes/`.
 
-Schema version: **1.1.0** (see [`scripts/schema.py`](../scripts/schema.py))
+Schema version: **1.2.0** (see [`scripts/schema.py`](../scripts/schema.py)). Terms such as SoV, RCV, UOCAVA, coordinated election and pseudo-precinct are defined in the [glossary](#0-glossary).
+
+---
+
+## 0. Glossary
+
+| Term | Meaning |
+|---|---|
+| **SoV** (Statement of Votes) | The county's official, certified results file: votes for every candidate and question in every precinct. |
+| **SOS** | Colorado Secretary of State; publishes its own precinct-level results for general elections. |
+| **Precinct** | The smallest geographic voting unit. `precinct_id` is 10 digits (`2181007800`) except in Boulder's 2007-2012 files (3 digits, `073`). |
+| **Composite precinct** | Several precincts reported jointly as one unit (often to protect the privacy of very small groups); one `precinct_id` joined with `", "` (§4.3). |
+| **Pseudo-precinct** | A row that isn't a place: property-owner / landowner ballots in special-district contests, or an SOS summary row (§4.3a). `is_pseudo_precinct = True`. |
+| **General / primary / coordinated** | `general`: even-year November (federal, state, county). `primary`: even-year June party nominations (not yet ingested). `coordinated`: odd-year November, run by the county for cities, school and special districts. |
+| **Measure** | A yes/no ballot question (amendment, proposition, referendum, local issue). |
+| **Retention** | A yes/no vote on whether a judge keeps their seat. |
+| **RCV** (ranked-choice voting) | Voters rank candidates; the last-place candidate is eliminated round by round until one has a majority. Boulder mayor, from 2023 (§3). |
+| **UOCAVA** | Uniformed and Overseas Citizens Absentee Voting Act — military and overseas ballots, which can arrive after election night. |
+| **Canvass / certification** | The post-election reconciliation of every ballot, ending in the certified SoV ~2-3 weeks after election day. |
 
 ---
 
 ## 1. Schema (canonical columns)
 
-The harmonized in-memory schema is **20 columns**. The **per-year CSV files** under
-`data/processed/statements-of-votes/` hold a slim 15-column view — the 5 provenance columns (#16-20
+The harmonized in-memory schema is **21 columns**. The **per-year CSV files** under
+`data/processed/statements-of-votes/` hold a slim 16-column view — the 5 provenance columns (#17-21
 in the table below) are redundant per-row (every row from a single source file
 has the same value) so they live in a sidecar:
 
 ```
 data/processed/
 ├── statements-of-votes/
-│   ├── 2020-general-boulder-county.csv     ← 15-column slim view
+│   ├── 2020-general-boulder-county.csv     ← 16-column slim view
 │   ├── …                                    ← one slim CSV per source file
 │   ├── all-elections-tidy.csv              ← combined slim CSV
 │   └── provenance.csv                      ← one row per source file; carries
@@ -42,7 +60,7 @@ need the source URL or retrieved-at timestamp for a row.
 | 4 | `data_source` | string | yes | `boulder_county` or `secretary_of_state` — which agency published the file. |
 | 5 | `jurisdiction_level` | string | yes | `county` (Boulder County SoV) or `state` (SOS file, Boulder rows only). |
 | 6 | `jurisdiction_name` | string | yes | Always `Boulder County` in this project. |
-| 7 | `precinct_id` | string | yes | The 10-digit Boulder/Colorado precinct identifier as a **string** (preserves leading zeros). Composite IDs (2015, 2022) appear as `"2181007800, 2181207403"` — see [§4.3](#43-composite-precinct-ids). |
+| 7 | `precinct_id` | string | yes | Precinct identifier as a **string** (preserves leading zeros): 10 digits for SOS and Boulder 2005/2013+, 3 digits for Boulder 2007-2012 ([§2.1](#21-precinct-ids)). Composite units appear as `"2181007800, 2181207403"` ([§4.3](#43-composite-precinct-ids)); pseudo-precincts as a code such as `Landowner` ([§4.3a](#43a-property-owner--landowner-pseudo-precincts)). |
 | 8 | `precinct_name` | string | no | Short form (typically 3-digit) precinct code. Null for SOS rows and for older Boulder files that didn't ship a separate short code. |
 | 9 | `contest` | string | yes | Contest title as published. May contain trailing classifiers like `(CONSTITUTIONAL)`, `(STATUTORY)`. |
 | 10 | `contest_type` | string | yes | One of `candidate`, `measure`, `retention`, `recall`, `ranked_choice`. See [§3](#3-contest-types). |
@@ -51,11 +69,12 @@ need the source URL or retrieved-at timestamp for a row.
 | 13 | `votes` | int (Int64) | usually | Vote tally for this row. **May be negative for RCV intermediate rounds** (votes transferring away from an eliminated candidate). |
 | 14 | `active_voters` | int (Int64) | no | Active registered voters in the precinct at the time of the election. Boulder SoVs only. Null on SOS rows. |
 | 15 | `ballots_cast` | int (Int64) | no | Ballots cast in the precinct. Boulder SoVs only. Null on SOS rows (SOS files don't report ballot totals). |
-| 16 | `source_file` | string | sidecar | **Provenance — sidecar only.** The local filename of the raw download (e.g., `2020-general-sov.xlsx`). |
-| 17 | `source_url` | string | sidecar | **Provenance — sidecar only.** The canonical upstream URL. |
-| 18 | `retrieved_at` | string (ISO UTC) | sidecar | **Provenance — sidecar only.** Timestamp when the raw file was downloaded by `scripts/fetch.py` (or the file's mtime if downloaded by hand). |
-| 19 | `extraction_quality` | string | sidecar | **Provenance — sidecar only.** `machine_readable` (XLS/XLSX), `pdf_text_layer` (pdfplumber-extracted from text-layer PDF), `pdf_ocr` (reserved), `manual` (reserved). |
-| 20 | `extraction_notes` | string | sidecar | **Provenance — sidecar only.** Free-text caveats from the parser — composite-ID flags, RCV mechanics, skipped panels, etc. |
+| 16 | `is_pseudo_precinct` | boolean | yes | `True` when `precinct_id` is, or includes, a unit with no precinct geography (property-owner / landowner ballots; SOS `SUM` / `Provisional` rows) — see [§4.3a](#43a-property-owner--landowner-pseudo-precincts). Keep these rows for contest totals; drop them before spatial joins. Added in 1.2.0. |
+| 17 | `source_file` | string | sidecar | **Provenance — sidecar only.** The local filename of the raw download (e.g., `2020-general-sov.xlsx`). |
+| 18 | `source_url` | string | sidecar | **Provenance — sidecar only.** The canonical upstream URL. |
+| 19 | `retrieved_at` | string (ISO UTC) | sidecar | **Provenance — sidecar only.** Timestamp when the raw file was downloaded by `scripts/fetch.py` (or the file's mtime if downloaded by hand). |
+| 20 | `extraction_quality` | string | sidecar | **Provenance — sidecar only.** `machine_readable` (XLS/XLSX), `pdf_text_layer` (pdfplumber-extracted from text-layer PDF), `pdf_ocr` (reserved), `manual` (reserved). |
+| 21 | `extraction_notes` | string | sidecar | **Provenance — sidecar only.** Free-text caveats from the parser — composite-ID flags, RCV mechanics, skipped panels, etc. |
 
 Columns marked **sidecar** live in `data/processed/statements-of-votes/provenance.csv` rather than in every row of every per-year CSV. They're constant per source file, so duplicating them on every row would inflate file sizes ~3× for no information gain. The pipeline writes both files together so they stay in sync.
 
@@ -65,7 +84,16 @@ Columns marked **sidecar** live in `data/processed/statements-of-votes/provenanc
 
 ### 2.1 Precinct IDs
 
-Boulder uses 10-digit precinct numbers like `2181007800` (county-state-precinct format) and a "short" form like `800` (last three digits). We treat the 10-digit form as the canonical `precinct_id`. The short form is `precinct_name` when published, otherwise null.
+Boulder uses 10-digit precinct numbers like `2181007800` and a "short" form like `800` (last three digits). We treat the 10-digit form as the canonical `precinct_id` and keep the short form in `precinct_name` when published, otherwise null.
+
+The width depends on the file, so exact-match filters and cross-year joins have to account for it:
+
+| Files | `precinct_id` |
+|---|---|
+| SOS 2004-2020 | 10 digits (`2161307900`); SOS 2008 also has `299`, `499` and `Provisional`, SOS 2006 `SUM` and two 11-digit IDs |
+| Boulder 2005 (PDF) | 10 digits (`2181007037`) |
+| Boulder 2007-2012 (PDF / panel XLS) | 3-digit short codes (`073`) — the only form those files print |
+| Boulder 2013-2025 | 10 digits |
 
 `precinct_id` is always a **string** so leading zeros are preserved.
 
@@ -172,20 +200,40 @@ These XLS files predate the modern tidy export. Results are reported as repeatin
 
 ### 4.3 Composite precinct IDs
 
-In **2015** and **2022**, Boulder County reported some precincts jointly because turnout in individual sub-precincts was small enough to risk voter privacy. These rows have comma-joined IDs:
+Every Boulder file from **2010 to 2025** reports some precincts jointly (often because a sub-precinct is small enough to risk voter privacy). The files write the member IDs with different separators — `,` (2023), `, ` (2012-2022, 2025), ` + ` and `+` (2011) — so since schema 1.2.0 the parser writes every composite with one `", "` separator:
 
-```
-precinct_id = "2181007800, 2181207403"
-precinct_name = "800, 403"
-```
+| As published | `precinct_id` |
+|---|---|
+| `073 + 74` (2011) | `073, 74` |
+| `128+132+133+  232+233` (2011) | `128, 132, 133, 232, 233` |
+| `2181207201,2181207202` (2023) | `2181207201, 2181207202` |
+| `2181007800, 2181207403` (2015) | unchanged |
+| `002-004` (2010) | unchanged — a dash may be a range, so it isn't rewritten |
 
-Vote tallies are for the **combined** unit. To match these against single-precinct geography, split the comma-separated IDs into a one-to-many lookup. The parser flags these in `extraction_notes`.
+Members are printed as published: 2011 abbreviates later members (`073, 74` is precincts 073 and 074). `precinct_name` gets the same separator normalization. A composite can include a pseudo-precinct (`2181307910, Landowner`; `004, 005, LFPD`), in which case `is_pseudo_precinct` is `True`.
 
-**Source anomaly — 2023 City of Louisville City Council Ward 2.** The 2023 SoV reports this contest under two *overlapping* composite units, `2181207201,2181207202` and `2181207202,2181207500`, with near-identical tallies (Fahey 184 / 183, Colbert 234 / 234, 458 ballots each). Summed as published, the SoV gives 1,602 / 1,441; without the `202,500` row it gives 1,419 / 1,207 — exactly the county's final election-night web totals (§8). It looks like a double-listed tally in the published file, but the data is left as published (never split or drop composite rows on a guess). It is the only contest in the 2015, 2022 or 2023 files where one precinct appears in two reporting units.
+Vote tallies are for the **combined** unit — never split them between members. To match these against single-precinct geography, split the IDs on `", "` into a one-to-many lookup and treat the group as one area. The tidy-format parser also notes composites in `extraction_notes`.
+
+**Source anomaly — 2023 City of Louisville City Council Ward 2.** The 2023 SoV reports this contest under two *overlapping* composite units, `2181207201, 2181207202` and `2181207202, 2181207500`, with near-identical tallies (Fahey 184 / 183, Colbert 234 / 234, 458 ballots each). Summed as published, the SoV gives 1,602 / 1,441; without the `202, 500` row it gives 1,419 / 1,207 — exactly the county's final election-night web totals (§8). It looks like a double-listed tally in the published file, but the data is left as published (never split or drop composite rows on a guess). It is the only contest in the 2015, 2022 or 2023 files where one precinct appears in two reporting units.
 
 ### 4.3a Property-owner / landowner pseudo-precincts
 
-Special-district contests can include ballots from non-resident property owners. The SoV reports them on a row whose precinct code is `Property Owner` (2023, 2025), `Landowner` (2007, 2008, 2012, 2015; `Landowner CCCPR` etc. in 2011) or a district code such as `FMFPD` / `SLFPD` (2010) or `RMFPD` / `NCLD` (2009) instead of a real precinct. They count toward the certified totals, so they are kept with `precinct_id = "Property Owner"` (or `Landowner`) and flagged in `extraction_notes`. They have no precinct geography — exclude them before a spatial join, but keep them when summing contest totals. (Before 2026-10 the 2023/2025 rows were rejected for a missing `precinct_id`, which undercounted e.g. 2023 Nederland Eco Pass 6A by 101 Yes / 43 No.)
+Special-district contests can include ballots from non-resident property owners. The SoV reports them on a row whose precinct code isn't a precinct. Every variant in the data, all flagged `is_pseudo_precinct = True`:
+
+| `precinct_id` | Files |
+|---|---|
+| `Landowner` | Boulder 2005, 2007, 2008, 2012, 2013, 2016, 2017, 2020, 2022 |
+| `LANDOWNER` | Boulder 2014, 2015, 2018, 2021 |
+| `Landowner CCCPR`, `Landowner CVLID`, `Landowner MFID`, `Landowner PBLID`, `Landowner RMFPD` | Boulder 2011 (one per district) |
+| `Landowner-FM, Landowner-FMLV`, `Landowner-FMLV, Landowner-LV` | Boulder 2019 |
+| `FMFPD`, `SLFPD`, and `LFPD` inside `004, 005, LFPD` | Boulder 2010 (fire-district codes) |
+| `RMFPD`, `NCLD` | Boulder 2009 |
+| `Property Owner` | Boulder 2023, 2025 |
+| a real precinct plus one of the above (`2181307910, Landowner`, `916, Landowner`, …) | Boulder 2012-2022 |
+| `SUM` (0-vote rows) | SOS 2006 |
+| `Provisional` | SOS 2008 |
+
+They count toward the certified totals, so they are kept. They have no precinct geography — filter `~is_pseudo_precinct` before a spatial join, but keep them when summing contest totals. Their `active_voters` is usually 0, so turnout percentages for them are meaningless. (Before 2026-10 the 2023/2025 rows were rejected for a missing `precinct_id`, which undercounted e.g. 2023 Nederland Eco Pass 6A by 101 Yes / 43 No.)
 
 ### 4.4 PDF years (2005, 2007, 2009)
 
@@ -246,44 +294,48 @@ The SOS publishes **only candidate vote totals**, never ballots-cast or active-v
 
 The audit is generated by [`scripts/audit.py`](../scripts/audit.py) and refreshed on every pipeline run. The full per-year summary lives at [`data/audit/summary.md`](../data/audit/summary.md) and per-file fragments at `data/audit/{stem}.md`.
 
-Quick reference (post-pipeline run, 2026-10-26). Contests count distinct titles; SOS 2012-2020 retention contests are one per judge (§4.5):
+Quick reference, regenerated from the per-year CSVs by `uv run python -m scripts.doc_stats`. Contests count distinct titles (SOS 2012-2020 retention contests are one per judge, §4.5); precincts count distinct `precinct_id`s, including composites and pseudo-precincts. 2024 Boulder holds only local races and 2024 SOS is turnout-only (see the notes below). The combined dataset has <!-- generated:row-count -->409,496<!-- /generated:row-count --> rows.
 
-| Year | Source | Election | Rows | Contests | Precincts | Quality |
-|---|---|---|---|---|---|---|
-| 2005 | Boulder | coordinated | 7,307 | 43 | 228 | `pdf_text_layer` |
-| 2007 | Boulder | coordinated | 6,866 | 45 | 235 | `pdf_text_layer` |
-| 2008 | Boulder | general | 27,934 | 71 | 237 | `machine_readable` |
-| 2008 | SOS | general | 24,856 | 43 | 239 | `machine_readable` |
-| 2009 | Boulder | coordinated | 6,654 | 41 | 236 | `pdf_text_layer` |
-| 2010 | Boulder | general | 23,078 | 57 | 247 | `machine_readable` |
-| 2010 | SOS | general | 18,196 | 37 | 236 | `machine_readable` |
-| 2011 | Boulder | coordinated | 6,291 | 49 | 246 | `machine_readable` |
-| 2012 | Boulder | general | 16,775 | 46 | 243 | `machine_readable` |
-| 2012 | SOS | general | 14,290 | 28 | 234 | `machine_readable` |
-| 2013 | Boulder | coordinated | 4,783 | 103 | 246 | `machine_readable` |
-| 2014 | Boulder | general | 20,307 | 58 | 234 | `machine_readable` |
-| 2014 | SOS | general | 15,617 | 32 | 233 | `machine_readable` |
-| 2015 | Boulder | coordinated | 5,235 | 39 | 237 | `machine_readable` (composite precincts) |
-| 2016 | Boulder | general | 26,051 | 62 | 235 | `machine_readable` |
-| 2016 | SOS | general | 21,623 | 38 | 233 | `machine_readable` |
-| 2017 | Boulder | coordinated | 6,047 | 38 | 237 | `machine_readable` |
-| 2018 | Boulder | general | 22,025 | 70 | 240 | `machine_readable` |
-| 2018 | SOS | general | 17,085 | 39 | 235 | `machine_readable` |
-| 2019 | Boulder | coordinated | 5,529 | 32 | 246 | `machine_readable` |
-| 2020 | Boulder | general | 22,990 | 50 | 245 | `machine_readable` |
-| 2020 | SOS | general | 20,584 | 34 | 240 | `machine_readable` |
-| 2021 | Boulder | coordinated | 6,241 | 40 | 243 | `machine_readable` |
-| 2022 | Boulder | general | 22,144 | 76 | 201 | `machine_readable` (composite precincts) |
-| 2023 | Boulder | coordinated | 5,695 | 38 | 198 | `machine_readable` (Plurality + RCV sheets) |
-| 2024 | Boulder | general | 66 | 2 | 13 | `machine_readable` ⚠ check upstream |
-| 2024 | SOS | general | 0 | 0 | 0 | upstream file is turnout-only — no candidate/contest detail; harmonized rows skipped, raw file kept in `data/original/` |
-| 2025 | Boulder | coordinated | 4,342 | 32 | 196 | `machine_readable` (Propositions LL/MM, Boulder County ballot issues) |
+<!-- generated:sov-table -->
+| Year | Source | Election | Rows | Contests | Precincts | Pseudo-precinct rows | Quality |
+|---|---|---|---|---|---|---|---|
+| 2004 | SOS | general | 13,586 | 33 | 229 | 0 | `machine_readable` |
+| 2005 | Boulder | coordinated | 7,307 | 43 | 228 | 6 | `pdf_text_layer` |
+| 2006 | SOS | general | 17,299 | 41 | 237 | 89 | `machine_readable` |
+| 2007 | Boulder | coordinated | 6,866 | 45 | 235 | 8 | `pdf_text_layer` |
+| 2008 | Boulder | general | 27,934 | 71 | 237 | 8 | `machine_readable` |
+| 2008 | SOS | general | 24,856 | 43 | 239 | 104 | `machine_readable` |
+| 2009 | Boulder | coordinated | 6,654 | 41 | 236 | 6 | `pdf_text_layer` |
+| 2010 | Boulder | general | 23,078 | 57 | 247 | 6 | `machine_readable` |
+| 2010 | SOS | general | 18,196 | 37 | 236 | 0 | `machine_readable` |
+| 2011 | Boulder | coordinated | 6,291 | 49 | 246 | 12 | `machine_readable` |
+| 2012 | Boulder | general | 16,775 | 46 | 243 | 6 | `machine_readable` |
+| 2012 | SOS | general | 14,290 | 28 | 234 | 0 | `machine_readable` |
+| 2013 | Boulder | coordinated | 4,783 | 103 | 246 | 146 | `machine_readable` |
+| 2014 | Boulder | general | 20,307 | 58 | 234 | 6 | `machine_readable` |
+| 2014 | SOS | general | 15,617 | 32 | 233 | 0 | `machine_readable` |
+| 2015 | Boulder | coordinated | 5,235 | 39 | 237 | 7 | `machine_readable` |
+| 2016 | Boulder | general | 26,051 | 62 | 235 | 4 | `machine_readable` |
+| 2016 | SOS | general | 21,623 | 38 | 233 | 0 | `machine_readable` |
+| 2017 | Boulder | coordinated | 6,047 | 38 | 237 | 4 | `machine_readable` |
+| 2018 | Boulder | general | 22,025 | 70 | 240 | 10 | `machine_readable` |
+| 2018 | SOS | general | 17,085 | 39 | 235 | 0 | `machine_readable` |
+| 2019 | Boulder | coordinated | 5,529 | 32 | 246 | 4 | `machine_readable` |
+| 2020 | Boulder | general | 22,990 | 50 | 245 | 6 | `machine_readable` |
+| 2020 | SOS | general | 20,584 | 34 | 240 | 0 | `machine_readable` |
+| 2021 | Boulder | coordinated | 6,241 | 40 | 243 | 2 | `machine_readable` |
+| 2022 | Boulder | general | 22,144 | 76 | 201 | 6 | `machine_readable` |
+| 2023 | Boulder | coordinated | 5,695 | 38 | 198 | 4 | `machine_readable` |
+| 2024 | Boulder | general | 66 | 2 | 13 | 0 | `machine_readable` |
+| 2024 | SOS | general | 0 | 0 | 0 | 0 | `machine_readable` |
+| 2025 | Boulder | coordinated | 4,342 | 32 | 196 | 2 | `machine_readable` |
+<!-- /generated:sov-table -->
 
 **Notes on row counts:**
 
 - 2008-2012 Boulder: panel files; every candidate reconciles to the file's printed `Totals` — see [§4.2](#42-boulder-county-panel-years-2008-2010-2011-2012).
 - 2024 Boulder: the upstream "Amended Statement of Votes" file contains only 66 rows of local races (Town of Superior, etc.), and the 2024 SOS file is turnout-only. County-wide totals for all 65 contests are in the election-night dataset's final 2024 snapshot (§8).
-- 2023 / 2025 Boulder: precinct counts include the `Property Owner` pseudo-precinct (§4.3a).
+- Precinct counts include composite units (§4.3) and pseudo-precincts (§4.3a).
 - 2008-2014 SOS: ~3-5 fewer precincts than Boulder — SOS reports precinct subset that voted; Boulder reports every registered precinct.
 
 ---
@@ -411,4 +463,5 @@ hold; 2025's final snapshot is pre-certification ("Unofficial Results").
   - `For/Against the Measure`, `FOR THE ISSUE`, `FOR`/`AGAINST` → `Yes`/`No` (contest type `measure`); county/district court judges typed `retention`, TABOR revenue-retention questions typed `measure`.
   - Party codes unified across sources (`UNI`/`Unity Party of Colorado` → `UTY`, `LIB` → `LBR`, `UNA` → `UAF`, `APV` → `AVP`, full names → codes; see `data/lookups/party-codes.json`).
   - `provenance.csv` has a row for every source file, including the PDF years and the turnout-only 2024 SOS file; `reconcile.py` adds a contest × candidate check.
+- **2026-10** — Schema **1.2.0**: new `is_pseudo_precinct` boolean (appended after `ballots_cast`; CSVs are now 16 columns), and composite precinct IDs use one `", "` separator (§4.3). Glossary (§0); precinct-ID widths by year (§2.1); every pseudo-precinct variant listed (§4.3a); counts in §5 generated by `scripts/doc_stats.py`.
 - **2026-10** — Pipeline and provenance: filtered runs no longer overwrite the whole-dataset outputs (combined CSV, provenance, rejects, audit summary, reconciliation, election-night CSVs); `fetch` records and keeps files already on disk and verifies hashes (`--verify`); the Datasette database is built from the committed per-year CSVs, so it now has all 22 years (2005/2007/2009 were missing); the annual refresh targets the previous year. Election-night: the duplicate 2023 RCV final report rows are dropped (one row per candidate and round per report time), and the Round-N semantics are documented (§3).

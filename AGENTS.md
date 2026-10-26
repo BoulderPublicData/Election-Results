@@ -8,7 +8,7 @@ This file is also a useful overview for human collaborators.
 
 ## 0. One-paragraph summary
 
-This repo harmonizes precinct-level election results from Boulder County (2005-2025) and the Colorado Secretary of State (2004-2024) into a single long-form CSV under `data/processed/statements-of-votes/`. Raw files in `data/original/` are immutable; everything else under `data/` is regenerable from them via `scripts/pipeline.py`. The schema is defined once in [`scripts/schema.py`](scripts/schema.py); every parser produces the same 20 columns. A reconciliation audit ([`scripts/reconcile.py`](scripts/reconcile.py)) compares top-line contest totals between the originals and the processed CSVs and would catch a regression. [`scripts/discover.py`](scripts/discover.py) scrapes the upstream Boulder County and SOS landing pages so the pipeline picks up newly-published years even before they're hand-added to the static registry. A GitHub Action runs every January 6 to refresh the prior calendar year; another runs pytest on every push and PR.
+This repo harmonizes precinct-level election results from Boulder County (2005-2025) and the Colorado Secretary of State (2004-2024) into a single long-form CSV under `data/processed/statements-of-votes/`. Raw files in `data/original/` are immutable; everything else under `data/` is regenerable from them via `scripts/pipeline.py`. The schema is defined once in [`scripts/schema.py`](scripts/schema.py); every parser produces the same 21 columns. A reconciliation audit ([`scripts/reconcile.py`](scripts/reconcile.py)) compares top-line and contest × candidate totals between the originals and the processed CSVs and would catch a regression. [`scripts/discover.py`](scripts/discover.py) scrapes the upstream Boulder County and SOS landing pages so the pipeline picks up newly-published years even before they're hand-added to the static registry. A GitHub Action runs every January 6 to refresh the prior calendar year; another runs pytest on every push and PR.
 
 ---
 
@@ -59,7 +59,7 @@ All Excel reads go through `parsers/common.py:read_excel` / `excel_file` (the ca
 
 ### 2.1 Long-form schema with one row per (year × precinct × contest × candidate)
 
-**Why:** Long form pivots to anything (candidate-wide, contest-wide, precinct-wide, year-wide). The cost is that `active_voters` and `ballots_cast` repeat across every row in the same precinct/year — analysts must `drop_duplicates(["year","precinct_id"])` before summing them. Documented in `docs/filter-pivot-recipes.md` § "Common gotchas".
+**Why:** Long form pivots to anything (candidate-wide, contest-wide, precinct-wide, year-wide). The cost is that `active_voters` and `ballots_cast` repeat across every row in the same precinct — and are reported per contest — so analysts take the max per `(election_year, election_type, data_source, precinct_id)` rather than summing them. Documented in `docs/filter-pivot-recipes.md` § "Common gotchas".
 
 **Don't change to wide form.** The reshape recipes already handle the common views; widening the storage would break the SOS schema (which lacks ballots_cast) and the RCV round-level rows.
 
@@ -114,8 +114,9 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at for ev
 | Area | Hazard | What to do |
 |---|---|---|
 | **Schema changes** | Adding/removing a column without updating `scripts/schema.py` breaks coercion and validation downstream. | Edit `COLUMNS` + `DTYPES` in one place; every parser will fail-fast until it returns the new shape. |
-| **Composite precinct IDs (2015, 2022)** | Joining to precinct geography on `precinct_id` silently drops these rows. | Split on `,` before joins; `extraction_notes` flags these years. |
-| **Property-owner pseudo-precincts (2015, 2023, 2025)** | Rows with `precinct_id` `Property Owner` / `Landowner` have no geography; dropping them undercounts special-district contests. | Keep them for totals, exclude them before spatial joins. See `docs/data-dictionary.md` §4.3a. |
+| **Composite precinct IDs (Boulder 2010-2025)** | Joining to precinct geography on `precinct_id` silently drops these rows. | Members are joined with `", "` (normalized in `add_provenance`); split into a lookup for joins, never split the votes. See `docs/data-dictionary.md` §4.3. |
+| **Pseudo-precincts (most Boulder years; SOS 2006/2008)** | Rows with `precinct_id` `Property Owner` / `Landowner` / `RMFPD` / `SUM` / … have no geography; dropping them undercounts special-district contests. | Keep them for totals; exclude `is_pseudo_precinct` rows before spatial joins. See `docs/data-dictionary.md` §4.3a. |
+| **Precinct-ID width** | Boulder 2007-2012 use 3-digit codes (`073`); SOS and Boulder 2005/2013+ use 10 digits. | Don't expect IDs to match across 2012 → 2013. |
 | **RCV expansion (2023)** | Summing `votes` for RCV contests double-counts (Round 1 + Round 2 + Final). | Filter to `candidate_or_option.str.endswith("| Final")` before summing totals. Reconcile already handles this — see `reconcile.py:reconcile_source`. |
 | **2008-2012 Boulder panel format** | Header labels don't sit over their values (merged cells), so `boco_panel` maps each row's non-empty cells to the header's non-empty labels by position — never by spreadsheet column. Rows that don't fit go to the reject port. | Keep `reconcile.py`'s contest × candidate check at 0 mismatches: it compares against the file's own `Totals` row. |
 | **2005/2007/2009 PDF years** | Candidate columns change page to page within one contest, and the vote-method block is 4 columns (2007) or 6 (2005/2009). | `boco_pdf` re-reads the header on every page and splits rows at the `%` token. Rows still carry `extraction_quality = pdf_text_layer`; spot-check names against the source PDF. |
@@ -123,7 +124,7 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at for ev
 | **negative `votes` values** | Legitimately appear in RCV intermediate rounds (ballots transferring away from eliminated candidates). | `validate()` skips this check for `contest_type == "ranked_choice"` rows. Don't "fix" it by taking absolute values — you lose information. |
 | **Election-night snapshots** (`data/processed/vote-counting/`) | Rows are cumulative county-wide totals per snapshot; summing `votes` across snapshots multiplies them, and concatenating with precinct data double-counts. | Use `vote_change` or filter `is_final_snapshot`. Keep the dataset separate (own schema in `schema.py:VOTE_COUNTING_*`). |
 | **Vote-counting OCR fixes** | Editing a cached Datalab JSON hides the fix and is overwritten on re-OCR. | Add a row to `scripts/corrections/vote-counting.csv` (the build fails if its `ocr_value` stops matching). `data/audit/vote-counting.md` must show 0 open issues. |
-| **Combined CSV size** | `all-elections-tidy.csv` is 152 MB. Gitignored. | The pipeline regenerates it from per-year files in ~30s; never check it in. |
+| **Combined CSV size** | `all-elections-tidy.csv` is <!-- generated:combined-size -->61 MB<!-- /generated:combined-size -->. Gitignored. | The pipeline regenerates it from per-year files; never check it in. |
 
 ---
 
@@ -159,7 +160,7 @@ In rough order of value:
 2. **Spot-check 2005/2007/2009 PDF candidate names** against the source PDFs. Vote counts now reconcile to the printed totals and `tests/test_pdf_parser.py` pins golden values per year; names from rotated text still deserve a sampled read.
 3. **Add Colorado primary elections** to the source registry. Boulder publishes primary SoVs in even-year June; the SOS publishes statewide primary precinct files too.
 4. **Add precinct geographies** as a separate `data/geography/` directory (GeoJSON or shapefile) with a year column so changing precinct boundaries can be joined to historical results.
-5. **Golden-output tests per parser.** The `tests/` suite (~115 tests) covers helpers, schema, discovery, and the election-night pipeline; small checked-in fixture workbooks per parser generation would catch silent regressions in the parsers themselves.
+5. **Golden-output tests per parser.** Done for `sos` (`tests/test_sos_parser.py`), `boco_panel` (synthetic sheet, `tests/test_boco_panel.py`) and `boco_pdf` (golden pages of each committed PDF, `tests/test_pdf_parser.py`); `boco_tidy` still has only helper-level tests and would benefit from a small fixture workbook.
 6. **Add primary-vs-general party-affiliation tracking** for partisan primaries (the schema already has `party`; needs the primary data to populate it).
 7. **Fail the annual-refresh PR on new reconcile mismatches.** The Action now runs `reconcile.py` and puts the mismatch count in the PR body; it doesn't yet fail the job when that count is above 0.
 8. **Repo / org setting prerequisite for the Action:** The Action opens a PR via `peter-evans/create-pull-request`. For that to work, the repo (and the org, if it enforces) must have **Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"** enabled. Without it, the scheduled run fails at the `Open PR` step with `"GitHub Actions is not permitted to create or approve pull requests"`. The workflow has a fallback step that opens an issue containing the same body in that case, but enabling the toggle is the proper fix.
@@ -186,7 +187,9 @@ In rough order of value:
 3. Update every parser under `scripts/parsers/` to populate the new column (start with `pd.NA` if the source doesn't provide it).
 4. Re-run `scripts.export_lookups`; verify `data/lookups/schema.json` updated.
 5. Re-run the pipeline; check `validate()` doesn't surface unexpected nulls.
-6. Bump `SCHEMA_VERSION` in `schema.py`.
+6. Bump `SCHEMA_VERSION` in `schema.py` (minor for an added column, major for a removed or renamed one) and add a changelog entry (`docs/data-dictionary.md` §9).
+7. Append new columns after `ballots_cast` rather than in the middle, so readers that address CSV columns by position keep working (that's where 1.2.0 put `is_pseudo_precinct`).
+8. Derived columns are computed in one place — `parsers/common.py:add_provenance` (and `schema.coerce` as a fallback) — not per parser.
 
 ---
 
@@ -204,7 +207,8 @@ In rough order of value:
 | Reconciliation module | [`scripts/reconcile.py`](scripts/reconcile.py) |
 | End-to-end driver | [`scripts/pipeline.py`](scripts/pipeline.py) |
 | JSON lookup exporter | [`scripts/export_lookups.py`](scripts/export_lookups.py) |
-| Test suite | [`tests/`](tests/) (pytest, ~115 tests, runs in ~3s; hermetic — never writes into `data/`) |
+| Doc counts/sizes generator | [`scripts/doc_stats.py`](scripts/doc_stats.py) (rewrites the `<!-- generated:… -->` spans) |
+| Test suite | [`tests/`](tests/) (pytest, <!-- generated:test-count -->431 tests<!-- /generated:test-count -->; hermetic — never writes into `data/`) |
 | Shared Excel reader | [`scripts/parsers/common.py`](scripts/parsers/common.py) (`read_excel`, `excel_file`) |
 | Data dictionary | [`docs/data-dictionary.md`](docs/data-dictionary.md) |
 | Filter/pivot recipes | [`docs/filter-pivot-recipes.md`](docs/filter-pivot-recipes.md) |
@@ -234,7 +238,7 @@ In rough order of value:
 - **Hardcoding a path.** Everything should resolve from `REPO_ROOT = Path(__file__).resolve().parents[1]`.
 - **Inferring schema from `data/processed/` instead of `scripts/schema.py`.** The schema file is authoritative.
 - **Bypassing `add_provenance()`.** Parsers must still attach the provenance columns — they're in the in-memory schema even though the CSV writer strips them. The audit module and the `provenance.csv` sidecar both depend on them.
-- **Inferring schema from the CSV files.** Per-year CSVs use `CSV_COLUMNS` (15 cols, no provenance); the canonical `COLUMNS` constant in `schema.py` has all 20. Use `CSV_COLUMNS` when validating a CSV; use `COLUMNS` when validating a parser-output frame.
+- **Inferring schema from the CSV files.** Per-year CSVs use `CSV_COLUMNS` (16 cols, no provenance); the canonical `COLUMNS` constant in `schema.py` has all 21. Use `CSV_COLUMNS` when validating a CSV; use `COLUMNS` when validating a parser-output frame.
 - **Pretending PDF years are machine-readable.** Their `extraction_quality` is intentionally `pdf_text_layer` so downstream filters can skip them.
 - **"Fixing" composite precinct IDs by splitting on comma.** Their vote tallies are reported jointly — splitting would multiply totals.
 - **Recreating a `data/cleaned/` or `data/original/output/` directory for "intermediate" outputs.** There are only two homes for data on disk: `data/original/` for immutable raw downloads and `data/processed/` for everything the pipeline produces — one subfolder per dataset (`statements-of-votes/`, `vote-counting/`), with cross-dataset publishing artifacts (`elections.db`, `metadata.yaml`) at its top. The `data/audit/` and `data/lookups/` siblings are read-only artifacts derived from `data/processed/`; do not invent new write targets.

@@ -1,8 +1,8 @@
 {
-  "$schema_version": "1.1.0",
+  "$schema_version": "1.2.0",
   "$description": "Yes/No variant normalization. Published files use many spellings (`Yes/For`, `No/Against`, `Yes/S\u00ed`, `FOR THE MEASURE`, ...). `mapping` is source \u2192 canonical. Matching is case- and whitespace-insensitive: lower-case the value and collapse runs of spaces before looking it up (so `YES`, ` yes ` and `For The Measure` all match). All canonical values are either `Yes` or `No`.",
   "$generated_by": "scripts/export_lookups.py from scripts/parsers/common.py:CHOICE_MAP",
-  "$generated_at": "2026-10-26T04:32:34+00:00",
+  "$generated_at": "2026-10-26T05:04:41+00:00",
   "mapping": {
     "Against": "No",
     "Against the": "No",

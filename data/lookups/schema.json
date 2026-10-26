@@ -1,8 +1,8 @@
 {
-  "$schema_version": "1.1.0",
-  "$description": "Harmonized schema for data/processed/statements-of-votes/. `columns` is the full in-memory schema (20 cols). `csv_columns` is the slim view written to per-year CSV files (15 cols). `provenance_columns` are the 5 fields stored in data/processed/statements-of-votes/provenance.csv instead of duplicating them on every row.",
+  "$schema_version": "1.2.0",
+  "$description": "Harmonized schema for data/processed/statements-of-votes/. `columns` is the full in-memory schema (21 cols). `csv_columns` is the slim view written to per-year CSV files (16 cols). `provenance_columns` are the 5 fields stored in data/processed/statements-of-votes/provenance.csv instead of duplicating them on every row.",
   "$generated_by": "scripts/export_lookups.py from scripts/schema.py",
-  "$generated_at": "2026-10-26T03:11:49+00:00",
+  "$generated_at": "2026-10-26T05:04:41+00:00",
   "columns": [
     "election_year",
     "election_date",
@@ -19,6 +19,7 @@
     "votes",
     "active_voters",
     "ballots_cast",
+    "is_pseudo_precinct",
     "source_file",
     "source_url",
     "retrieved_at",
@@ -40,7 +41,8 @@
     "party",
     "votes",
     "active_voters",
-    "ballots_cast"
+    "ballots_cast",
+    "is_pseudo_precinct"
   ],
   "provenance_columns": [
     "source_file",
@@ -65,6 +67,7 @@
     "votes": "Int64",
     "active_voters": "Int64",
     "ballots_cast": "Int64",
+    "is_pseudo_precinct": "boolean",
     "source_file": "string",
     "source_url": "string",
     "retrieved_at": "string",

@@ -183,7 +183,8 @@ def now_utc_iso() -> str:
 
 def precinct_id_str(value: object) -> object:
     """Boulder/SOS precinct IDs are numeric but must travel as strings (leading zeros).
-    Composite IDs (2015, 2022) like '2181007800, 2181207403' are preserved verbatim."""
+    Composite IDs like '2181007800, 2181207403' keep every member;
+    add_provenance() normalizes their separator."""
     if pd.isna(value):
         return pd.NA
     if isinstance(value, float) and value.is_integer():
@@ -191,9 +192,46 @@ def precinct_id_str(value: object) -> object:
     return str(value).strip()
 
 
+# Composite reporting units are published with ",", ", ", " + " or "+" between
+# the member IDs (#27); they are written with one ", " separator. A "-" between
+# two numbers ("002-004", 2010) is left alone: it may be a range.
+_COMPOSITE_SEP_RE = re.compile(r"\s*[,+]\s*")
+_REAL_PRECINCT_RE = re.compile(r"\d+(-\d+)?")
+
+
+def normalize_precinct_id(value: object) -> object:
+    """'2181207201,2181207202' / '073 + 74' → '2181207201, 2181207202' / '073, 74'."""
+    if pd.isna(value):
+        return value
+    s = str(value).strip()
+    if "," not in s and "+" not in s:
+        return s
+    return ", ".join(p for p in _COMPOSITE_SEP_RE.split(s) if p)
+
+
+def is_pseudo_precinct(value: object) -> bool:
+    """True when a precinct_id is, or includes, a unit with no precinct
+    geography: property-owner / landowner ballots (`Property Owner`,
+    `Landowner`, `LANDOWNER`, `Landowner-FMLV`, `RMFPD`, …) and the SOS
+    `SUM` / `Provisional` rows. Every component of a composite ID is checked,
+    so `2181307910, Landowner` is True."""
+    if pd.isna(value):
+        return False
+    parts = [p for p in _COMPOSITE_SEP_RE.split(str(value).strip()) if p]
+    return any(not _REAL_PRECINCT_RE.fullmatch(p) for p in parts)
+
+
 def add_provenance(df: pd.DataFrame, meta: SourceMeta, *, extraction_notes: str | None = None) -> pd.DataFrame:
-    """Attach the SourceMeta fields and reorder to canonical schema."""
+    """Attach the SourceMeta fields and reorder to canonical schema. Also the
+    one place precinct IDs are normalized and `is_pseudo_precinct` is derived,
+    so every parser gets both."""
     df = df.copy()
+    for col in ("precinct_id", "precinct_name"):
+        if col in df.columns:
+            df[col] = df[col].map(normalize_precinct_id)
+    df["is_pseudo_precinct"] = (df["precinct_id"].map(is_pseudo_precinct).astype("boolean")
+                                if "precinct_id" in df.columns
+                                else pd.Series(dtype="boolean", index=df.index))
     df["election_year"] = meta.election_year
     df["election_date"] = meta.election_date
     df["election_type"] = meta.election_type
