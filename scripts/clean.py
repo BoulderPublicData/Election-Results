@@ -26,11 +26,11 @@ from .config import (
     MANIFEST_PATH,
     ORIGINAL,
     PROVENANCE_CSV,
-    REPO_ROOT,
     SECRETARY_OF_STATE,
     SOURCES,
     STATEMENTS_OF_VOTES,
     Source,
+    display_path,
     original_path,
     sov_csv_path,
 )
@@ -206,7 +206,7 @@ def main(argv: list[str] | None = None) -> int:
                 write_csv(df, dest)
                 prov_rows.append(provenance_record(df, _meta_for(s)))
                 parsed.append((s.data_source, s.local_filename))
-                print(f"OK   {label}  rows={len(df):>6}  -> {dest.relative_to(REPO_ROOT)}")
+                print(f"OK   {label}  rows={len(df):>6}  -> {display_path(dest)}")
             else:
                 print(f"OK   {label}  rows={len(df):>6}  (validate-only)")
         except Exception as e:
@@ -220,7 +220,7 @@ def main(argv: list[str] | None = None) -> int:
         # rebuilt by `pipeline` (or shared_outputs.rebuild_combined()).
         shared_outputs.upsert_provenance(prov_rows)
         rej = shared_outputs.upsert_rejects(rejected, parsed)
-        print(f"updated {PROVENANCE_CSV.relative_to(REPO_ROOT)} ({len(prov_rows)} rows) and "
+        print(f"updated {display_path(PROVENANCE_CSV)} ({len(prov_rows)} rows) and "
               f"data/audit/rejected.csv ({len(rej)} rows)")
     elif len(rejected):
         print(f"  {len(rejected)} row(s) would be rejected", file=sys.stderr)

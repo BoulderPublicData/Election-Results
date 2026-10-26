@@ -24,7 +24,7 @@ from pathlib import Path
 import pandas as pd
 
 from .config import AUDIT as AUDIT_DIR  # noqa: F401
-from .config import AUDIT_SUMMARY_MD, PROVENANCE_CSV, REPO_ROOT, STATEMENTS_OF_VOTES
+from .config import AUDIT_SUMMARY_MD, PROVENANCE_CSV, STATEMENTS_OF_VOTES, display_path
 
 
 def _md_table(rows: list[dict], cols: list[str]) -> str:
@@ -177,7 +177,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         args.out.write_text("\n".join(fragments))
         n = len(fragments)
-    print(f"\nwrote {args.out.relative_to(REPO_ROOT)} ({n} sections)")
+    print(f"\nwrote {display_path(args.out)} ({n} sections)")
     return 0
 
 

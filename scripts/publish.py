@@ -40,10 +40,10 @@ from .config import (
     DATASETTE_RECENT_DB,
     EXCEL_ZIP,
     PROVENANCE_CSV,
-    REPO_ROOT,
     STATEMENTS_OF_VOTES,
     VOTE_COUNTING_CONTESTS_CSV,
     VOTE_COUNTING_SUMMARY_CSV,
+    display_path,
 )
 from .logging_setup import get_logger
 from .schema import (
@@ -75,7 +75,7 @@ def export_excel_csvs(out: Path = EXCEL_ZIP) -> Path:
     with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         for p in per_year_csvs(STATEMENTS_OF_VOTES) + [PROVENANCE_CSV]:
             zf.writestr(p.name, "\ufeff" + p.read_text(encoding="utf-8"))
-    print(f"wrote {out.relative_to(REPO_ROOT)}")
+    print(f"wrote {display_path(out)}")
     return out
 
 
@@ -176,7 +176,7 @@ def build(db_path: Path = DB_PATH, since: int | None = None) -> Path:
     # union it with `elections`.
     for table, path in VOTE_COUNTING_TABLES.items():
         if not path.exists():
-            log.warning("publish.vote_counting_missing", path=str(path.relative_to(REPO_ROOT)))
+            log.warning("publish.vote_counting_missing", path=str(display_path(path)))
             continue
         dtypes = VOTE_COUNTING_DTYPES if table == "vote_counting_contests" \
             else VOTE_COUNTING_SUMMARY_DTYPES
@@ -204,7 +204,7 @@ def build(db_path: Path = DB_PATH, since: int | None = None) -> Path:
         replace=True,
     )
 
-    print(f"wrote {db_path.relative_to(REPO_ROOT)}: elections={len(elections):,} rows "
+    print(f"wrote {display_path(db_path)}: elections={len(elections):,} rows "
           f"({elections['election_year'].nunique()} years), provenance={len(provenance)}, "
           f"concepts={len(concepts)}")
     return db_path
@@ -391,7 +391,7 @@ def build_metadata(out: Path = METADATA_PATH) -> Path:
         },
     }
     out.write_text(yaml.safe_dump(metadata, sort_keys=False, allow_unicode=True))
-    print(f"wrote {out.relative_to(REPO_ROOT)}")
+    print(f"wrote {display_path(out)}")
     return out
 
 
@@ -421,11 +421,11 @@ def main(argv: list[str] | None = None) -> int:
     md = build_metadata()
     export_excel_csvs()
     for path in (db, recent):
-        print(f"  {path.relative_to(REPO_ROOT)}: {path.stat().st_size / 1e6:.0f} MB")
+        print(f"  {display_path(path)}: {path.stat().st_size / 1e6:.0f} MB")
     print(
         f"\nPreview locally:\n"
-        f"  uv run datasette serve {db.relative_to(REPO_ROOT)} "
-        f"-m {md.relative_to(REPO_ROOT)}"
+        f"  uv run datasette serve {display_path(db)} "
+        f"-m {display_path(md)}"
     )
     return 0
 

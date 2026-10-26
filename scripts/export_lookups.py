@@ -13,7 +13,7 @@ import json
 from datetime import UTC, datetime
 
 from .concepts import CONCEPTS
-from .config import ELECTION_DATES, LOOKUPS, REPO_ROOT
+from .config import ELECTION_DATES, LOOKUPS, display_path
 from .config import SOURCES as ALL_SOURCES
 from .parsers.common import CHOICE_MAP, PARTY_MAP
 from .schema import (
@@ -202,7 +202,7 @@ def main(argv: list[str] | None = None) -> int:
     export_schema()
     export_concepts()
     export_vote_counting_schema()
-    print(f"wrote 7 lookup files under {LOOKUPS.relative_to(REPO_ROOT)}/")
+    print(f"wrote 7 lookup files under {display_path(LOOKUPS)}/")
     return 0
 
 

@@ -140,6 +140,19 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at for ev
 | **Vote-counting OCR fixes** | Editing a cached Datalab JSON hides the fix and is overwritten on re-OCR. | Add a row to `scripts/corrections/vote-counting.csv` (the build fails if its `ocr_value` stops matching). `data/audit/vote-counting.md` must show 0 open issues. |
 | **Combined CSV size** | `all-elections-tidy.csv` is <!-- generated:combined-size -->61 MB<!-- /generated:combined-size -->. Gitignored. | The pipeline regenerates it from per-year files; never check it in. |
 
+### 3a. Long runs and the working tree
+
+`pipeline` rewrites every per-year CSV, the combined CSV, provenance, the audit and the reconciliation reports as it goes. If a commit-on-stop hook or file watcher is active, run against a copy so a half-finished `data/` is never committed, and commit once at the end:
+
+```bash
+mkdir -p /tmp/er && cp -r data /tmp/er/
+ELECTIONS_DATA_DIR=/tmp/er/data uv run python -m scripts.pipeline --skip-fetch
+ELECTIONS_DATA_DIR=/tmp/er/data uv run python -m scripts.reconcile
+cp -r /tmp/er/data/. data/ && git add data && git commit
+```
+
+`ELECTIONS_DATA_DIR` moves every path in `scripts/config.py`; printed paths still read `data/...` (`config.display_path`).
+
 ---
 
 ## 4. Limitations and uncertainties
@@ -251,7 +264,7 @@ In rough order of value:
 - **Building a path to a raw SoV by hand.** Boulder SoVs live in `data/original/boulder-county/statement-of-votes/`; always go through `config.original_path(data_source, local_filename)`. The same goes for outputs: harmonized SoV CSVs live in `data/processed/statements-of-votes/` — use `config.sov_csv_path(year, election_type, data_source)`, and `config.STATEMENTS_OF_VOTES` / `config.VOTE_COUNTING` for the dataset folders.
 - **Editing `data/original/` instead of the parser.** The raw files are reference. Fix the parser.
 - **Adding a parser without updating `scripts/clean.py`'s router.** The orchestrator picks the parser by year; a new parser orphaned outside the router won't run.
-- **Hardcoding a path.** Everything should resolve from `REPO_ROOT = Path(__file__).resolve().parents[1]`.
+- **Hardcoding a path.** Everything should resolve from `scripts/config.py` (`DATA`, which honors `ELECTIONS_DATA_DIR`, and `REPO_ROOT`). Show paths to people with `config.display_path`, not `relative_to(REPO_ROOT)`, which fails when the data lives in a copy.
 - **Inferring schema from `data/processed/` instead of `scripts/schema.py`.** The schema file is authoritative.
 - **Bypassing `add_provenance()`.** Parsers must still attach the provenance columns — they're in the in-memory schema even though the CSV writer strips them. The audit module and the `provenance.csv` sidecar both depend on them.
 - **Inferring schema from the CSV files.** Per-year CSVs use `CSV_COLUMNS` (16 cols, no provenance); the canonical `COLUMNS` constant in `schema.py` has all 21. Use `CSV_COLUMNS` when validating a CSV; use `COLUMNS` when validating a parser-output frame.
@@ -263,7 +276,17 @@ In rough order of value:
 
 ## 10. Sanity-check before declaring done
 
-After any non-trivial change, run all six:
+Run the cheapest check that can catch a mistake in what you changed, and say in the PR which one you ran. Times are measured on the full dataset.
+
+| Change touches | Run | Time |
+|---|---|---|
+| docs, comments, recipes, CI config | `ruff check .`, `pytest` | ~25 s |
+| a parser, `clean.py`, `schema.py`, `sources.py`, `data/original/` | + `pipeline --skip-fetch` (with PDFs if a PDF year is affected; `--year`/`--source` while iterating), then `reconcile` | ~5 min (`--no-pdf` saves ~45 s) |
+| `common.py` cues, `PARTY_MAP`, concepts, choice maps | + full `pipeline --skip-fetch`, `reconcile`, `export_lookups` | ~5 min |
+| `vote_counting.py` | + `vote_counting` from the cache (the OCR step is **paid**: ask before `--election` triggers new Datalab calls) | not measured |
+| `Cleaning.ipynb` | + `nbconvert --execute` | ~15 s |
+
+Per-year CSVs should come out byte-identical whenever a change isn't meant to move counts; compare hashes before and after. The full sequence below is the release check, not the per-change one:
 
 ```bash
 uv sync                                                  # installs pytest + ruff (dev group)

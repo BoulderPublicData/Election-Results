@@ -32,9 +32,9 @@ from .config import (
     COMBINED_CSV,
     PROVENANCE_CSV,
     REJECTED_CSV,
-    REPO_ROOT,
     SECRETARY_OF_STATE,
     STATEMENTS_OF_VOTES,
+    display_path,
     sov_csv_path,
 )
 from .config import (
@@ -158,7 +158,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     # Whole-dataset outputs: rebuilt from every per-year CSV on disk or
     # upserted by key, never replaced by just this run's subset (#18).
     combined = shared_outputs.rebuild_combined(STATEMENTS_OF_VOTES, args.combined_out)
-    print(f"\nwrote {args.combined_out.relative_to(REPO_ROOT)} "
+    print(f"\nwrote {display_path(args.combined_out)} "
           f"({len(combined):,} rows, "
           f"{combined['election_year'].nunique()} years, "
           f"{combined['data_source'].nunique()} sources)")
@@ -167,7 +167,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     # these 5 columns to keep file sizes down (they're constant for every row
     # from a given file); the sidecar preserves the info so nothing's lost.
     prov_df = shared_outputs.upsert_provenance(prov_rows, PROVENANCE_CSV)
-    print(f"wrote {PROVENANCE_CSV.relative_to(REPO_ROOT)} "
+    print(f"wrote {display_path(PROVENANCE_CSV)} "
           f"({len(prov_df)} source files; {len(prov_rows)} updated this run)")
 
     # Reject port — drain the per-parser rejection buffers and upsert them by
@@ -175,7 +175,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
     # the row_index column points back into the source file.
     from .reject import drain as _drain_rejects
     rejected = shared_outputs.upsert_rejects(_drain_rejects(), parsed, REJECTED_CSV)
-    print(f"wrote {REJECTED_CSV.relative_to(REPO_ROOT)} ({len(rejected)} rejected rows"
+    print(f"wrote {display_path(REJECTED_CSV)} ({len(rejected)} rejected rows"
           + (" — investigate before publishing)" if len(rejected) else ")"))
 
     # Election-night vote counting — rebuilt from the committed Datalab cache
@@ -216,7 +216,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
         except Exception as e:
             print(f"  audit FAIL {stem}: {e}", file=sys.stderr)
     n = shared_outputs.rebuild_audit_summary(AUDIT, AUDIT_SUMMARY_MD)
-    print(f"wrote {AUDIT_SUMMARY_MD.relative_to(REPO_ROOT)} ({n} sections)")
+    print(f"wrote {display_path(AUDIT_SUMMARY_MD)} ({n} sections)")
 
     return 1 if errors else 0
 

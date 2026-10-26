@@ -35,7 +35,9 @@ from .sources import (
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DATA = REPO_ROOT / "data"
+# ELECTIONS_DATA_DIR points every data path at a copy of data/ outside the
+# working tree, so a long run can be committed once at the end (AGENTS.md §3a).
+DATA = Path(os.environ.get("ELECTIONS_DATA_DIR", REPO_ROOT / "data")).resolve()
 
 # The two-home rule (see AGENTS.md): only these two directories receive writes
 # from parsers / fetchers / cleaners. `audit/` and `lookups/` are read-only
@@ -46,6 +48,20 @@ PROCESSED = DATA / "processed"
 # Read-only artifact dirs.
 AUDIT = DATA / "audit"
 LOOKUPS = DATA / "lookups"
+
+def display_path(path: Path) -> Path:
+    """``path`` as shown to people: repo-relative, or ``data/...`` when
+    ``ELECTIONS_DATA_DIR`` puts it outside the repo."""
+    path = Path(path)
+    try:
+        return path.relative_to(REPO_ROOT)
+    except ValueError:
+        pass
+    try:
+        return Path("data") / path.relative_to(DATA)
+    except ValueError:
+        return path
+
 
 # Where each data source's raw downloads live under ORIGINAL. Boulder County's
 # Statement of Votes files sit in a subfolder next to the election-night
@@ -145,7 +161,7 @@ LOG_LEVEL = os.environ.get("ELECTIONS_LOG_LEVEL", "INFO")
 # than recomputing REPO_ROOT.  When you find a module computing its own
 # REPO_ROOT, swap it out for an import from here.
 __all__ = [
-    "REPO_ROOT", "DATA", "ORIGINAL", "PROCESSED", "AUDIT", "LOOKUPS",
+    "REPO_ROOT", "DATA", "display_path", "ORIGINAL", "PROCESSED", "AUDIT", "LOOKUPS",
     "ORIGINAL_SUBDIRS", "original_path",
     "MANIFEST_PATH", "PROVENANCE_CSV", "COMBINED_CSV",
     "RECONCILIATION_CSV", "RECONCILIATION_MD", "RECONCILIATION_CANDIDATES_CSV",

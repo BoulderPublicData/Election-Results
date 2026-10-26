@@ -32,10 +32,10 @@ from . import http
 from .config import (
     BOULDER_COUNTY,
     MANIFEST_PATH,
-    REPO_ROOT,
     SECRETARY_OF_STATE,
     SOURCES,
     Source,
+    display_path,
     original_path,
 )
 from .logging_setup import get_logger
@@ -233,7 +233,7 @@ def main(argv: list[str] | None = None) -> int:
         problems = verify_manifest()
         for p in problems:
             print(f"FAIL  {p}", file=sys.stderr)
-        print(f"verified {MANIFEST_PATH.relative_to(REPO_ROOT)}: "
+        print(f"verified {display_path(MANIFEST_PATH)}: "
               f"{len(problems)} problem(s)")
         return 1 if problems else 0
     if args.backfill_manifest:

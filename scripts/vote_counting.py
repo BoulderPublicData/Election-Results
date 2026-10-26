@@ -49,7 +49,6 @@ import pandas as pd
 from .config import (
     AUDIT,
     ELECTION_DATES,
-    REPO_ROOT,
     VOTE_COUNTING,
     VOTE_COUNTING_CACHE,
     VOTE_COUNTING_CONTESTS_CSV,
@@ -58,6 +57,7 @@ from .config import (
     VOTE_COUNTING_QA_CSV,
     VOTE_COUNTING_QA_MD,
     VOTE_COUNTING_SUMMARY_CSV,
+    display_path,
     election_key,
     parse_election_key,
 )
@@ -632,7 +632,7 @@ def write_outputs(contests: pd.DataFrame, summary: pd.DataFrame, qa: pd.DataFram
     QA_MD.write_text("\n".join(lines) + "\n")
 
     for path in (CONTESTS_CSV, SUMMARY_CSV, QA_CSV, QA_MD):
-        print(f"wrote {path.relative_to(REPO_ROOT)}")
+        print(f"wrote {display_path(path)}")
     print(f"QA: {len(blocking)} open issue(s), {(qa['status'] == 'accepted').sum()} accepted, "
           f"{(qa['status'] == 'info').sum()} informational")
 
