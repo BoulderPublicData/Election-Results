@@ -9,7 +9,7 @@ harmonized into a single tidy long-form dataset spanning **2004-2025**.
 >
 > Full SQL editor, faceting, JSON API. Datasette Lite downloads the whole database into
 > your browser before it shows anything: the full one is about
-> <!-- generated:db-size -->106 MB<!-- /generated:db-size -->, the 2018-onward one about a third of that,
+> <!-- generated:db-size -->110 MB<!-- /generated:db-size -->, the 2018-onward one about a third of that,
 > so pick the second on a slow or metered connection. Both are rebuilt and re-released
 > on every push to `main` by [`.github/workflows/publish.yml`](.github/workflows/publish.yml).
 > Direct downloads from the [latest release](https://github.com/BoulderPublicData/Election-Results/releases/tag/latest):
@@ -132,8 +132,8 @@ Are the results of individual contests available at the level of precincts in an
 | Year | Boulder | State | Notes |
 |---|---|---|---|
 | 2025 | ✅ [2025 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx) | ❌ not published | Coordinated election (odd-year). |
-| 2024 | ✅ [2024 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx) | ⚠️ [2024 SOS turnout-only](https://www.coloradosos.gov/pubs/elections/Results/2024/2024GeneralPrecinctVoterTurnout.xlsx) | Amended SoV — verify scope before publishing. SOS file is turnout-only (no candidate detail). |
-| 2023 | ✅ [2023 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx) | ❌ not published | First Boulder mayoral RCV |
+| 2024 | ✅ [2024 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2024/11/2024G-Boulder-County-Official-Statement-of-Votes.xlsx) + [amended SoV](https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx) | ⚠️ [2024 SOS turnout-only](https://www.coloradosos.gov/pubs/elections/Results/2024/2024GeneralPrecinctVoterTurnout.xlsx) | All 65 contests; the amended SoV's 2 contests merged over the full one. SOS file is turnout-only (no candidate detail). |
+| 2023 | ✅ [2023 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2023/11/2023C-Boulder-County-Official-Statement-of-Votes.xlsx) + [recount SoV](https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx) | ❌ not published | First Boulder mayoral RCV. City of Boulder Council from the December recount; Louisville Ward 2 corrected (data dictionary §4.7–4.8). |
 | 2022 | ✅ [2022 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2022/12/2022G-Boulder-County-Official-Statement-of-Votes.xlsx) | ❌ not published | Composite precincts in places |
 | 2021 | ✅ [2021 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2021/11/2021-Boulder-County-Coordinated-Election-Official-Statement-of-Votes-1.xlsx) | ❌ not published | |
 | 2020 | ✅ [2020 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2020/11/2020-Boulder-County-General-Election-Official-Statement-of-Votes.xlsx) | ✅ [2020 SOS xlsx](https://www.coloradosos.gov/pubs/elections/Results/2020/2020GEPrecinctLevelResultsPosted.xlsx) | |
@@ -225,7 +225,7 @@ uv run python -m scripts.pipeline --discover            # full end-to-end with d
 The pytest suite and [ruff](https://docs.astral.sh/ruff/) lint run on every push and PR via [`.github/workflows/tests.yml`](.github/workflows/tests.yml). The tests cover schema contracts, per-parser helpers, the discovery classifier (with cached HTML fixtures so it works offline), source-registry shape, the election-night parser and QA, fixture or golden-page tests for the SOS, panel and PDF parsers, and every committed processed CSV. They never touch the network or rewrite committed files.
 
 ```bash
-uv run pytest                  # run everything (<!-- generated:test-count -->436 tests<!-- /generated:test-count -->)
+uv run pytest                  # run everything (<!-- generated:test-count -->469 tests<!-- /generated:test-count -->)
 uv run pytest tests/test_discover.py -v
 uv run ruff check .            # lint (rules in pyproject.toml)
 ```
@@ -234,7 +234,7 @@ uv run ruff check .            # lint (rules in pyproject.toml)
 
 - **2008–2012 Boulder SoV panel format** — the XLS headers don't sit over their values (merged cells), so the parser maps each row's values to the header labels by position. Every candidate's precinct rows sum to the county's printed total, and the contests both publishers title the same way match the SOS file exactly ([`docs/data-dictionary.md` §4.2](docs/data-dictionary.md#42-boulder-county-panel-years-2008-2010-2011-2012)). Precinct IDs are 3-digit in these years.
 - **2005 / 2007 / 2009 PDF extraction** — `extraction_quality = pdf_text_layer`. Contest titles, candidate names, and per-precinct counts are extracted with pdfplumber, and every candidate's precinct rows sum to the PDF's printed totals, but candidate labels come from rotated text — spot-check names against the source PDF before publishing precinct-level claims.
-- **2024 Boulder SoV** — only 66 rows of local races (Town of Superior, etc.), and the 2024 SOS file is turnout-only. For county-wide 2024 totals across all 65 contests, use the final election-night snapshot in [`data/processed/vote-counting/`](data/processed/vote-counting/) (`is_final_snapshot`).
+- **Recount / amended SoVs (2023, 2024)** — the county's December files re-report only the contests a recount or amendment changed, so each is merged over the full SoV by contest, and one published error (2023 Louisville Ward 2) is corrected with its evidence ([`docs/data-dictionary.md` §4.7–4.8](docs/data-dictionary.md#47-recount-and-amended-sovs-boulder-2023-2024)). The 2024 SOS file is turnout-only.
 - **`Cleaning.ipynb` rewrite** preserves the methodology of the original notebook but no longer re-implements every per-year transform — those live in `scripts/parsers/` now.
 
 ## Glossary

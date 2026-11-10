@@ -23,8 +23,14 @@ The "original" side for each generation:
 - Boulder 2005/2007/2009 (PDF): the ``Totals:`` line printed at the end of
   each candidate group (``parsers/boco_pdf.py:published_totals``).
 
+A source's supplements (a recount or amended SoV, ``sources.Supplement``) are
+read the same way and replace the contests they report on the original side
+(``overlay.overlay_totals``), as they do in the processed data.
+
 Status per row: ``match`` (delta 0), ``near_match`` (|delta| < 50) or
-``mismatch`` (|delta| >= 50). A non-zero delta is not always a bug — e.g. the
+``mismatch`` (|delta| >= 50); ``corrected`` when the delta is exactly the
+source's adjudicated corrections (``scripts/corrections/statements-of-votes.csv``,
+see ``scripts/sov_corrections.py``), which ``--check`` does not count. A non-zero delta is not always a bug — e.g. the
 SOS files can differ slightly from the county's certified totals — but every
 ``mismatch`` should be explained before publishing.
 
@@ -63,6 +69,7 @@ from .config import (
     SOURCES as ALL_SOURCES,
 )
 from .logging_setup import get_logger
+from .overlay import overlay_totals
 from .parsers import boco_panel, boco_pdf
 from .parsers.common import clean_cols, excel_file, normalize_choice, read_excel
 
@@ -210,9 +217,9 @@ def _read_boco_tidy_original(path: Path) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)
 
 
-def _read_original(source: Source) -> pd.DataFrame | None:
-    """Original-side frame (contest / candidate_or_option / party / votes) for
-    one source, or None if the raw file is missing or has no vote totals."""
+def _read_original_file(source: Source) -> pd.DataFrame | None:
+    """Original-side frame for one raw file (a source, or a supplement as a
+    single-file Source)."""
     from .clean import BOCO_PANEL_YEARS, BOCO_PDF_YEARS
 
     path = original_path(source.data_source, source.local_filename)
@@ -225,6 +232,20 @@ def _read_original(source: Source) -> pd.DataFrame | None:
     if source.year in BOCO_PANEL_YEARS:
         return boco_panel.published_totals(path, source.year)
     return _read_boco_tidy_original(path)
+
+
+def _read_original(source: Source) -> pd.DataFrame | None:
+    """Original-side frame (contest / candidate_or_option / party / votes) for
+    one source, or None if the raw file is missing or has no vote totals.
+    Supplements (recount / amended SoVs) replace the contests they report
+    (scripts/overlay.py), read with the same cheap readers as the base file."""
+    orig = _read_original_file(source)
+    for rec in source.file_records()[1:]:
+        sup = _read_original_file(rec)
+        if orig is None or sup is None:
+            return None
+        orig = overlay_totals(orig, sup)
+    return orig
 
 
 def _processed_path(s: Source) -> Path:
@@ -241,6 +262,26 @@ def _read_processed(source: Source) -> pd.DataFrame | None:
 
 
 _MISSING = object()
+
+CORRECTED_NOTE = "documented correction (scripts/corrections/statements-of-votes.csv)"
+
+
+def _corrections(source: Source) -> pd.DataFrame:
+    from . import sov_corrections
+
+    return sov_corrections.for_source(source.year, source.election_type, source.data_source)
+
+
+def _correction_deltas(source: Source) -> dict[tuple[str, str], int]:
+    """Expected processed − original delta per (contest key, option key) from
+    the source's adjudicated corrections (scripts/sov_corrections.py)."""
+    from .sov_corrections import vote_delta
+
+    out: dict[tuple[str, str], int] = {}
+    for fix in _corrections(source).itertuples(index=False):
+        k = (_name_key(fix.contest), _option_key(fix.candidate_or_option))
+        out[k] = out.get(k, 0) + vote_delta(fix)
+    return out
 
 
 def reconcile_source(
@@ -295,6 +336,17 @@ def reconcile_source(
         out.loc[out["original_total"].isna() & out["processed_total"].isna(), "status"] = (
             "not_in_file"
         )
+        # A delta that is exactly the source's documented corrections.
+        from .sov_corrections import vote_delta
+
+        expected: dict[str, int] = {}
+        for fix in _corrections(source).itertuples(index=False):
+            canon = _match_canonical(fix.contest, patterns)
+            if canon is not None:
+                expected[canon] = expected.get(canon, 0) + vote_delta(fix)
+        for canon, d in expected.items():
+            if canon in out.index and d != 0 and out.at[canon, "delta"] == d:
+                out.at[canon, "status"] = "corrected"
 
     out = out.reset_index().rename(columns={"index": "canonical"})
     out["year"] = source.year
@@ -414,6 +466,12 @@ def reconcile_candidates(
     j["note"] = ""
     j.loc[j["votes_p"].isna(), "note"] = "only in original"
     j.loc[j["votes_o"].isna(), "note"] = "only in processed"
+    expected = _correction_deltas(source)
+    if expected:
+        exp = pd.Series([expected.get(k) for k in j.index], index=j.index, dtype="Int64")
+        corrected = (exp.notna() & (exp != 0) & (j["delta"] == exp)).fillna(False)
+        j.loc[corrected, "status"] = "corrected"
+        j.loc[corrected, "note"] = CORRECTED_NOTE
     j["year"] = source.year
     j["election_type"] = source.election_type
     j["data_source"] = source.data_source
@@ -433,8 +491,9 @@ def candidate_markdown(cand: pd.DataFrame, checks: list[dict]) -> list[str]:
         "columns count duplicate (precinct, contest, candidate) keys and contests that mix "
         "Yes/No options with named candidates; both should be 0.",
         "",
-        "| file | keys | match | near_match | mismatch | duplicate keys | mixed contests |",
-        "|---|---|---|---|---|---|---|",
+        "| file | keys | match | near_match | corrected | mismatch | duplicate keys | "
+        "mixed contests |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     by_file = {(c["year"], c["election_type"], c["data_source"]): c for c in checks}
     for k in sorted(by_file):
@@ -444,11 +503,11 @@ def candidate_markdown(cand: pd.DataFrame, checks: list[dict]) -> list[str]:
         ]
         n = g["status"].value_counts()
         if c.get("status") == "no_original":
-            counts = "— | — | — | —"
+            counts = "— | — | — | — | —"
         else:
             counts = (
                 f"{len(g):,} | {n.get('match', 0):,} | {n.get('near_match', 0):,} | "
-                f"{n.get('mismatch', 0):,}"
+                f"{n.get('corrected', 0):,} | {n.get('mismatch', 0):,}"
             )
         lines.append(
             f"| {k[0]} {k[1]} {k[2]} | {counts} | {c['duplicate_keys']:,} | "
@@ -799,10 +858,14 @@ def report_markdown(
         "usually safe).",
         "- `mismatch` — totals differ by ≥ 50 votes. Investigate.",
         "- `not_in_file` — the canonical contest pattern matched nothing in either file.",
+        "- `corrected` — the difference is exactly an adjudicated correction in "
+        "[`scripts/corrections/statements-of-votes.csv`](../../scripts/corrections/"
+        "statements-of-votes.csv) (the published file is wrong; see its evidence column).",
         "",
         f"**Contest × candidate:** {len(cand):,} keys compared, "
         f"{int((cand['status'] == 'match').sum()):,} match, "
         f"{int((cand['status'] == 'near_match').sum()):,} near_match, "
+        f"{int((cand['status'] == 'corrected').sum()):,} corrected, "
         f"**{n_cand_bad:,} mismatch**; structural issues (duplicate keys + mixed "
         f"contests): **{n_struct:,}**.",
         "",

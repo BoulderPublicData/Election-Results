@@ -1162,15 +1162,15 @@ year,election_type,final_snapshot,contest,sov_contest,candidate_or_option,snapsh
 2023,coordinated,2023-12-06T16:50:00,City of Boulder Mayoral Candidates,City of Boulder Mayoral Candidates,Bob Yates | Final,15592,15592,0,match
 2023,coordinated,2023-12-06T16:50:00,City of Boulder Mayoral Candidates,City of Boulder Mayoral Candidates,Paul Tweedlie | Final,0,0,0,match
 2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Terri Brncic,14365,14365,0,match
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Jenny Robins,11249,11247,2,near_match
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Aaron Gabriel Neyer,3483,3484,-1,near_match
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Jenny Robins,11249,11249,0,match
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Aaron Gabriel Neyer,3483,3483,0,match
 2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Jacques Decalo,3329,3329,0,match
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Silas Atkins,6829,6831,-2,near_match
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Waylon Lewis,8862,8863,-1,near_match
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Ryan Schuchard,14411,14412,-1,near_match
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Silas Atkins,6829,6829,0,match
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Waylon Lewis,8862,8862,0,match
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Ryan Schuchard,14411,14411,0,match
 2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Tara Winer,21255,21255,0,match
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Tina Marquis,14958,14959,-1,near_match
-2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Taishya Adams,14633,14634,-1,near_match
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Tina Marquis,14958,14958,0,match
+2023,coordinated,2023-12-06T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Taishya Adams,14633,14633,0,match
 2023,coordinated,2023-12-06T16:50:00,City of Lafayette City Council Candidates,City of Lafayette City Council Candidates,Tim Barnes,6448,6448,0,match
 2023,coordinated,2023-12-06T16:50:00,City of Lafayette City Council Candidates,City of Lafayette City Council Candidates,JD Mangat,7894,7894,0,match
 2023,coordinated,2023-12-06T16:50:00,City of Lafayette City Council Candidates,City of Lafayette City Council Candidates,Eric Ryant,3471,3471,0,match
@@ -1195,8 +1195,8 @@ year,election_type,final_snapshot,contest,sov_contest,candidate_or_option,snapsh
 2023,coordinated,2023-12-06T16:50:00,City of Louisville Mayor At-Large (4 Year Term),City of Louisville Mayor At-Large (4 Year Term),Chris Leh,4789,4789,0,match
 2023,coordinated,2023-12-06T16:50:00,City of Louisville Mayor At-Large (4 Year Term),City of Louisville Mayor At-Large (4 Year Term),Josh Cooperman,1347,1347,0,match
 2023,coordinated,2023-12-06T16:50:00,City of Louisville City Council Ward 1 (4-year term),City of Louisville City Council Ward 1 (4-year term),J. Caleb Dickinson,1833,1833,0,match
-2023,coordinated,2023-12-06T16:50:00,City of Louisville City Council Ward 2 (4-year term),City of Louisville City Council Ward 2 (4-year term),Deborah Fahey,1419,1602,-183,differs
-2023,coordinated,2023-12-06T16:50:00,City of Louisville City Council Ward 2 (4-year term),City of Louisville City Council Ward 2 (4-year term),George Colbert,1207,1441,-234,differs
+2023,coordinated,2023-12-06T16:50:00,City of Louisville City Council Ward 2 (4-year term),City of Louisville City Council Ward 2 (4-year term),Deborah Fahey,1419,1419,0,match
+2023,coordinated,2023-12-06T16:50:00,City of Louisville City Council Ward 2 (4-year term),City of Louisville City Council Ward 2 (4-year term),George Colbert,1207,1207,0,match
 2023,coordinated,2023-12-06T16:50:00,City of Louisville City Council Ward 3,City of Louisville City Council Ward 3,Dietrich Hoefner,998,998,0,match
 2023,coordinated,2023-12-06T16:50:00,City of Louisville City Council Ward 3,City of Louisville City Council Ward 3,Barbara Hamlington,1969,1969,0,match
 2023,coordinated,2023-12-06T16:50:00,Boulder Valley School District RE-2 Director District A (4 Years),Boulder Valley School District RE-2 Director District A (4 Years),Jason Unger,32288,32288,0,match
@@ -1266,159 +1266,159 @@ year,election_type,final_snapshot,contest,sov_contest,candidate_or_option,snapsh
 2023,coordinated,2023-12-06T16:50:00,Nederland Eco Pass Public Improvement District Ballot Issue 6A,Nederland Eco Pass Public Improvement District Ballot Issue 6A,No,313,313,0,match
 2023,coordinated,2023-12-06T16:50:00,North Metro Fire Rescue District Ballot Issue 7A,North Metro Fire Rescue District Ballot Issue 7A,Yes,52,52,0,match
 2023,coordinated,2023-12-06T16:50:00,North Metro Fire Rescue District Ballot Issue 7A,North Metro Fire Rescue District Ballot Issue 7A,No,29,29,0,match
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Kamala D. Harris / Tim Walz,150149,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Donald J. Trump / JD Vance,40758,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Blake Huber / Andrea Denault,123,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Chase Russell Oliver / Mike ter Maat,1263,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Jill Stein / Rudolph Ware,1499,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Randall Terry / Stephen E Broden,147,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Cornel West / Melina Abdullah,457,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Robert F. Kennedy Jr. / Nicole Shanahan,1754,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Chris Garrity / Cody Ballard,4,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Claudia De la Cruz / Karina García,82,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Shiva Ayyadurai / Crystal Ellis,2,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Peter Sonski / Lauren Onak,65,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Bill Frankel / Steve Jenkins,1,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Presidential Electors,,Brian Anthony Perry / Mark Sbani,0,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Representative to the 119th United States Congress - District 2,,Joe Neguse,145762,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Representative to the 119th United States Congress - District 2,,Marshall Dawson,39641,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Representative to the 119th United States Congress - District 2,,Cynthia Munhos de Aquino Sirianni,1865,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Representative to the 119th United States Congress - District 2,,Jan Kok,1023,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Representative to the 119th United States Congress - District 2,,Gaylon Kent,2066,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Representative to the 119th United States Congress - District 2,,Mike Watson,1,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Board of Education Member - Congressional District 2,,Kathy Gebhardt,147271,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Board of Education Member - Congressional District 2,,Ethan Augreen,487,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Regent of the University of Colorado - At Large,,Eric Rinard,44470,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Regent of the University of Colorado - At Large,,Elliott Hood,128822,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Regent of the University of Colorado - At Large,,Thomas Reasoner,1333,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Regent of the University of Colorado - At Large,,T.J. Cole,4073,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Senator - District 17,,Tom Van Lone,25338,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Senator - District 17,,Sonya Jaquez Lewis,56000,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Senator - District 18,,Judy Amabile,73150,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Senator - District 18,,Gary Swing,7704,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Representative - District 10,,William B. DeOreo,6290,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Representative - District 10,,Junie Joseph,33889,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Representative - District 11,,Karen McCormick,31650,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Representative - District 11,,Kathy Reeves,14005,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Representative - District 12,,Kyle Brown,39742,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Representative - District 12,,Mark Milliman,12166,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Representative - District 19,,Dan Woog,6617,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Representative - District 19,,Jillaire McMillan,11312,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Representative - District 49,,Steve Ferrante,5420,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,State Representative - District 49,,Lesley Smith,21842,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,District Attorney - 20th Judicial District,,Michael T. Dougherty,145972,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Regional Transportation District Director - District I,,Karen Benker,41191,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Boulder County Commissioner - District 1,,Claire Levy,143314,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Boulder County Commissioner - District 1,,Raphael Minot,360,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Boulder County Commissioner - District 2,,Marta Loachamin,135438,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Boulder County Commissioner - District 2,,"Donald ""Don"" Lewis",43777,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Boulder County Coroner,,Jeff Martin,137661,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,City of Louisville City Council Ward 1,,Joshua Sroge,1738,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,City of Louisville City Council Ward 1,,Josh Cooperman,1753,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Town of Erie - Mayor,,Andrew Moore,4353,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Town of Erie - Mayor,,Justin Brooks,4454,,,contest_not_in_sov
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Kamala D. Harris / Tim Walz,150149,150149,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Donald J. Trump / JD Vance,40758,40758,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Blake Huber / Andrea Denault,123,123,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Chase Russell Oliver / Mike ter Maat,1263,1263,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Jill Stein / Rudolph Ware,1499,1499,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Randall Terry / Stephen E Broden,147,147,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Cornel West / Melina Abdullah,457,457,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Robert F. Kennedy Jr. / Nicole Shanahan,1754,1754,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Chris Garrity / Cody Ballard,4,4,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Claudia De la Cruz / Karina García,82,82,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Shiva Ayyadurai / Crystal Ellis,2,2,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Peter Sonski / Lauren Onak,65,65,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Bill Frankel / Steve Jenkins,1,1,0,match
+2024,general,2024-12-05T15:05:00,Presidential Electors,Presidential Electors,Brian Anthony Perry / Mark Sbani,0,0,0,match
+2024,general,2024-12-05T15:05:00,Representative to the 119th United States Congress - District 2,Representative to the 119th United States Congress - District 2,Joe Neguse,145762,145762,0,match
+2024,general,2024-12-05T15:05:00,Representative to the 119th United States Congress - District 2,Representative to the 119th United States Congress - District 2,Marshall Dawson,39641,39641,0,match
+2024,general,2024-12-05T15:05:00,Representative to the 119th United States Congress - District 2,Representative to the 119th United States Congress - District 2,Cynthia Munhos de Aquino Sirianni,1865,1865,0,match
+2024,general,2024-12-05T15:05:00,Representative to the 119th United States Congress - District 2,Representative to the 119th United States Congress - District 2,Jan Kok,1023,1023,0,match
+2024,general,2024-12-05T15:05:00,Representative to the 119th United States Congress - District 2,Representative to the 119th United States Congress - District 2,Gaylon Kent,2066,2066,0,match
+2024,general,2024-12-05T15:05:00,Representative to the 119th United States Congress - District 2,Representative to the 119th United States Congress - District 2,Mike Watson,1,1,0,match
+2024,general,2024-12-05T15:05:00,State Board of Education Member - Congressional District 2,State Board of Education Member - Congressional District 2,Kathy Gebhardt,147271,147271,0,match
+2024,general,2024-12-05T15:05:00,State Board of Education Member - Congressional District 2,State Board of Education Member - Congressional District 2,Ethan Augreen,487,487,0,match
+2024,general,2024-12-05T15:05:00,Regent of the University of Colorado - At Large,Regent of the University of Colorado - At Large,Eric Rinard,44470,44470,0,match
+2024,general,2024-12-05T15:05:00,Regent of the University of Colorado - At Large,Regent of the University of Colorado - At Large,Elliott Hood,128822,128822,0,match
+2024,general,2024-12-05T15:05:00,Regent of the University of Colorado - At Large,Regent of the University of Colorado - At Large,Thomas Reasoner,1333,1333,0,match
+2024,general,2024-12-05T15:05:00,Regent of the University of Colorado - At Large,Regent of the University of Colorado - At Large,T.J. Cole,4073,4073,0,match
+2024,general,2024-12-05T15:05:00,State Senator - District 17,State Senator - District 17,Tom Van Lone,25338,25338,0,match
+2024,general,2024-12-05T15:05:00,State Senator - District 17,State Senator - District 17,Sonya Jaquez Lewis,56000,56000,0,match
+2024,general,2024-12-05T15:05:00,State Senator - District 18,State Senator - District 18,Judy Amabile,73150,73150,0,match
+2024,general,2024-12-05T15:05:00,State Senator - District 18,State Senator - District 18,Gary Swing,7704,7704,0,match
+2024,general,2024-12-05T15:05:00,State Representative - District 10,State Representative - District 10,William B. DeOreo,6290,6290,0,match
+2024,general,2024-12-05T15:05:00,State Representative - District 10,State Representative - District 10,Junie Joseph,33889,33889,0,match
+2024,general,2024-12-05T15:05:00,State Representative - District 11,State Representative - District 11,Karen McCormick,31650,31650,0,match
+2024,general,2024-12-05T15:05:00,State Representative - District 11,State Representative - District 11,Kathy Reeves,14005,14005,0,match
+2024,general,2024-12-05T15:05:00,State Representative - District 12,State Representative - District 12,Kyle Brown,39742,39742,0,match
+2024,general,2024-12-05T15:05:00,State Representative - District 12,State Representative - District 12,Mark Milliman,12166,12166,0,match
+2024,general,2024-12-05T15:05:00,State Representative - District 19,State Representative - District 19,Dan Woog,6617,6617,0,match
+2024,general,2024-12-05T15:05:00,State Representative - District 19,State Representative - District 19,Jillaire McMillan,11312,11312,0,match
+2024,general,2024-12-05T15:05:00,State Representative - District 49,State Representative - District 49,Steve Ferrante,5420,5420,0,match
+2024,general,2024-12-05T15:05:00,State Representative - District 49,State Representative - District 49,Lesley Smith,21842,21842,0,match
+2024,general,2024-12-05T15:05:00,District Attorney - 20th Judicial District,District Attorney - 20th Judicial District,Michael T. Dougherty,145972,145972,0,match
+2024,general,2024-12-05T15:05:00,Regional Transportation District Director - District I,Regional Transportation District Director - District I,Karen Benker,41191,41191,0,match
+2024,general,2024-12-05T15:05:00,Boulder County Commissioner - District 1,Boulder County Commissioner - District 1,Claire Levy,143314,143314,0,match
+2024,general,2024-12-05T15:05:00,Boulder County Commissioner - District 1,Boulder County Commissioner - District 1,Raphael Minot,360,360,0,match
+2024,general,2024-12-05T15:05:00,Boulder County Commissioner - District 2,Boulder County Commissioner - District 2,Marta Loachamin,135438,135438,0,match
+2024,general,2024-12-05T15:05:00,Boulder County Commissioner - District 2,Boulder County Commissioner - District 2,"Donald ""Don"" Lewis",43777,43777,0,match
+2024,general,2024-12-05T15:05:00,Boulder County Coroner,Boulder County Coroner,Jeff Martin,137661,137661,0,match
+2024,general,2024-12-05T15:05:00,City of Louisville City Council Ward 1,City of Louisville City Council Ward 1,Joshua Sroge,1738,1738,0,match
+2024,general,2024-12-05T15:05:00,City of Louisville City Council Ward 1,City of Louisville City Council Ward 1,Josh Cooperman,1753,1753,0,match
+2024,general,2024-12-05T15:05:00,Town of Erie - Mayor,Town of Erie - Mayor,Andrew Moore,4353,4353,0,match
+2024,general,2024-12-05T15:05:00,Town of Erie - Mayor,Town of Erie - Mayor,Justin Brooks,4454,4454,0,match
 2024,general,2024-12-05T15:05:00,Town of Erie - Council Member District 1,Town of Erie - Council Member District 1,John Mortellaro,2654,2654,0,match
 2024,general,2024-12-05T15:05:00,Town of Erie - Council Member District 1,Town of Erie - Council Member District 1,Andrew Sawusch,2633,2633,0,match
 2024,general,2024-12-05T15:05:00,Town of Erie - Council Member District 1,Town of Erie - Council Member District 1,Anil Pesaramelli,3992,3992,0,match
 2024,general,2024-12-05T15:05:00,Town of Erie - Council Member District 1,Town of Erie - Council Member District 1,Richard Garcia,2188,2188,0,match
-2024,general,2024-12-05T15:05:00,Town of Erie - Council Member District 2,Town of Erie - Council Member District 1,Dan Hoback,600,,,candidate_not_in_sov
-2024,general,2024-12-05T15:05:00,Town of Erie - Council Member District 2,Town of Erie - Council Member District 1,Brandon M. Bell,477,,,candidate_not_in_sov
-2024,general,2024-12-05T15:05:00,Town of Erie - Council Member District 2,Town of Erie - Council Member District 1,Dan Maloit,359,,,candidate_not_in_sov
-2024,general,2024-12-05T15:05:00,Town of Erie - Council Member District 2,Town of Erie - Council Member District 1,Ben Hemphill,579,,,candidate_not_in_sov
+2024,general,2024-12-05T15:05:00,Town of Erie - Council Member District 2,Town of Erie - Council Member District 2,Dan Hoback,600,600,0,match
+2024,general,2024-12-05T15:05:00,Town of Erie - Council Member District 2,Town of Erie - Council Member District 2,Brandon M. Bell,477,477,0,match
+2024,general,2024-12-05T15:05:00,Town of Erie - Council Member District 2,Town of Erie - Council Member District 2,Dan Maloit,359,359,0,match
+2024,general,2024-12-05T15:05:00,Town of Erie - Council Member District 2,Town of Erie - Council Member District 2,Ben Hemphill,579,579,0,match
 2024,general,2024-12-05T15:05:00,Town of Superior - Trustee,Town of Superior - Trustee,Heather Cracraft,3251,3251,0,match
 2024,general,2024-12-05T15:05:00,Town of Superior - Trustee,Town of Superior - Trustee,Jason Serbu,3419,3419,0,match
 2024,general,2024-12-05T15:05:00,Town of Superior - Trustee,Town of Superior - Trustee,Mike Foster,3531,3531,0,match
 2024,general,2024-12-05T15:05:00,Town of Superior - Trustee,Town of Superior - Trustee,Gregory D. Horowitz,2147,2147,0,match
 2024,general,2024-12-05T15:05:00,Town of Superior - Trustee,Town of Superior - Trustee,George A. Kupfner,830,830,0,match
 2024,general,2024-12-05T15:05:00,Town of Superior - Trustee,Town of Superior - Trustee,Sandie Hammerly,3239,3239,0,match
-2024,general,2024-12-05T15:05:00,Justice of the Colorado Supreme Court - Maria E. Berkenkotter,,Yes,113378,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Justice of the Colorado Supreme Court - Maria E. Berkenkotter,,No,31101,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Justice of the Colorado Supreme Court - Brian D. Boatright,,Yes,101874,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Justice of the Colorado Supreme Court - Brian D. Boatright,,No,40388,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Justice of the Colorado Supreme Court - Monica M. Marquez,,Yes,112218,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Justice of the Colorado Supreme Court - Monica M. Marquez,,No,31640,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Stephanie Dunn,,Yes,112519,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Stephanie Dunn,,No,27066,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Jerry N. Jones,,Yes,94305,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Jerry N. Jones,,No,43065,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - W. Eric Kuhn,,Yes,109893,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - W. Eric Kuhn,,No,27789,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Gilbert M. Roman,,Yes,105904,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Gilbert M. Roman,,No,31466,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Timothy J. Schutz,,Yes,106090,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Timothy J. Schutz,,No,31032,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - J. Keith Collins,,Yes,107493,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - J. Keith Collins,,No,28146,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - Robert R. Gunning,,Yes,107824,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - Robert R. Gunning,,No,27045,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - Dea Marie Lindsey,,Yes,106454,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - Dea Marie Lindsey,,No,28768,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - Thomas Frances Mulvahill,,Yes,103032,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - Thomas Frances Mulvahill,,No,31561,,,contest_not_in_sov
+2024,general,2024-12-05T15:05:00,Justice of the Colorado Supreme Court - Maria E. Berkenkotter,Justice of the Colorado Supreme Court - Berkenkotter,Yes,113378,113378,0,match
+2024,general,2024-12-05T15:05:00,Justice of the Colorado Supreme Court - Maria E. Berkenkotter,Justice of the Colorado Supreme Court - Berkenkotter,No,31101,31101,0,match
+2024,general,2024-12-05T15:05:00,Justice of the Colorado Supreme Court - Brian D. Boatright,Justice of the Colorado Supreme Court - Boatright,Yes,101874,101874,0,match
+2024,general,2024-12-05T15:05:00,Justice of the Colorado Supreme Court - Brian D. Boatright,Justice of the Colorado Supreme Court - Boatright,No,40388,40388,0,match
+2024,general,2024-12-05T15:05:00,Justice of the Colorado Supreme Court - Monica M. Marquez,Justice of the Colorado Supreme Court - Marquez,Yes,112218,112218,0,match
+2024,general,2024-12-05T15:05:00,Justice of the Colorado Supreme Court - Monica M. Marquez,Justice of the Colorado Supreme Court - Marquez,No,31640,31640,0,match
+2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Stephanie Dunn,Colorado Court of Appeals Judge - Dunn,Yes,112519,112519,0,match
+2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Stephanie Dunn,Colorado Court of Appeals Judge - Dunn,No,27066,27066,0,match
+2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Jerry N. Jones,Colorado Court of Appeals Judge - Jones,Yes,94305,94305,0,match
+2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Jerry N. Jones,Colorado Court of Appeals Judge - Jones,No,43065,43065,0,match
+2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - W. Eric Kuhn,Colorado Court of Appeals Judge - Kuhn,Yes,109893,109893,0,match
+2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - W. Eric Kuhn,Colorado Court of Appeals Judge - Kuhn,No,27789,27789,0,match
+2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Gilbert M. Roman,Colorado Court of Appeals Judge - Roman,Yes,105904,105904,0,match
+2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Gilbert M. Roman,Colorado Court of Appeals Judge - Roman,No,31466,31466,0,match
+2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Timothy J. Schutz,Colorado Court of Appeals Judge - Schutz,Yes,106090,106090,0,match
+2024,general,2024-12-05T15:05:00,Colorado Court of Appeals Judge - Timothy J. Schutz,Colorado Court of Appeals Judge - Schutz,No,31032,31032,0,match
+2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - J. Keith Collins,District Court Judge - 20th Judicial District - Collins,Yes,107493,107493,0,match
+2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - J. Keith Collins,District Court Judge - 20th Judicial District - Collins,No,28146,28146,0,match
+2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - Robert R. Gunning,District Court Judge - 20th Judicial District - Gunning,Yes,107824,107824,0,match
+2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - Robert R. Gunning,District Court Judge - 20th Judicial District - Gunning,No,27045,27045,0,match
+2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - Dea Marie Lindsey,District Court Judge - 20th Judicial District - Lindsey,Yes,106454,106454,0,match
+2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - Dea Marie Lindsey,District Court Judge - 20th Judicial District - Lindsey,No,28768,28768,0,match
+2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - Thomas Frances Mulvahill,District Court Judge - 20th Judicial District - Mulvahill,Yes,103032,103032,0,match
+2024,general,2024-12-05T15:05:00,District Court Judge - 20th Judicial District - Thomas Frances Mulvahill,District Court Judge - 20th Judicial District - Mulvahill,No,31561,31561,0,match
 2024,general,2024-12-05T15:05:00,Boulder County Court - Jonathon P. Martin,,Yes,109266,,,contest_not_in_sov
 2024,general,2024-12-05T15:05:00,Boulder County Court - Jonathon P. Martin,,No,26382,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment G (Constitutional),,Yes,145038,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment G (Constitutional),,No,38530,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment H (Constitutional),,Yes,142593,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment H (Constitutional),,No,35696,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment I (Constitutional),,Yes,135076,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment I (Constitutional),,No,47350,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment J (Constitutional),,Yes,157277,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment J (Constitutional),,No,32408,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment K (Constitutional),,Yes,105901,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment K (Constitutional),,No,66641,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment 79 (Constitutional),,Yes,153538,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment 79 (Constitutional),,No,37361,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment 80 (Constitutional),,Yes,66866,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Amendment 80 (Constitutional),,No,119273,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition JJ (Statutory),,Yes,165105,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition JJ (Statutory),,No,23267,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition KK (Statutory),,Yes,142175,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition KK (Statutory),,No,47035,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition 127 (Statutory),,Yes,110045,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition 127 (Statutory),,No,76306,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition 128 (Statutory),,Yes,85402,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition 128 (Statutory),,No,97334,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition 129 (Statutory),,Yes,86532,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition 129 (Statutory),,No,93795,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition 130 (Statutory),,Yes,73887,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition 130 (Statutory),,No,108744,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition 131 (Statutory),,Yes,87425,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Proposition 131 (Statutory),,No,94626,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,City of Boulder Ballot Question 2C,,Yes,27688,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,City of Boulder Ballot Question 2C,,No,18752,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,City of Boulder Ballot Question 2D,,Yes,25085,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,City of Boulder Ballot Question 2D,,No,18683,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,City of Boulder Ballot Question 2E,,Yes,21491,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,City of Boulder Ballot Question 2E,,No,21556,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,City of Lafayette Ballot Question 2A,,Yes,9770,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,City of Lafayette Ballot Question 2A,,No,6021,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,City of Longmont Ballot Issue 3A,,Yes,39437,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,City of Longmont Ballot Issue 3A,,No,13545,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Town of Erie Ballot Issue 3C,,Yes,5309,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Town of Erie Ballot Issue 3C,,No,4128,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Town of Lyons Ballot Question 2B,,Yes,1175,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Town of Lyons Ballot Question 2B,,No,292,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Town of Superior Ballot Issue 3B,,Yes,4088,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Town of Superior Ballot Issue 3B,,No,3517,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,St. Vrain Valley School District RE-1J Ballot Issue 5C,,Yes,51072,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,St. Vrain Valley School District RE-1J Ballot Issue 5C,,No,15475,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Thompson School District R2-J Ballot Issue 5A,,Yes,54,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Thompson School District R2-J Ballot Issue 5A,,No,78,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Thompson School District R2-J Ballot Issue 5B,,Yes,56,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Thompson School District R2-J Ballot Issue 5B,,No,75,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Eldorado Springs Public Improvement District Ballot Question 6C,,Yes,148,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Eldorado Springs Public Improvement District Ballot Question 6C,,No,13,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Homestead Public Improvement District of Boulder County Ballot Issue 6D,,Yes,97,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Homestead Public Improvement District of Boulder County Ballot Issue 6D,,No,64,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Lafayette Downtown Development Authority Ballot Question 6A,,Yes,237,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Lafayette Downtown Development Authority Ballot Question 6A,,No,56,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Lafayette Downtown Development Authority Ballot Issue 6B,,Yes,226,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Lafayette Downtown Development Authority Ballot Issue 6B,,No,61,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Regional Transportation District Ballot Issue 7A,,Yes,143887,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,Regional Transportation District Ballot Issue 7A,,No,35778,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,St. Vrain and Left Hand Water Conservancy District Ballot Issue 7C,,Yes,53313,,,contest_not_in_sov
-2024,general,2024-12-05T15:05:00,St. Vrain and Left Hand Water Conservancy District Ballot Issue 7C,,No,9102,,,contest_not_in_sov
+2024,general,2024-12-05T15:05:00,Amendment G (Constitutional),Amendment G (Constitutional),Yes,145038,145038,0,match
+2024,general,2024-12-05T15:05:00,Amendment G (Constitutional),Amendment G (Constitutional),No,38530,38530,0,match
+2024,general,2024-12-05T15:05:00,Amendment H (Constitutional),Amendment H (Constitutional),Yes,142593,142593,0,match
+2024,general,2024-12-05T15:05:00,Amendment H (Constitutional),Amendment H (Constitutional),No,35696,35696,0,match
+2024,general,2024-12-05T15:05:00,Amendment I (Constitutional),Amendment I (Constitutional),Yes,135076,135076,0,match
+2024,general,2024-12-05T15:05:00,Amendment I (Constitutional),Amendment I (Constitutional),No,47350,47350,0,match
+2024,general,2024-12-05T15:05:00,Amendment J (Constitutional),Amendment J (Constitutional),Yes,157277,157277,0,match
+2024,general,2024-12-05T15:05:00,Amendment J (Constitutional),Amendment J (Constitutional),No,32408,32408,0,match
+2024,general,2024-12-05T15:05:00,Amendment K (Constitutional),Amendment K (Constitutional),Yes,105901,105901,0,match
+2024,general,2024-12-05T15:05:00,Amendment K (Constitutional),Amendment K (Constitutional),No,66641,66641,0,match
+2024,general,2024-12-05T15:05:00,Amendment 79 (Constitutional),Amendment 79 (Constitutional),Yes,153538,153538,0,match
+2024,general,2024-12-05T15:05:00,Amendment 79 (Constitutional),Amendment 79 (Constitutional),No,37361,37361,0,match
+2024,general,2024-12-05T15:05:00,Amendment 80 (Constitutional),Amendment 80 (Constitutional),Yes,66866,66866,0,match
+2024,general,2024-12-05T15:05:00,Amendment 80 (Constitutional),Amendment 80 (Constitutional),No,119273,119273,0,match
+2024,general,2024-12-05T15:05:00,Proposition JJ (Statutory),Proposition JJ (Statutory),Yes,165105,165105,0,match
+2024,general,2024-12-05T15:05:00,Proposition JJ (Statutory),Proposition JJ (Statutory),No,23267,23267,0,match
+2024,general,2024-12-05T15:05:00,Proposition KK (Statutory),Proposition KK (Statutory),Yes,142175,142175,0,match
+2024,general,2024-12-05T15:05:00,Proposition KK (Statutory),Proposition KK (Statutory),No,47035,47035,0,match
+2024,general,2024-12-05T15:05:00,Proposition 127 (Statutory),Proposition 127 (Statutory),Yes,110045,110045,0,match
+2024,general,2024-12-05T15:05:00,Proposition 127 (Statutory),Proposition 127 (Statutory),No,76306,76306,0,match
+2024,general,2024-12-05T15:05:00,Proposition 128 (Statutory),Proposition 128 (Statutory),Yes,85402,85402,0,match
+2024,general,2024-12-05T15:05:00,Proposition 128 (Statutory),Proposition 128 (Statutory),No,97334,97334,0,match
+2024,general,2024-12-05T15:05:00,Proposition 129 (Statutory),Proposition 129 (Statutory),Yes,86532,86532,0,match
+2024,general,2024-12-05T15:05:00,Proposition 129 (Statutory),Proposition 129 (Statutory),No,93795,93795,0,match
+2024,general,2024-12-05T15:05:00,Proposition 130 (Statutory),Proposition 130 (Statutory),Yes,73887,73887,0,match
+2024,general,2024-12-05T15:05:00,Proposition 130 (Statutory),Proposition 130 (Statutory),No,108744,108744,0,match
+2024,general,2024-12-05T15:05:00,Proposition 131 (Statutory),Proposition 131 (Statutory),Yes,87425,87425,0,match
+2024,general,2024-12-05T15:05:00,Proposition 131 (Statutory),Proposition 131 (Statutory),No,94626,94626,0,match
+2024,general,2024-12-05T15:05:00,City of Boulder Ballot Question 2C,City of Boulder Ballot Question 2C,Yes,27688,27688,0,match
+2024,general,2024-12-05T15:05:00,City of Boulder Ballot Question 2C,City of Boulder Ballot Question 2C,No,18752,18752,0,match
+2024,general,2024-12-05T15:05:00,City of Boulder Ballot Question 2D,City of Boulder Ballot Question 2D,Yes,25085,25085,0,match
+2024,general,2024-12-05T15:05:00,City of Boulder Ballot Question 2D,City of Boulder Ballot Question 2D,No,18683,18683,0,match
+2024,general,2024-12-05T15:05:00,City of Boulder Ballot Question 2E,City of Boulder Ballot Question 2E,Yes,21491,21491,0,match
+2024,general,2024-12-05T15:05:00,City of Boulder Ballot Question 2E,City of Boulder Ballot Question 2E,No,21556,21556,0,match
+2024,general,2024-12-05T15:05:00,City of Lafayette Ballot Question 2A,City of Lafayette Ballot Question 2A,Yes,9770,9770,0,match
+2024,general,2024-12-05T15:05:00,City of Lafayette Ballot Question 2A,City of Lafayette Ballot Question 2A,No,6021,6021,0,match
+2024,general,2024-12-05T15:05:00,City of Longmont Ballot Issue 3A,City of Longmont Ballot Issue 3A,Yes,39437,39437,0,match
+2024,general,2024-12-05T15:05:00,City of Longmont Ballot Issue 3A,City of Longmont Ballot Issue 3A,No,13545,13545,0,match
+2024,general,2024-12-05T15:05:00,Town of Erie Ballot Issue 3C,Town of Erie Ballot Issue 3C,Yes,5309,5309,0,match
+2024,general,2024-12-05T15:05:00,Town of Erie Ballot Issue 3C,Town of Erie Ballot Issue 3C,No,4128,4128,0,match
+2024,general,2024-12-05T15:05:00,Town of Lyons Ballot Question 2B,Town of Lyons Ballot Question 2B,Yes,1175,1175,0,match
+2024,general,2024-12-05T15:05:00,Town of Lyons Ballot Question 2B,Town of Lyons Ballot Question 2B,No,292,292,0,match
+2024,general,2024-12-05T15:05:00,Town of Superior Ballot Issue 3B,Town of Superior Ballot Issue 3B,Yes,4088,4088,0,match
+2024,general,2024-12-05T15:05:00,Town of Superior Ballot Issue 3B,Town of Superior Ballot Issue 3B,No,3517,3517,0,match
+2024,general,2024-12-05T15:05:00,St. Vrain Valley School District RE-1J Ballot Issue 5C,St. Vrain Valley School District RE-1J Ballot Issue 5C,Yes,51072,51072,0,match
+2024,general,2024-12-05T15:05:00,St. Vrain Valley School District RE-1J Ballot Issue 5C,St. Vrain Valley School District RE-1J Ballot Issue 5C,No,15475,15475,0,match
+2024,general,2024-12-05T15:05:00,Thompson School District R2-J Ballot Issue 5A,Thompson School District R2-J Ballot Issue 5A,Yes,54,54,0,match
+2024,general,2024-12-05T15:05:00,Thompson School District R2-J Ballot Issue 5A,Thompson School District R2-J Ballot Issue 5A,No,78,78,0,match
+2024,general,2024-12-05T15:05:00,Thompson School District R2-J Ballot Issue 5B,Thompson School District R2-J Ballot Issue 5B,Yes,56,56,0,match
+2024,general,2024-12-05T15:05:00,Thompson School District R2-J Ballot Issue 5B,Thompson School District R2-J Ballot Issue 5B,No,75,75,0,match
+2024,general,2024-12-05T15:05:00,Eldorado Springs Public Improvement District Ballot Question 6C,Eldorado Springs Public Improvement District Ballot Question 6C,Yes,148,148,0,match
+2024,general,2024-12-05T15:05:00,Eldorado Springs Public Improvement District Ballot Question 6C,Eldorado Springs Public Improvement District Ballot Question 6C,No,13,13,0,match
+2024,general,2024-12-05T15:05:00,Homestead Public Improvement District of Boulder County Ballot Issue 6D,Homestead Public Improvement District of Boulder County Ballot Issue 6D,Yes,97,97,0,match
+2024,general,2024-12-05T15:05:00,Homestead Public Improvement District of Boulder County Ballot Issue 6D,Homestead Public Improvement District of Boulder County Ballot Issue 6D,No,64,64,0,match
+2024,general,2024-12-05T15:05:00,Lafayette Downtown Development Authority Ballot Question 6A,Lafayette Downtown Development Authority Ballot Question 6A,Yes,237,237,0,match
+2024,general,2024-12-05T15:05:00,Lafayette Downtown Development Authority Ballot Question 6A,Lafayette Downtown Development Authority Ballot Question 6A,No,56,56,0,match
+2024,general,2024-12-05T15:05:00,Lafayette Downtown Development Authority Ballot Issue 6B,Lafayette Downtown Development Authority Ballot Issue 6B,Yes,226,226,0,match
+2024,general,2024-12-05T15:05:00,Lafayette Downtown Development Authority Ballot Issue 6B,Lafayette Downtown Development Authority Ballot Issue 6B,No,61,61,0,match
+2024,general,2024-12-05T15:05:00,Regional Transportation District Ballot Issue 7A,Regional Transportation District Ballot Issue 7A,Yes,143887,143887,0,match
+2024,general,2024-12-05T15:05:00,Regional Transportation District Ballot Issue 7A,Regional Transportation District Ballot Issue 7A,No,35778,35778,0,match
+2024,general,2024-12-05T15:05:00,St. Vrain and Left Hand Water Conservancy District Ballot Issue 7C,St. Vrain and Left Hand Water Conservancy District Ballot Issue 7C,Yes,53313,53313,0,match
+2024,general,2024-12-05T15:05:00,St. Vrain and Left Hand Water Conservancy District Ballot Issue 7C,St. Vrain and Left Hand Water Conservancy District Ballot Issue 7C,No,9102,9102,0,match
 2025,coordinated,2025-11-13T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Nicole Speer,16165,16165,0,match
 2025,coordinated,2025-11-13T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Rob Kaplan,15867,15867,0,match
 2025,coordinated,2025-11-13T16:50:00,City of Boulder Council Candidates,City of Boulder Council Candidates,Montserrat Palacios,2957,2957,0,match

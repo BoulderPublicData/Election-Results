@@ -20,13 +20,14 @@ Schema version: **1.2.0** (see [`scripts/schema.py`](../scripts/schema.py)). Ter
 | **Precinct** | The smallest geographic voting unit. `precinct_id` is 10 digits (`2181007800`) except in Boulder's 2007-2012 files (3 digits, `073`). |
 | **Composite precinct** | Several precincts reported jointly as one unit (often to protect the privacy of very small groups); one `precinct_id` joined with `", "` (§4.3). |
 | **Pseudo-precinct** | A row that isn't a place: property-owner / landowner ballots in special-district contests, or an SOS summary row (§4.3a). `is_pseudo_precinct = True`. |
-| **General / primary / coordinated** | `general`: even-year November (federal, state, county). `primary`: even-year June party nominations (not yet ingested). `coordinated`: odd-year November, run by the county for cities, school and special districts. |
+| **General / primary / coordinated / presidential primary** | `general`: even-year November (federal, state, county). `primary`: even-year June party nominations (not yet ingested). `coordinated`: odd-year November, run by the county for cities, school and special districts. `presidential_primary`: March of a presidential year (2024-03-05); not ingested here, but in the shared vocabulary because Cast-Vote-Records holds the 2024 presidential primary. |
 | **Measure** | A yes/no ballot question (amendment, proposition, referendum, local issue). |
 | **Retention** | A yes/no vote on whether a judge keeps their seat. |
 | **RCV** (ranked-choice voting) | Voters rank candidates; the last-place candidate is eliminated round by round until one has a majority. Boulder mayor, from 2023 (§3). |
 | **UOCAVA** | Uniformed and Overseas Citizens Absentee Voting Act — military and overseas ballots, which can arrive after election night. |
 | **Canvass / certification** | The post-election reconciliation of every ballot, ending in the certified SoV ~2-3 weeks after election day. |
-| **Election key** | `{year}-{type}`, lowercase (`2016-general`) — the identifier shared with the Cast-Vote-Records repository. |
+| **Election key** | `{year}-{type}`, lowercase, `_` written `-` (`2016-general`, `2024-presidential-primary`) — the identifier shared with the Cast-Vote-Records repository. |
+| **Recount / amended SoV** | A Statement of Votes the county reissues after a recount or amendment. It lists only the contests that changed, so it is merged over the full SoV by contest (§4.7). |
 
 The full shared glossary (including cast-vote-record terms) is [`docs/glossary.md`](glossary.md).
 
@@ -217,7 +218,7 @@ Members are printed as published: 2011 abbreviates later members (`073, 74` is p
 
 Vote tallies are for the **combined** unit — never split them between members. To match these against single-precinct geography, split the IDs on `", "` into a one-to-many lookup and treat the group as one area. The tidy-format parser also notes composites in `extraction_notes`.
 
-**Source anomaly — 2023 City of Louisville City Council Ward 2.** The 2023 SoV reports this contest under two *overlapping* composite units, `2181207201, 2181207202` and `2181207202, 2181207500`, with near-identical tallies (Fahey 184 / 183, Colbert 234 / 234, 458 ballots each). Summed as published, the SoV gives 1,602 / 1,441; without the `202, 500` row it gives 1,419 / 1,207 — exactly the county's final election-night web totals (§8). It looks like a double-listed tally in the published file, but the data is left as published (never split or drop composite rows on a guess). It is the only contest in the 2015, 2022 or 2023 files where one precinct appears in two reporting units.
+**Corrected — 2023 City of Louisville City Council Ward 2 (#44).** The 2023 SoV reports this contest under two *overlapping* composite units, `2181207201, 2181207202` and `2181207202, 2181207500`, with near-identical tallies (Fahey 184 / 183, Colbert 234 / 234, 458 ballots each), so precinct 202 is counted twice: summed as published, Fahey 1,602 and Colbert 1,441. The `2181207202, 2181207500` rows are dropped by an adjudicated correction (§4.8), which gives **Fahey 1,419, Colbert 1,207**: exactly the county's own Official Summary of Votes and its results site's final update (the election-night dataset's final snapshot, §8). Dropping the other unit instead would give Fahey 1,418. It is the only contest in the 2015, 2022 or 2023 files where one precinct appears in two reporting units. Every other composite row is kept as published: never split or drop composite rows without that kind of evidence.
 
 ### 4.3a Property-owner / landowner pseudo-precincts
 
@@ -231,8 +232,8 @@ Special-district contests can include ballots from non-resident property owners.
 | `Landowner-FM, Landowner-FMLV`, `Landowner-FMLV, Landowner-LV` | Boulder 2019 |
 | `FMFPD`, `SLFPD`, and `LFPD` inside `004, 005, LFPD` | Boulder 2010 (fire-district codes) |
 | `RMFPD`, `NCLD` | Boulder 2009 |
-| `Property Owner` | Boulder 2023, 2025 |
-| a real precinct plus one of the above (`2181307910, Landowner`, `916, Landowner`, …) | Boulder 2012-2022 |
+| `Property Owner` | Boulder 2023, 2024, 2025 |
+| a real precinct plus one of the above (`2181307910, Landowner`, `916, Landowner`, `2181207508, Property Owner`, …) | Boulder 2012-2022, 2024 |
 | `SUM` (0-vote rows) | SOS 2006 |
 | `Provisional` | SOS 2008 |
 
@@ -291,13 +292,39 @@ The SOS publishes **only candidate vote totals**, never ballots-cast or active-v
 
 `election_date` is set from a small table in [`scripts/sources.py`](../scripts/sources.py) (`ELECTION_DATES`). It records election day, not the certification date. Boulder County typically certifies its SoV ~3 weeks after election day; the file `retrieved_at` timestamp captures when we pulled the latest copy.
 
+### 4.7 Recount and amended SoVs (Boulder 2023, 2024)
+
+After certifying, the county twice posted a second, **partial** Statement of Votes covering only the contests a recount or amendment changed:
+
+| Election | Full SoV (the source) | Partial SoV (a supplement) | Contests it replaces |
+|---|---|---|---|
+| 2023-coordinated | `2023-coordinated-sov.xlsx` ([November](https://assets.bouldercounty.gov/wp-content/uploads/2023/11/2023C-Boulder-County-Official-Statement-of-Votes.xlsx)) | `2023-coordinated-sov-recount.xlsx` ([December recount](https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx)) | City of Boulder Council Candidates |
+| 2024-general | `2024-general-sov.xlsx` ([November](https://assets.bouldercounty.gov/wp-content/uploads/2024/11/2024G-Boulder-County-Official-Statement-of-Votes.xlsx)) | `2024-general-sov-amended.xlsx` ([December amended](https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx)) | Town of Superior - Trustee; Town of Erie - Council Member District 1 |
+
+Both files of each pair are kept in `data/original/` unchanged. The registry lists the partial file in the source's `supplements` ([`scripts/sources.py`](../scripts/sources.py)), and [`scripts/overlay.py`](../scripts/overlay.py) merges it **by contest**: each contest it reports replaces that contest's rows in the full file, whole, and every other contest keeps the full file's rows. A supplement contest that isn't in the full file stops the build. `reconcile.py` applies the same rule to the raw workbooks, and the provenance row's `extraction_notes` names the supplement, its URL and the contests it replaced.
+
+What the merge changed:
+
+- **2023:** City of Boulder Council Candidates, 113,379 → **113,374** votes (the December 2023 recount; e.g. Robins 11,247 → 11,249, Atkins 6,831 → 6,829). Until #42 the registry pointed at the recount URL while the committed file was the November original.
+- **2024:** until #43 this repo held only the 66-row amended file (2 contests, 27,884 votes). It now holds the full SoV, 18,438 rows and 65 contests, with the amended file's two contests merged over it: 6,649,409 votes in the November file → **6,649,407** (Superior Trustee: Foster 3,532 → 3,531, Hammerly 3,238 → 3,239; Erie District 1: Sawusch 2,634 → 2,633, Garcia 2,189 → 2,188).
+
+### 4.8 Adjudicated corrections
+
+The data reproduces each SoV as published, except where a row of [`scripts/corrections/statements-of-votes.csv`](../scripts/corrections/statements-of-votes.csv) documents a defect in the county's file. Each row names the published row (election key, data source, contest, `precinct_id`, `candidate_or_option`), the action (`drop_row` or `set_votes`), the published and corrected votes, the **evidence** and a note. If the published row or its count stops matching, the build fails, so a correction never applies silently. `reconcile.py` reports a key whose difference from the raw file equals its corrections as `corrected`, not `mismatch`, and the provenance row's `extraction_notes` lists every correction applied.
+
+| Election | Contest | Correction | Evidence |
+|---|---|---|---|
+| 2023-coordinated | City of Louisville City Council Ward 2 (4-year term) | Drop the duplicated unit `2181207202, 2181207500` (Fahey 183, Colbert 234; §4.3) | The county's [2023 Official Summary of Votes](https://assets.bouldercounty.gov/wp-content/uploads/2023/11/2023C-Boulder-County-Official-Summary-of-Votes.pdf): Fahey 1,419, Colbert 1,207, 2,994 ballots, 366 undervotes. The results site's final update (`vote-counting/2023C/2023 Coordinated (9) Recount Results.jpeg`, 2023-12-06 16:50; the final snapshot in `vote-counting-contests.csv`): 1,419 and 1,207. |
+
+Why this unit: each unit holds precinct 202's ballots plus a one-ballot sub-precinct (of 201 or of 500). The two units' tallies differ by one Fahey vote and one undervote, so the 201 ballot was a Fahey vote and the 500 ballot an undervote. Dropping `202, 500` therefore removes no candidate vote that isn't also counted in `201, 202`; it loses only that one undervoted ballot, so the unit `ballots_cast` add up to 2,993 against the county's 2,994. `votes` match the county exactly.
+
 ---
 
 ## 5. Per-year audits
 
 The audit is generated by [`scripts/audit.py`](../scripts/audit.py) and refreshed on every pipeline run. The full per-year summary lives at [`data/audit/summary.md`](../data/audit/summary.md) and per-file fragments at `data/audit/{stem}.md`.
 
-Quick reference, regenerated from the per-year CSVs by `uv run python -m scripts.doc_stats`. Contests count distinct titles (SOS 2012-2020 retention contests are one per judge, §4.5); precincts count distinct `precinct_id`s, including composites and pseudo-precincts. 2024 Boulder holds only local races and 2024 SOS is turnout-only (see the notes below). The combined dataset has <!-- generated:row-count -->409,496<!-- /generated:row-count --> rows.
+Quick reference, regenerated from the per-year CSVs by `uv run python -m scripts.doc_stats`. Contests count distinct titles (SOS 2012-2020 retention contests are one per judge, §4.5); precincts count distinct `precinct_id`s, including composites and pseudo-precincts. 2024 SOS is turnout-only (see the notes below). The combined dataset has <!-- generated:row-count -->427,866<!-- /generated:row-count --> rows.
 
 <!-- generated:sov-table -->
 | Year | Source | Election | Rows | Contests | Precincts | Pseudo-precinct rows | Quality |
@@ -328,8 +355,8 @@ Quick reference, regenerated from the per-year CSVs by `uv run python -m scripts
 | 2020 | SOS | general | 20,584 | 34 | 240 | 0 | `machine_readable` |
 | 2021 | Boulder | coordinated | 6,241 | 40 | 243 | 2 | `machine_readable` |
 | 2022 | Boulder | general | 22,144 | 76 | 201 | 6 | `machine_readable` |
-| 2023 | Boulder | coordinated | 5,695 | 38 | 198 | 4 | `machine_readable` |
-| 2024 | Boulder | general | 66 | 2 | 13 | 0 | `machine_readable` |
+| 2023 | Boulder | coordinated | 5,693 | 38 | 197 | 4 | `machine_readable` |
+| 2024 | Boulder | general | 18,438 | 65 | 197 | 10 | `machine_readable` |
 | 2024 | SOS | general | 0 | 0 | 0 | 0 | `machine_readable` |
 | 2025 | Boulder | coordinated | 4,342 | 32 | 196 | 2 | `machine_readable` |
 <!-- /generated:sov-table -->
@@ -337,7 +364,8 @@ Quick reference, regenerated from the per-year CSVs by `uv run python -m scripts
 **Notes on row counts:**
 
 - 2008-2012 Boulder: panel files; every candidate reconciles to the file's printed `Totals` — see [§4.2](#42-boulder-county-panel-years-2008-2010-2011-2012).
-- 2024 Boulder: the upstream "Amended Statement of Votes" file contains only 66 rows of local races (Town of Superior, etc.), and the 2024 SOS file is turnout-only. County-wide totals for all 65 contests are in the election-night dataset's final 2024 snapshot (§8).
+- 2023 and 2024 Boulder: the full SoV with the county's December recount (2023) or amended (2024) SoV merged over it by contest (§4.7); 2023 also has one adjudicated correction (§4.8). Before #43 the 2024 row was the amended file alone: 66 rows, 2 contests.
+- 2024 SOS: turnout-only (no candidate or contest columns), so it has no rows.
 - Precinct counts include composite units (§4.3) and pseudo-precincts (§4.3a).
 - 2008-2014 SOS: ~3-5 fewer precincts than Boulder — SOS reports precinct subset that voted; Boulder reports every registered precinct.
 
@@ -358,7 +386,7 @@ The pipeline pulls source URLs from two layers:
    - Boulder County: [bouldercounty.gov/elections/results/](https://bouldercounty.gov/elections/results/)
    - Colorado SOS: [coloradosos.gov/pubs/elections/Results/Archives.html](https://www.coloradosos.gov/pubs/elections/Results/Archives.html)
 
-Discovery prefers `.xlsx` over `.xls` over `.pdf` when the same year publishes multiple formats. The filename filter rejects sample ballots, TABOR notices, summary files, abstracts, and other non-SoV publications.
+Discovery prefers `.xlsx` over `.xls` over `.pdf` when the same year publishes multiple formats. A recount or amended SoV is attached to that election's full SoV as a supplement (§4.7), never used in its place; a presidential-primary file (`2024PP-…`) is keyed `{year}-presidential-primary`. The filename filter rejects sample ballots, TABOR notices, summary files, abstracts, and other non-SoV publications.
 
 ```bash
 # See what discovery would find that's NOT already in sources.py
@@ -444,12 +472,26 @@ box's footnotes and update notices, verbatim), and provenance (`source_file`, `s
    vote cells blank (read from the image).
 4. **External check.** `scripts/reconcile.py` compares each election's final snapshot with the
    SoV, candidate by candidate (report only — see the last section of
-   [`data/audit/reconciliation.md`](../data/audit/reconciliation.md)). For 2014–2022 every
-   matchable candidate agrees **exactly**.
+   [`data/audit/reconciliation.md`](../data/audit/reconciliation.md)). For 2014–2025 every
+   matchable candidate agrees **exactly**. (Until #42–#44, 2023 had 7 near-matches from the
+   City of Boulder Council recount, whose final web update is post-recount, and 2 differences
+   from the double-counted Louisville Ward 2 unit, §4.8; 2024 had only local races to compare.)
 
-**Known gaps:** write-in candidates can't be matched to the SoV (it lumps them); the 2024 SoV in
-this repo has only local races, so for 2024 this dataset is the fullest county-level record we
-hold; 2025's final snapshot is pre-certification ("Unofficial Results").
+**Known gaps:** write-in candidates can't be matched to the SoV (it lumps them); the 2024
+`Boulder County Court - Jonathon P. Martin` card isn't matched by name to the SoV's `Boulder
+County Court - Martin`; 2025's final snapshot is pre-certification ("Unofficial Results").
+
+**Ballots counted vs. the county's ballot returns (#45).** The county also publishes daily
+cumulative ballot returns (its BallotReturns page, not in this repo). For 2017–2025 the final
+snapshot's `total_ballots_counted` is 0.55–1.56% *below* the election-day cumulative returns, as
+expected when some returned ballots are never counted (signature cures not completed, rejected
+envelopes). **2016 is the exception:** 192,822 counted against 189,629 returned, 1.68% *above*.
+The 2016 count is internally consistent (mail 179,175 + in person 13,230 + property owner 417 =
+192,822, in the final snapshot of 2016-11-22) and agrees with the 2016 SoV, whose per-precinct
+`ballots_cast` (largest value per `precinct_id`) sum to 192,917, within 0.05%. So the gap is most
+likely on the returns side: a returns figure updated before the last ballots arrived, or a
+different definition of "returned" in 2016. The cause isn't confirmed; treat 2016 returns and
+counts as not directly comparable.
 
 ---
 

@@ -80,7 +80,12 @@ _BOILERPLATE_PREFIXES = (
     "absentee",
     "total number of voters",
     "precincts reporting",
-    "boulder county",
+    # The page banner: "Boulder County, CO — GENERAL ELECTION …" (2008),
+    # "Boulder County, Colorado — 2010 BOULDER COUNTY GENERAL ELECTION …".
+    # Not a bare "boulder county": that also starts real titles, such as
+    # 2011's "Boulder County Mountains Forest Improvement District Question
+    # 5C:" (#46).
+    "boulder county, co",
     "canvass report",
     "general election",
     "coordinated election",
@@ -89,15 +94,33 @@ _BOILERPLATE_PREFIXES = (
 )
 
 
+def _ends_panel(row: pd.Series) -> bool:
+    """True for a previous panel's data or ``Totals`` row: column 0 holds a
+    precinct, a landowner code or ``Totals``, or the row is a run of numbers
+    under a non-numeric code (2010's fire-district pseudo-precincts)."""
+    cells = _row_cells(row.tolist())
+    if not cells:
+        return False
+    col0 = row.iloc[0]
+    first = "" if pd.isna(col0) else str(col0).strip()
+    if first and (_is_totals(first) or _is_row_start(first)):
+        return True
+    return len(cells) > 2 and all(_to_number(c) is not None for c in cells[1:])
+
+
 def _contest_title(raw: pd.DataFrame, start: int) -> str:
     """The contest title sits 1-10 rows above the 'Precinct' header row, typically
     in column 0 or column 6. Walk upward and pick the first non-null, non-boilerplate
-    cell. The window is wide because page-break headers can push the title up."""
+    cell. The window is wide because page-break headers can push the title up,
+    but the walk stops at the previous panel's data or ``Totals`` row: a title
+    is never above those, and reading past them returned a number (#46)."""
     for offset in range(1, 11):
         idx = start - offset
         if idx < 0:
             break
         row = raw.iloc[idx]
+        if _ends_panel(row):
+            break
         for col in (6, 0, 1, 2, 3, 4, 5, 7):
             if col >= raw.shape[1]:
                 continue

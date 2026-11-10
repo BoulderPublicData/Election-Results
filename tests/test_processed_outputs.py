@@ -141,3 +141,56 @@ def test_composite_ids_use_one_separator_and_pseudo_flag_matches(path):
     assert not ids.str.contains(r"\+|,(?! )|\s{2,}", regex=True).any(), path.name
     assert df["is_pseudo_precinct"].notna().all()
     assert (df["is_pseudo_precinct"] == df["precinct_id"].map(is_pseudo_precinct)).all()
+
+
+def _totals(name: str, contest: str) -> dict[str, int] | None:
+    df = _maybe_load(name)
+    if df is None:
+        return None
+    sub = df[df["contest"] == contest]
+    return {k: int(v) for k, v in sub.groupby("candidate_or_option")["votes"].sum().items()}
+
+
+def test_2023_boulder_council_is_the_recount():
+    """#42: the December 2023 recount replaces City of Boulder Council."""
+    t = _totals("2023-coordinated-boulder-county.csv", "City of Boulder Council Candidates")
+    if t is None:
+        pytest.skip("2023 CSV not on disk")
+    assert sum(t.values()) == 113_374
+    assert t["Jenny Robins"] == 11_249 and t["Silas Atkins"] == 6_829
+
+
+def test_2023_louisville_ward_2_is_corrected():
+    """#44: the duplicated reporting unit is dropped."""
+    t = _totals(
+        "2023-coordinated-boulder-county.csv",
+        "City of Louisville City Council Ward 2 (4-year term)",
+    )
+    if t is None:
+        pytest.skip("2023 CSV not on disk")
+    assert t == {"Deborah Fahey": 1_419, "George Colbert": 1_207}
+
+
+def test_2024_boulder_is_the_full_sov_with_the_amended_contests():
+    """#43: the full 2024 SoV, with the amended file's two contests over it."""
+    df = _maybe_load("2024-general-boulder-county.csv")
+    if df is None:
+        pytest.skip("2024 CSV not on disk")
+    assert len(df) == 18_438
+    assert df["contest"].nunique() == 65
+    assert int(df["votes"].sum()) == 6_649_407
+    t = _totals("2024-general-boulder-county.csv", "Town of Superior - Trustee")
+    assert t["Mike Foster"] == 3_531 and t["Sandie Hammerly"] == 3_239
+
+
+def test_2011_no_numeric_contest_titles():
+    """#46: Mountains Forest Improvement District 5C was titled "161"."""
+    df = _maybe_load("2011-coordinated-boulder-county.csv")
+    if df is None:
+        pytest.skip("2011 CSV not on disk")
+    assert not df["contest"].str.fullmatch(r"[\d.,\s]+").any()
+    t = _totals(
+        "2011-coordinated-boulder-county.csv",
+        "Boulder County Mountains Forest Improvement District Question 5C:",
+    )
+    assert t == {"Yes": 2_347, "No": 3_331}

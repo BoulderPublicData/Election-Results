@@ -23,6 +23,7 @@ import pandera.pandas as pa
 from pandera.typing import Series  # noqa: F401  -- re-exported for users
 
 from .schema import COLUMNS, CSV_COLUMNS
+from .sources import ELECTION_TYPES
 
 # ----------------------------------------------------------------------------
 # Reusable column specs. Each entry pairs a pandera Column with a description
@@ -58,9 +59,10 @@ _BASE_COLUMNS = {
         "string",
         nullable=False,
         required=True,
-        checks=pa.Check.isin(["general", "primary", "coordinated"]),
+        checks=pa.Check.isin(list(ELECTION_TYPES)),
         description="general (even-year November), primary (even-year June), "
-        "coordinated (odd-year November).",
+        "coordinated (odd-year November), presidential_primary (March of a "
+        "presidential year; none ingested yet).",
     ),
     "data_source": pa.Column(
         "string",

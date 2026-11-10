@@ -10,12 +10,13 @@ Shared vocabulary for the BoulderPublicData election repositories — this one
 
 | Term | Meaning |
 |---|---|
-| **Election key** | The identifier both repositories use for one election: lowercase `{year}-{type}`, e.g. `2016-general`, `2023-coordinated`. File stems (`2016-general-boulder-county.csv`), cache folders and every `--election` option use it. Raw folders keep the names they were published or collected under (`2016G`); code maps them (`scripts.sources.parse_election_key`). |
+| **Election key** | The identifier both repositories use for one election: lowercase `{year}-{type}`, e.g. `2016-general`, `2023-coordinated`, `2024-presidential-primary` (the type `presidential_primary` is written with a hyphen in the key). File stems (`2016-general-boulder-county.csv`), cache folders and every `--election` option use it. Raw folders keep the names they were published or collected under (`2016G`); code maps them (`scripts.sources.parse_election_key`). |
 | **General election** | `general`: the even-year November election for federal, state and county offices. |
 | **Primary election** | `primary`: the even-year June election in which each party picks its nominees. Not yet ingested here. |
+| **Presidential primary** | `presidential_primary`: the March election, in a presidential year, in which each party's voters choose among its presidential candidates (2024-03-05). Cast-Vote-Records holds the 2024 presidential primary; this repository ingests none. |
 | **Coordinated election** | `coordinated`: the odd-year November election the county runs on behalf of cities, school districts and special districts (and statewide ballot measures). |
 | **Canvass / certification** | The post-election review in which the county reconciles every ballot and certifies the official results, usually 2-3 weeks after election day. |
-| **Recount / amended SoV** | A Statement of Votes reissued after a recount or correction; it supersedes the original (2023 and 2024 here). |
+| **Recount / amended SoV** | A Statement of Votes reissued after a recount or amendment (2023 and 2024 here). It lists only the contests that changed, so it supersedes the original for those contests only: it is merged over the full SoV by contest. |
 | **UOCAVA** | Uniformed and Overseas Citizens Absentee Voting Act: ballots from military and overseas voters, which can arrive after election night. |
 
 ## Results files

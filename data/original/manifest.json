@@ -170,6 +170,18 @@
       "url": "https://assets.bouldercounty.gov/wp-content/uploads/2022/12/2022G-Boulder-County-Official-Statement-of-Votes.xlsx",
       "year": 2022
     },
+    "boulder_county/2023-coordinated-sov-recount.xlsx": {
+      "bytes": 37511,
+      "data_source": "boulder_county",
+      "election_type": "coordinated",
+      "filename": "2023-coordinated-sov-recount.xlsx",
+      "kind": "recount",
+      "retrieved_at": "2026-11-10T03:45:59+00:00",
+      "sha256": "d026b31de701b297d97956438a0af241ca58a4343d40ea56a8deb0aa9a117e1a",
+      "supplement_of": "2023-coordinated-sov.xlsx",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx",
+      "year": 2023
+    },
     "boulder_county/2023-coordinated-sov.xlsx": {
       "bytes": 248737,
       "data_source": "boulder_county",
@@ -177,17 +189,29 @@
       "filename": "2023-coordinated-sov.xlsx",
       "retrieved_at": "2026-05-23T18:13:44+00:00",
       "sha256": "64caac078d86bafb871c0837b8f556ffc7c4393239000b61cfbb61975b73b8ba",
-      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2023/11/2023C-Boulder-County-Official-Statement-of-Votes.xlsx",
       "year": 2023
     },
-    "boulder_county/2024-general-sov.xlsx": {
+    "boulder_county/2024-general-sov-amended.xlsx": {
       "bytes": 17082,
       "data_source": "boulder_county",
       "election_type": "general",
-      "filename": "2024-general-sov.xlsx",
+      "filename": "2024-general-sov-amended.xlsx",
+      "kind": "amended",
       "retrieved_at": "2026-05-23T18:13:44+00:00",
       "sha256": "59e11786461f0e92a13bbf9dfd7dfb106da28fe3e9f5381982a0d644481d31dd",
+      "supplement_of": "2024-general-sov.xlsx",
       "url": "https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx",
+      "year": 2024
+    },
+    "boulder_county/2024-general-sov.xlsx": {
+      "bytes": 754348,
+      "data_source": "boulder_county",
+      "election_type": "general",
+      "filename": "2024-general-sov.xlsx",
+      "retrieved_at": "2026-11-10T03:45:59+00:00",
+      "sha256": "015eba50653f52e604cff84e860c0a9d7c16666f04ac8ba62371fb8f4e713094",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2024/11/2024G-Boulder-County-Official-Statement-of-Votes.xlsx",
       "year": 2024
     },
     "boulder_county/2025-coordinated-sov.xlsx": {

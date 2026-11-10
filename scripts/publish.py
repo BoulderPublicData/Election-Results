@@ -237,7 +237,7 @@ def build(db_path: Path = DB_PATH, since: int | None = None) -> Path:
 _COLUMN_DESCRIPTIONS: dict[str, str] = {
     "election_year": "Calendar year the election was held.",
     "election_date": "Election day, ISO YYYY-MM-DD.",
-    "election_type": "general / primary / coordinated.",
+    "election_type": "general / primary / coordinated / presidential_primary.",
     "data_source": "Which agency published the file (boulder_county or secretary_of_state).",
     "jurisdiction_level": "county / state / city / school_district / special_district.",
     "jurisdiction_name": "Always 'Boulder County' in this project.",

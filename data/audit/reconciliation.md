@@ -14,51 +14,60 @@ county's own `Totals` row per candidate (Boulder panel XLS, 2008-2012), or the
 - `near_match` — totals differ by < 50 votes (small counting reconciliation, usually safe).
 - `mismatch` — totals differ by ≥ 50 votes. Investigate.
 - `not_in_file` — the canonical contest pattern matched nothing in either file.
+- `corrected` — the difference is exactly an adjudicated correction in [`scripts/corrections/statements-of-votes.csv`](../../scripts/corrections/statements-of-votes.csv) (the published file is wrong; see its evidence column).
 
-**Contest × candidate:** 3,183 keys compared, 3,183 match, 0 near_match, **0 mismatch**; structural issues (duplicate keys + mixed contests): **0**.
+**Contest × candidate:** 3,325 keys compared, 3,323 match, 0 near_match, 2 corrected, **0 mismatch**; structural issues (duplicate keys + mixed contests): **0**.
 
-**Top-line summary across all 175 contest-source rows:**
+**Top-line summary across all 182 contest-source rows:**
 
 | status | rows |
 |---|---|
-| match | 175 |
+| corrected | 1 |
+| match | 181 |
 
 ## Contest × candidate reconciliation
 
 Every (contest, candidate_or_option) key in each file, original vs. processed (RCV contests on their `| Final` rows). Full detail: [`reconciliation-candidates.csv`](reconciliation-candidates.csv). The structural columns count duplicate (precinct, contest, candidate) keys and contests that mix Yes/No options with named candidates; both should be 0.
 
-| file | keys | match | near_match | mismatch | duplicate keys | mixed contests |
+| file | keys | match | near_match | corrected | mismatch | duplicate keys | mixed contests |
+|---|---|---|---|---|---|---|---|
+| 2004 general secretary_of_state | 86 | 86 | 0 | 0 | 0 | 0 | 0 |
+| 2005 coordinated boulder_county | 111 | 111 | 0 | 0 | 0 | 0 | 0 |
+| 2006 general secretary_of_state | 89 | 89 | 0 | 0 | 0 | 0 | 0 |
+| 2007 coordinated boulder_county | 118 | 118 | 0 | 0 | 0 | 0 | 0 |
+| 2008 general boulder_county | 160 | 160 | 0 | 0 | 0 | 0 | 0 |
+| 2008 general secretary_of_state | 102 | 102 | 0 | 0 | 0 | 0 | 0 |
+| 2009 coordinated boulder_county | 98 | 98 | 0 | 0 | 0 | 0 | 0 |
+| 2010 general boulder_county | 130 | 130 | 0 | 0 | 0 | 0 | 0 |
+| 2010 general secretary_of_state | 91 | 91 | 0 | 0 | 0 | 0 | 0 |
+| 2011 coordinated boulder_county | 112 | 112 | 0 | 0 | 0 | 0 | 0 |
+| 2012 general boulder_county | 122 | 122 | 0 | 0 | 0 | 0 | 0 |
+| 2012 general secretary_of_state | 82 | 82 | 0 | 0 | 0 | 0 | 0 |
+| 2013 coordinated boulder_county | 165 | 165 | 0 | 0 | 0 | 0 | 0 |
+| 2014 general boulder_county | 135 | 135 | 0 | 0 | 0 | 0 | 0 |
+| 2014 general secretary_of_state | 82 | 82 | 0 | 0 | 0 | 0 | 0 |
+| 2015 coordinated boulder_county | 94 | 94 | 0 | 0 | 0 | 0 | 0 |
+| 2016 general boulder_county | 159 | 159 | 0 | 0 | 0 | 0 | 0 |
+| 2016 general secretary_of_state | 104 | 104 | 0 | 0 | 0 | 0 | 0 |
+| 2017 coordinated boulder_county | 98 | 98 | 0 | 0 | 0 | 0 | 0 |
+| 2018 general boulder_county | 154 | 154 | 0 | 0 | 0 | 0 | 0 |
+| 2018 general secretary_of_state | 91 | 91 | 0 | 0 | 0 | 0 | 0 |
+| 2019 coordinated boulder_county | 86 | 86 | 0 | 0 | 0 | 0 | 0 |
+| 2020 general boulder_county | 131 | 131 | 0 | 0 | 0 | 0 | 0 |
+| 2020 general secretary_of_state | 98 | 98 | 0 | 0 | 0 | 0 | 0 |
+| 2021 coordinated boulder_county | 96 | 96 | 0 | 0 | 0 | 0 | 0 |
+| 2022 general boulder_county | 192 | 192 | 0 | 0 | 0 | 0 | 0 |
+| 2023 coordinated boulder_county | 107 | 105 | 0 | 2 | 0 | 0 | 0 |
+| 2024 general boulder_county | 152 | 152 | 0 | 0 | 0 | 0 | 0 |
+| 2024 general secretary_of_state | — | — | — | — | — | 0 | 0 |
+| 2025 coordinated boulder_county | 80 | 80 | 0 | 0 | 0 | 0 | 0 |
+
+### Keys that differ (2)
+
+| file | contest | candidate / option | original | processed | delta | status |
 |---|---|---|---|---|---|---|
-| 2004 general secretary_of_state | 86 | 86 | 0 | 0 | 0 | 0 |
-| 2005 coordinated boulder_county | 111 | 111 | 0 | 0 | 0 | 0 |
-| 2006 general secretary_of_state | 89 | 89 | 0 | 0 | 0 | 0 |
-| 2007 coordinated boulder_county | 118 | 118 | 0 | 0 | 0 | 0 |
-| 2008 general boulder_county | 160 | 160 | 0 | 0 | 0 | 0 |
-| 2008 general secretary_of_state | 102 | 102 | 0 | 0 | 0 | 0 |
-| 2009 coordinated boulder_county | 98 | 98 | 0 | 0 | 0 | 0 |
-| 2010 general boulder_county | 130 | 130 | 0 | 0 | 0 | 0 |
-| 2010 general secretary_of_state | 91 | 91 | 0 | 0 | 0 | 0 |
-| 2011 coordinated boulder_county | 112 | 112 | 0 | 0 | 0 | 0 |
-| 2012 general boulder_county | 122 | 122 | 0 | 0 | 0 | 0 |
-| 2012 general secretary_of_state | 82 | 82 | 0 | 0 | 0 | 0 |
-| 2013 coordinated boulder_county | 165 | 165 | 0 | 0 | 0 | 0 |
-| 2014 general boulder_county | 135 | 135 | 0 | 0 | 0 | 0 |
-| 2014 general secretary_of_state | 82 | 82 | 0 | 0 | 0 | 0 |
-| 2015 coordinated boulder_county | 94 | 94 | 0 | 0 | 0 | 0 |
-| 2016 general boulder_county | 159 | 159 | 0 | 0 | 0 | 0 |
-| 2016 general secretary_of_state | 104 | 104 | 0 | 0 | 0 | 0 |
-| 2017 coordinated boulder_county | 98 | 98 | 0 | 0 | 0 | 0 |
-| 2018 general boulder_county | 154 | 154 | 0 | 0 | 0 | 0 |
-| 2018 general secretary_of_state | 91 | 91 | 0 | 0 | 0 | 0 |
-| 2019 coordinated boulder_county | 86 | 86 | 0 | 0 | 0 | 0 |
-| 2020 general boulder_county | 131 | 131 | 0 | 0 | 0 | 0 |
-| 2020 general secretary_of_state | 98 | 98 | 0 | 0 | 0 | 0 |
-| 2021 coordinated boulder_county | 96 | 96 | 0 | 0 | 0 | 0 |
-| 2022 general boulder_county | 192 | 192 | 0 | 0 | 0 | 0 |
-| 2023 coordinated boulder_county | 107 | 107 | 0 | 0 | 0 | 0 |
-| 2024 general boulder_county | 10 | 10 | 0 | 0 | 0 | 0 |
-| 2024 general secretary_of_state | — | — | — | — | 0 | 0 |
-| 2025 coordinated boulder_county | 80 | 80 | 0 | 0 | 0 | 0 |
+| 2023 coordinated boulder_county | City of Louisville City Council Ward 2 (4-year term) | Deborah Fahey | 1,602 | 1,419 | -183 | `corrected` (documented correction (scripts/corrections/statements-of-votes.csv)) |
+| 2023 coordinated boulder_county | City of Louisville City Council Ward 2 (4-year term) | George Colbert | 1,441 | 1,207 | -234 | `corrected` (documented correction (scripts/corrections/statements-of-votes.csv)) |
 
 ## Top-line contests
 
@@ -365,9 +374,21 @@ Every (contest, candidate_or_option) key in each file, original vs. processed (R
 
 | canonical contest | original | processed | delta | status |
 |---|---|---|---|---|
-| City of Boulder Council | 113,379 | 113,379 | +0 | `match` |
+| City of Boulder Council | 113,374 | 113,374 | +0 | `match` |
 | City of Boulder Mayor | 32,415 | 32,415 | +0 | `match` |
-| City of Louisville Council | 7,843 | 7,843 | +0 | `match` |
+| City of Louisville Council | 7,843 | 7,426 | -417 | `corrected` |
+
+### 2024 general — boulder_county
+
+| canonical contest | original | processed | delta | status |
+|---|---|---|---|---|
+| City of Louisville Council | 3,491 | 3,491 | +0 | `match` |
+| County Commissioner | 322,889 | 322,889 | +0 | `match` |
+| District Attorney | 145,972 | 145,972 | +0 | `match` |
+| Presidential Electors | 196,304 | 196,304 | +0 | `match` |
+| Regent University of Colorado | 178,698 | 178,698 | +0 | `match` |
+| State Representative | 182,933 | 182,933 | +0 | `match` |
+| United States Representative | 190,358 | 190,358 | +0 | `match` |
 
 ### 2025 coordinated — boulder_county
 
@@ -406,6 +427,6 @@ Compares the last election-night web update in `data/processed/vote-counting/` w
 | 2020 general | 2020-11-24T18:22:00 | 128 | 0 | 0 | 7 | 5,875,163 | 5,875,163 |
 | 2021 coordinated | 2021-11-22T17:28:00 | 96 | 0 | 0 | 0 | 1,119,921 | 1,119,921 |
 | 2022 general | 2022-11-30T16:17:00 | 186 | 0 | 0 | 8 | 6,689,150 | 6,689,150 |
-| 2023 coordinated | 2023-12-06T16:50:00 | 100 | 7 | 2 | 0 | 1,229,986 | 1,230,408 |
-| 2024 general | 2024-12-05T15:05:00 | 10 | 0 | 0 | 143 | 27,884 | 27,884 |
+| 2023 coordinated | 2023-12-06T16:50:00 | 109 | 0 | 0 | 0 | 1,229,986 | 1,229,986 |
+| 2024 general | 2024-12-05T15:05:00 | 151 | 0 | 0 | 2 | 6,513,759 | 6,513,759 |
 | 2025 coordinated | 2025-11-13T16:50:00 | 80 | 0 | 0 | 0 | 1,122,213 | 1,122,213 |

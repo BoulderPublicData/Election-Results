@@ -24,7 +24,14 @@ from pathlib import Path
 import pandas as pd
 
 from . import shared_outputs
-from .clean import BOCO_PDF_YEARS, _meta_for, _output_path, clean_source, write_csv
+from .clean import (
+    BOCO_PDF_YEARS,
+    _meta_for,
+    _output_path,
+    clean_source,
+    parsed_files,
+    write_csv,
+)
 from .config import (
     AUDIT,
     AUDIT_SUMMARY_MD,
@@ -174,7 +181,7 @@ def _run_end_to_end(argv: list[str] | None = None) -> int:
         print(f"OK   {label}  rows={len(df):>6}")
         per_year.append(df)
         prov_rows.append(provenance_record(df, _meta_for(s)))
-        parsed.append((s.data_source, s.local_filename))
+        parsed.extend(parsed_files(s))
 
     # Whole-dataset outputs: rebuilt from every per-year CSV on disk or
     # upserted by key, never replaced by just this run's subset (#18).

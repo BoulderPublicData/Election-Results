@@ -124,7 +124,7 @@ PROVENANCE_DTYPES: dict[str, str] = {
     **{c: "string" for c in ["election_type", "data_source"] + PROVENANCE_COLUMNS},
 }
 
-ElectionType = Literal["general", "primary", "coordinated"]
+ElectionType = Literal["general", "primary", "coordinated", "presidential_primary"]
 ContestType = Literal[
     "candidate",  # partisan or non-partisan candidate race
     "measure",  # yes/no ballot measure, referendum, amendment

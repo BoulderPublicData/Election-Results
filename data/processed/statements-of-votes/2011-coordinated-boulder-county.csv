@@ -6208,42 +6208,42 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2011,2011-11-01,coordinated,boulder_county,county,Boulder County,008,,CRESTVIEW ESTATES BOULDER COUNTY LOCAL IMPROVEMENT DISTRICT ISSUE 5B:,measure,No,,130,211,151,False
 2011,2011-11-01,coordinated,boulder_county,county,Boulder County,Landowner CVLID,,CRESTVIEW ESTATES BOULDER COUNTY LOCAL IMPROVEMENT DISTRICT ISSUE 5B:,measure,Yes,,0,0,10,True
 2011,2011-11-01,coordinated,boulder_county,county,Boulder County,Landowner CVLID,,CRESTVIEW ESTATES BOULDER COUNTY LOCAL IMPROVEMENT DISTRICT ISSUE 5B:,measure,No,,10,0,10,True
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,002,,161,measure,Yes,,107,553,302,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,002,,161,measure,No,,190,553,302,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,003,,161,measure,Yes,,85,503,254,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,003,,161,measure,No,,165,503,254,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,004,,161,measure,Yes,,53,221,129,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,004,,161,measure,No,,73,221,129,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,007,,161,measure,Yes,,39,337,168,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,007,,161,measure,No,,128,337,168,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,008,,161,measure,Yes,,152,630,383,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,008,,161,measure,No,,221,630,383,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,009,,161,measure,Yes,,15,101,37,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,009,,161,measure,No,,22,101,37,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,010,,161,measure,Yes,,277,984,581,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,010,,161,measure,No,,297,984,581,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,011,,161,measure,Yes,,108,650,345,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,011,,161,measure,No,,231,650,345,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,012,,161,measure,Yes,,165,918,585,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,012,,161,measure,No,,408,918,585,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,013,,161,measure,Yes,,91,503,256,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,013,,161,measure,No,,164,503,256,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,014,,161,measure,Yes,,193,830,459,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,014,,161,measure,No,,263,830,459,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,015,,161,measure,Yes,,45,244,91,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,015,,161,measure,No,,45,244,91,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,016,,161,measure,Yes,,136,531,270,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,016,,161,measure,No,,127,531,270,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,017,,161,measure,Yes,,243,978,510,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,017,,161,measure,No,,249,978,510,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,018,,161,measure,Yes,,111,436,204,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,018,,161,measure,No,,90,436,204,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,019,,161,measure,Yes,,128,601,300,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,019,,161,measure,No,,160,601,300,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,"128, 132, 133, 232, 233",,161,measure,Yes,,7,51,21,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,"128, 132, 133, 232, 233",,161,measure,No,,14,51,21,False
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,Landowner MFID,,161,measure,Yes,,392,0,881,True
-2011,2011-11-01,coordinated,boulder_county,county,Boulder County,Landowner MFID,,161,measure,No,,484,0,881,True
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,002,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,107,553,302,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,002,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,190,553,302,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,003,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,85,503,254,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,003,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,165,503,254,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,004,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,53,221,129,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,004,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,73,221,129,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,007,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,39,337,168,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,007,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,128,337,168,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,008,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,152,630,383,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,008,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,221,630,383,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,009,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,15,101,37,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,009,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,22,101,37,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,010,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,277,984,581,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,010,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,297,984,581,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,011,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,108,650,345,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,011,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,231,650,345,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,012,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,165,918,585,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,012,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,408,918,585,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,013,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,91,503,256,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,013,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,164,503,256,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,014,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,193,830,459,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,014,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,263,830,459,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,015,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,45,244,91,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,015,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,45,244,91,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,016,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,136,531,270,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,016,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,127,531,270,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,017,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,243,978,510,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,017,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,249,978,510,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,018,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,111,436,204,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,018,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,90,436,204,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,019,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,128,601,300,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,019,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,160,601,300,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,"128, 132, 133, 232, 233",,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,7,51,21,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,"128, 132, 133, 232, 233",,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,14,51,21,False
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,Landowner MFID,,Boulder County Mountains Forest Improvement District Question 5C:,measure,Yes,,392,0,881,True
+2011,2011-11-01,coordinated,boulder_county,county,Boulder County,Landowner MFID,,Boulder County Mountains Forest Improvement District Question 5C:,measure,No,,484,0,881,True
 2011,2011-11-01,coordinated,boulder_county,county,Boulder County,017,,Rocky Mountain Fire Protection District Ballot Question 5D,measure,Yes,,44,137,85,False
 2011,2011-11-01,coordinated,boulder_county,county,Boulder County,017,,Rocky Mountain Fire Protection District Ballot Question 5D,measure,No,,38,137,85,False
 2011,2011-11-01,coordinated,boulder_county,county,Boulder County,019,,Rocky Mountain Fire Protection District Ballot Question 5D,measure,Yes,,192,818,416,False

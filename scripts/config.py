@@ -101,6 +101,8 @@ VOTE_COUNTING_CACHE = VOTE_COUNTING / "datalab"
 VOTE_COUNTING_CONTESTS_CSV = VOTE_COUNTING / "vote-counting-contests.csv"
 VOTE_COUNTING_SUMMARY_CSV = VOTE_COUNTING / "vote-counting-summary.csv"
 VOTE_COUNTING_CORRECTIONS_CSV = REPO_ROOT / "scripts" / "corrections" / "vote-counting.csv"
+# Adjudicated fixes to published Statements of Votes (scripts/sov_corrections.py).
+SOV_CORRECTIONS_CSV = REPO_ROOT / "scripts" / "corrections" / "statements-of-votes.csv"
 
 
 def sov_csv_path(year: int, election_type: str, data_source: str) -> Path:
@@ -192,6 +194,7 @@ __all__ = [
     "VOTE_COUNTING_CONTESTS_CSV",
     "VOTE_COUNTING_SUMMARY_CSV",
     "VOTE_COUNTING_CORRECTIONS_CSV",
+    "SOV_CORRECTIONS_CSV",
     "VOTE_COUNTING_QA_CSV",
     "VOTE_COUNTING_QA_MD",
     "HTTP_TIMEOUT",

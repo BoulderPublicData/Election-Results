@@ -118,14 +118,62 @@ class TestPrimariesAndRecounts:
         )
         assert _classify_boco_url(url) == (2023, "coordinated")
 
-    def test_recount_preferred_over_original(self):
-        base = "https://assets.bouldercounty.gov/wp-content/uploads/2023/12/"
+    def test_recount_is_a_supplement_of_the_full_sov(self):
+        """#42: the recount SoV re-reports only the recounted contest, so the
+        full SoV stays the source and the recount is merged over it."""
+        base = "https://assets.bouldercounty.gov/wp-content/uploads/2023/"
         html = (
-            f"<a href='{base}2023C-Boulder-County-Official-Statement-of-Votes.xlsx'>a</a>"
-            f"<a href='{base}2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx'>b</a>"
+            f"<a href='{base}12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx'>b</a>"
+            f"<a href='{base}11/2023C-Boulder-County-Official-Statement-of-Votes.xlsx'>a</a>"
+            f"<a href='{base}11/2023C-Boulder-County-Official-Statement-of-Votes.pdf'>c</a>"
         )
         found = discover_boulder_county(html=html)
-        assert len(found) == 1 and found[0].url.endswith("Recount.xlsx")
+        assert len(found) == 1
+        s = found[0]
+        assert s.url == f"{base}11/2023C-Boulder-County-Official-Statement-of-Votes.xlsx"
+        assert s.local_filename == "2023-coordinated-sov.xlsx"
+        assert [(x.kind, x.local_filename) for x in s.supplements] == [
+            ("recount", "2023-coordinated-sov-recount.xlsx")
+        ]
+
+    def test_amended_is_a_supplement_and_presidential_primary_is_its_own_election(self):
+        """#43, and the 2024 by-year page's three elections."""
+        base = "https://assets.bouldercounty.gov/wp-content/uploads/2024/"
+        html = "".join(
+            f"<a href='{base}{p}'>x</a>"
+            for p in (
+                "03/2024PP-Boulder-County-Official-Statement-of-Votes.xlsx",
+                "07/2024P-boulder-county-official-statement-of-votes.xlsx",
+                "11/2024G-Boulder-County-Official-Statement-of-Votes.xlsx",
+                "12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx",
+                "12/2024G-Boulder-County-Amended-Summary-of-Votes.pdf",
+            )
+        )
+        found = {s.election_type: s for s in discover_boulder_county(html=html)}
+        assert set(found) == {"general", "primary", "presidential_primary"}
+        g = found["general"]
+        assert g.url.endswith("11/2024G-Boulder-County-Official-Statement-of-Votes.xlsx")
+        assert [(x.kind, x.local_filename) for x in g.supplements] == [
+            ("amended", "2024-general-sov-amended.xlsx")
+        ]
+        pp = found["presidential_primary"]
+        assert pp.local_filename == "2024-presidential-primary-sov.xlsx"
+        assert not found["primary"].supplements
+
+    def test_partial_file_alone_is_used_whole(self):
+        url = (
+            "https://assets.bouldercounty.gov/wp-content/uploads/2031/12/"
+            "2031C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx"
+        )
+        (s,) = discover_boulder_county(html=f"<a href='{url}'>r</a>")
+        assert s.url == url and s.supplements == ()
+
+    def test_sos_presidential_primary(self):
+        url = (
+            "https://www.coloradosos.gov/pubs/elections/Results/2024/"
+            "2024PresidentialPrimaryPrecinctLevelResults.xlsx"
+        )
+        assert _classify_sos_url(url) == (2024, "presidential_primary")
 
     def test_primary_is_new_even_when_the_general_is_registered(self):
         from scripts.sources import Source

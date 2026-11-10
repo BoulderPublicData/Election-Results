@@ -14,8 +14,8 @@ Use this as the working agenda for what to land next. Each tier lands as its own
 > its gaps have since closed: the Publish phase exists (a Datasette database plus Datasette
 > Lite links, rebuilt on every push to `main`), the reject port, concept catalog, pandera
 > schemas and central `config.py` landed, and reconciliation now covers every contest ×
-> candidate key. Current counts: <!-- generated:test-count -->436 tests<!-- /generated:test-count -->;
-> 175 top-line and about 3,200 contest × candidate reconciliation rows, 0 mismatches. Where
+> candidate key. Current counts: <!-- generated:test-count -->469 tests<!-- /generated:test-count -->;
+> 182 top-line and about 3,300 contest × candidate reconciliation rows, 0 mismatches. Where
 > a line below disagrees with the code, the code and `AGENTS.md` win.
 
 ---
@@ -192,7 +192,7 @@ The "Baked Data" architecture (rebuild SQLite on every deploy; no app-layer writ
 
 Notable: the existing Cleaning.ipynb (the rewritten public-data-oped notebook) becomes a Quarto page directly. No content rewrite needed.
 
-**T3.3 — Git LFS for source PDFs + the combined CSV.** The 3 source PDFs (2005, 2007, 2009) are about 300 KB each; the combined `all-elections-tidy.csv` is <!-- generated:combined-size -->61 MB<!-- /generated:combined-size -->. Currently committed (PDFs) or gitignored (combined). LFS lets us commit both without bloating the git history. `.gitattributes`:
+**T3.3 — Git LFS for source PDFs + the combined CSV.** The 3 source PDFs (2005, 2007, 2009) are about 300 KB each; the combined `all-elections-tidy.csv` is <!-- generated:combined-size -->63 MB<!-- /generated:combined-size -->. Currently committed (PDFs) or gitignored (combined). LFS lets us commit both without bloating the git history. `.gitattributes`:
 
 ```
 *.pdf filter=lfs diff=lfs merge=lfs -text

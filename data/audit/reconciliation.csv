@@ -110,9 +110,16 @@ year,election_type,data_source,canonical,original_total,processed_total,delta,st
 2022,general,boulder_county,State Treasurer,161448,161448,0,match
 2022,general,boulder_county,United States Representative,163961,163961,0,match
 2022,general,boulder_county,United States Senator,165434,165434,0,match
-2023,coordinated,boulder_county,City of Boulder Council,113379,113379,0,match
+2023,coordinated,boulder_county,City of Boulder Council,113374,113374,0,match
 2023,coordinated,boulder_county,City of Boulder Mayor,32415,32415,0,match
-2023,coordinated,boulder_county,City of Louisville Council,7843,7843,0,match
+2023,coordinated,boulder_county,City of Louisville Council,7843,7426,-417,corrected
+2024,general,boulder_county,City of Louisville Council,3491,3491,0,match
+2024,general,boulder_county,County Commissioner,322889,322889,0,match
+2024,general,boulder_county,District Attorney,145972,145972,0,match
+2024,general,boulder_county,Presidential Electors,196304,196304,0,match
+2024,general,boulder_county,Regent University of Colorado,178698,178698,0,match
+2024,general,boulder_county,State Representative,182933,182933,0,match
+2024,general,boulder_county,United States Representative,190358,190358,0,match
 2025,coordinated,boulder_county,City of Boulder Council,113888,113888,0,match
 2025,coordinated,boulder_county,City of Longmont Mayor,31844,31844,0,match
 2025,coordinated,boulder_county,City of Louisville Council,7383,7383,0,match
