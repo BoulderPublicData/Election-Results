@@ -156,6 +156,13 @@ cp -r /tmp/er/data/. data/ && git add data && git commit
 
 `ELECTIONS_DATA_DIR` moves every path in `scripts/config.py`; printed paths still read `data/...` (`config.display_path`).
 
+### 3b. Working in a cloud session
+
+- **Delegated agents: push at milestones.** A brief for a subagent should say "commit and push after each milestone", so its work survives an interruption.
+- **Usage limits.** If a subagent stops on a usage limit, the notification gives the reset time. Schedule a check-in at that time (`send_later`), and resume the agent with `SendMessage` then, instead of waiting for someone to notice. Two agents sat idle for 7 h and 9 h before this was written down.
+- **Stopping background jobs.** Stop a background task with the task-stop tool and its task ID. If you must match by name, bracket the first letter (`pkill -f "[s]cripts.pipeline"`) so the pattern doesn't match its own shell.
+- **After a PR merges.** GitHub deletes the branch. Reset the session branch and drop the stale tracking ref: `git fetch origin main && git checkout -B claude/<branch> origin/main && git remote prune origin`. Otherwise the stop hook reports commits that are already on `main`.
+
 ---
 
 ## 4. Limitations and uncertainties
