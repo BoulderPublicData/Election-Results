@@ -15,6 +15,10 @@ conservative (#21):
 touching the network; ``--backfill-manifest`` records every registry file on
 disk that has no entry.
 
+A source's supplements (recount / amended SoVs, ``sources.Supplement``) are
+fetched, recorded and verified like any other file; their manifest records
+also name the ``kind`` and the file they are ``supplement_of``.
+
 HTTP layer (caching, retries, User-Agent) is in scripts/http.py.
 Path + config constants are in scripts/config.py.
 """
@@ -84,7 +88,25 @@ def _published_retrieved_at(s: Source) -> str | None:
     return vals[0] if vals else None
 
 
+def files(sources: list[Source]) -> list[Source]:
+    """Every raw file of `sources`: each source, then its supplements."""
+    return [rec for s in sources for rec in s.file_records()]
+
+
+def _supplement_info() -> dict[str, dict[str, str]]:
+    """Manifest key → {kind, supplement_of} for every registry supplement."""
+    out = {}
+    for s in SOURCES:
+        for sup in s.supplements:
+            out[f"{s.data_source}/{sup.local_filename}"] = {
+                "kind": sup.kind,
+                "supplement_of": s.local_filename,
+            }
+    return out
+
+
 def _record(s: Source, dest: Path, retrieved_at: str, **extra: object) -> dict:
+    extra = {**_supplement_info().get(_manifest_key(s), {}), **extra}
     return {
         "year": s.year,
         "election_type": s.election_type,
@@ -118,7 +140,7 @@ def backfill_manifest(sources: list[Source]) -> int:
     the number of entries added."""
     manifest = _load_manifest()
     added = 0
-    for s in sources:
+    for s in files(sources):
         if local_path(s).exists() and _manifest_key(s) not in manifest["files"]:
             record_existing(s, manifest)
             added += 1
@@ -132,8 +154,9 @@ def verify_manifest() -> list[str]:
     """Problems found comparing the manifest with data/original/ (no network):
     files missing on disk, and sha256 or size mismatches."""
     problems = []
-    for s in SOURCES:
-        rec = _load_manifest()["files"].get(_manifest_key(s))
+    manifest = _load_manifest()
+    for s in files(list(SOURCES)):
+        rec = manifest["files"].get(_manifest_key(s))
         dest = local_path(s)
         if rec is None:
             if dest.exists():
@@ -194,7 +217,7 @@ def fetch_one(s: Source, *, force: bool = False, dry_run: bool = False) -> tuple
 
 def fetch_many(sources: list[Source], *, force: bool = False, dry_run: bool = False) -> int:
     errors = 0
-    for s in sources:
+    for s in files(sources):
         changed, msg = fetch_one(s, force=force, dry_run=dry_run)
         print(msg)
         if msg.startswith("FAIL"):

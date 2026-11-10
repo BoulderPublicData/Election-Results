@@ -13,6 +13,7 @@ import pandas as pd
 import pytest
 
 from scripts import reject
+from scripts.config import original_path
 from scripts.parsers import boco_panel
 from scripts.parsers.boco_panel import split_party
 from scripts.schema import SourceMeta
@@ -228,3 +229,93 @@ def test_split_party(label, year, expected):
         assert pd.isna(party)
     else:
         assert party == expected[1]
+
+
+# ---------------------------------------------------------------------------
+# #46: contest titles that start with "Boulder County", and the upward walk
+# ---------------------------------------------------------------------------
+
+HEADER_2011 = {
+    0: "Precinct",
+    1: "Absentee Ballots Cast",
+    2: "Early Ballots Cast",
+    3: "Election Ballots Cast",
+    4: "Total Ballots Cast",
+    5: "Registered Voters",
+    6: "Percent Turnout",
+    7: "   Yes",
+    8: "   No",
+}
+
+
+def _panel_2011(title: str | None, precinct: str, values: list[object]) -> list[list[object]]:
+    """A 2011-style panel: title in column 6, header, one precinct, Totals.
+    The Totals row omits Percent Turnout and ends with the No votes."""
+    rows = [_row({})]
+    if title is not None:
+        rows += [_row({6: title}), _row({})]
+    rows.append(_row(HEADER_2011))
+    rows.append(_row(dict(enumerate([precinct, *values]))))
+    ballots, _, _, _, registered, _, yes, no = values
+    rows.append(
+        _row({0: "Totals", 1: ballots, 2: 0, 3: 0, 4: ballots, 5: registered, 7: yes, 8: no})
+    )
+    return rows
+
+
+def _sheet_2011(second_title: str | None) -> pd.DataFrame:
+    rows = [
+        _row({0: "Boulder County, Colorado  \x97  2011 Boulder County Coordinated Election"}),
+    ]
+    rows += _panel_2011(
+        "CRESTVIEW ESTATES BOULDER COUNTY LOCAL I", "008", [161, 0, 0, 161, 211, 0.71, 21, 140]
+    )
+    rows += _panel_2011(second_title, "002", [302, 0, 0, 302, 553, 0.55, 107, 161])
+    return pd.DataFrame(rows)
+
+
+def test_title_starting_with_boulder_county_is_kept():
+    """2011 rows 3218-3220: the 5C panel's title was skipped as the page
+    banner and the walk climbed into Crestview's Totals row, titling the
+    contest "161"."""
+    raw = _sheet_2011("Boulder County Mountains Forest Improvement District Question 5C:")
+    titles = [p.contest for p in boco_panel.walk_panels(raw)]
+    assert titles == [
+        "CRESTVIEW ESTATES BOULDER COUNTY LOCAL I",
+        "Boulder County Mountains Forest Improvement District Question 5C:",
+    ]
+
+
+def test_page_banner_is_still_skipped():
+    for banner in (
+        "Boulder County, CO  —  GENERAL ELECTION NOVEMBER 2008  —  November 04,",
+        "Boulder County, Colorado  —  2010 BOULDER COUNTY GENERAL ELECTION  —  ",
+    ):
+        raw = pd.DataFrame([_row({0: "STATE TREASURER"}), _row({0: banner}), _row(HEADER_2011)])
+        assert boco_panel._contest_title(raw, 2) == "STATE TREASURER"
+
+
+def test_walk_stops_at_the_previous_panels_totals_row():
+    """A panel with no title of its own must not take a number from the
+    previous panel's Totals row (or a precinct row) as its title."""
+    raw = _sheet_2011(None)
+    second = boco_panel._find_panel_starts(raw)[1]
+    assert boco_panel._contest_title(raw, second).startswith("<unknown contest")
+
+
+ORIGINAL_2011 = original_path("boulder_county", "2011-coordinated-sov.xls")
+
+
+@pytest.mark.skipif(not ORIGINAL_2011.exists(), reason="2011 workbook not on disk")
+def test_2011_forest_improvement_district_5c():
+    totals = boco_panel.published_totals(ORIGINAL_2011, 2011)
+    t = totals[totals["contest"].str.startswith("Boulder County Mountains Forest")]
+    assert t["contest"].unique().tolist() == [
+        "Boulder County Mountains Forest Improvement District Question 5C:"
+    ]
+    assert dict(zip(t["candidate_or_option"], t["votes"], strict=True)) == {
+        "Yes": 2347,
+        "No": 3331,
+    }
+    assert not totals["contest"].str.fullmatch(r"[\d.,\s]+").any()
+    assert totals["contest"].nunique() == 49

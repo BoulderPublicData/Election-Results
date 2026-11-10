@@ -21,6 +21,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from . import sov_corrections
 from .config import (
     BOULDER_COUNTY,
     MANIFEST_PATH,
@@ -35,6 +36,7 @@ from .config import (
     sov_csv_path,
 )
 from .logging_setup import get_logger
+from .overlay import overlay_by_contest
 from .parsers import boco_panel, boco_pdf, boco_tidy, sos
 from .schema import SourceMeta, coerce, validate
 from .sources import election_date_for
@@ -109,7 +111,8 @@ def _meta_for(s: Source) -> SourceMeta:
     )
 
 
-def clean_source(s: Source) -> pd.DataFrame:
+def _parse_file(s: Source) -> pd.DataFrame:
+    """Parse one raw file (a source, or a supplement as a single-file Source)."""
     path = original_path(s.data_source, s.local_filename)
     if not path.exists():
         raise FileNotFoundError(f"raw file missing: {path}")
@@ -117,19 +120,59 @@ def clean_source(s: Source) -> pd.DataFrame:
 
     if s.data_source == "boulder_county":
         if s.year in BOCO_PDF_YEARS:
-            df = boco_pdf.parse(path, meta)
-        elif s.year in BOCO_PANEL_YEARS:
-            df = boco_panel.parse(path, meta)
-        else:
-            df = boco_tidy.parse(path, meta)
-    elif s.data_source == "secretary_of_state":
-        df = sos.parse(path, meta)
-    else:
-        raise ValueError(f"unknown data_source: {s.data_source}")
+            return boco_pdf.parse(path, meta)
+        if s.year in BOCO_PANEL_YEARS:
+            return boco_panel.parse(path, meta)
+        return boco_tidy.parse(path, meta)
+    if s.data_source == "secretary_of_state":
+        return sos.parse(path, meta)
+    raise ValueError(f"unknown data_source: {s.data_source}")
+
+
+def _notes(df: pd.DataFrame) -> list[str]:
+    """A parser's extraction notes, split back into their parts."""
+    vals = df["extraction_notes"].dropna() if "extraction_notes" in df.columns else []
+    text = vals.iloc[0] if len(vals) else df.attrs.get("extraction_notes")
+    return [n for n in str(text).split("; ") if n] if text else []
+
+
+def clean_source(s: Source) -> pd.DataFrame:
+    """Parse a source, merge its supplements over it by contest
+    (scripts/overlay.py), then apply its adjudicated corrections
+    (scripts/sov_corrections.py)."""
+    df = _parse_file(s)
+    notes = _notes(df)
+    for sup, rec in zip(s.supplements, s.file_records()[1:], strict=True):
+        extra = _parse_file(rec)
+        df, replaced = overlay_by_contest(df, extra, label=sup.local_filename)
+        notes += [n for n in _notes(extra) if n not in notes]
+        notes.append(
+            f"{len(replaced)} contest(s) taken from the {sup.kind} file {sup.local_filename} "
+            f"({sup.url}), replacing the same contests in {s.local_filename}: "
+            + ", ".join(replaced)
+        )
+    df, applied = sov_corrections.apply(
+        df, sov_corrections.for_source(s.year, s.election_type, s.data_source)
+    )
+    if applied:
+        notes.append(
+            f"{len(applied)} adjudicated correction(s) from "
+            "scripts/corrections/statements-of-votes.csv: " + "; ".join(applied)
+        )
+    if s.supplements or applied:
+        text = "; ".join(notes) if notes else None
+        df = df.assign(extraction_notes=text)
+        df.attrs["extraction_notes"] = text
     # One choke point for the schema dtypes, so validate() checks real
     # problems rather than flagging int64-vs-Int16 on every parser, and
     # integer columns are written as integers ("1291", not "1291.0").
     return coerce(df)
+
+
+def parsed_files(s: Source) -> list[tuple[str, str]]:
+    """(data_source, file) for the source and each supplement: the keys the
+    reject sidecar is upserted on."""
+    return [(r.data_source, r.local_filename) for r in s.file_records()]
 
 
 def _output_path(s: Source) -> Path:
@@ -219,7 +262,7 @@ def main(argv: list[str] | None = None) -> int:
                 dest = _output_path(s)
                 write_csv(df, dest)
                 prov_rows.append(provenance_record(df, _meta_for(s)))
-                parsed.append((s.data_source, s.local_filename))
+                parsed.extend(parsed_files(s))
                 print(f"OK   {label}  rows={len(df):>6}  -> {display_path(dest)}")
             else:
                 print(f"OK   {label}  rows={len(df):>6}  (validate-only)")

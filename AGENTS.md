@@ -51,7 +51,7 @@ All modules above sit under `scripts/` and are wired up so `uv run python -m scr
 
 A second, separate dataset rides alongside: **election-night snapshots** (`scripts/vote_counting.py` → `data/processed/vote-counting/`), OCR'd from results-site screenshots through Datalab with a committed response cache, its own schema (`schema.py:VOTE_COUNTING_*`), QA (`data/audit/vote-counting.md`), and a report-only comparison against the SoV in `reconcile.py`. The pipeline rebuilds it from the cache and never calls the API.
 
-All Excel reads go through `parsers/common.py:read_excel` / `excel_file` (the calamine engine — 4-6× faster than openpyxl on the statewide SOS files). `clean.py:clean_source` coerces every parser's output to `schema.DTYPES` before it is validated or written.
+All Excel reads go through `parsers/common.py:read_excel` / `excel_file` (the calamine engine — 4-6× faster than openpyxl on the statewide SOS files). `clean.py:clean_source` merges a source's recount or amended supplements over it by contest (`scripts/overlay.py`), applies its adjudicated corrections (`scripts/sov_corrections.py`), and coerces the result to `schema.DTYPES` before it is validated or written.
 
 ---
 
@@ -89,7 +89,7 @@ To recover row-level provenance, join on `(election_year, election_type, data_so
 
 ### 2.5 `data/original/` is immutable
 
-Raw downloads are committed alongside the manifest (sha256 + retrieved_at for every file). Anything else under `data/` is regenerable. **Never edit `data/original/` files in place** — if you find an issue, change the parser, not the raw file. `scripts.fetch` never overwrites an original: an existing file is skipped (or recorded, if it has no manifest entry), a sha256 mismatch is a `FAIL`, and only `--force` re-downloads. `uv run python -m scripts.fetch --verify` checks every hash without the network.
+Raw downloads are committed alongside the manifest (sha256 + retrieved_at for every file). A recount or amended SoV is an original of its own, next to the file it supplements (`2023-coordinated-sov-recount.xlsx`, `2024-general-sov-amended.xlsx`); its manifest record names its `kind` and what it is the `supplement_of`. Anything else under `data/` is regenerable. **Never edit `data/original/` files in place** — if you find an issue, change the parser, not the raw file. `scripts.fetch` never overwrites an original: an existing file is skipped (or recorded, if it has no manifest entry), a sha256 mismatch is a `FAIL`, and only `--force` re-downloads. `uv run python -m scripts.fetch --verify` checks every hash without the network.
 
 **One documented exception:** the Datalab OCR cache under `data/processed/vote-counting/datalab/` is derived from `data/original/` but costs money to rebuild, so it is committed and the pipeline only ever reads it. Treat it as append-only: re-OCR (`vote_counting --ocr`) only images whose cache entry is missing or stale.
 
@@ -115,7 +115,7 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at for ev
 
 | Convention | Value |
 |---|---|
-| Election key | lowercase `{year}-{type}`, `type` ∈ `general` / `primary` / `coordinated` — `scripts.sources.election_key()` / `parse_election_key()`. File stems (`2016-general-boulder-county.csv`), the Datalab cache (`datalab/2016-general/`) and `--election` arguments use it. Raw folders under `data/original/` keep their published names (`2016G`) and are mapped in code — never renamed. |
+| Election key | lowercase `{year}-{type}`, `type` ∈ `general` / `primary` / `coordinated` / `presidential_primary`, with `_` written `-` in the key (`2024-presidential-primary`) — `scripts.sources.election_key()` / `parse_election_key()`. No presidential-primary data is ingested here; the type exists because Cast-Vote-Records holds the March 2024 presidential primary. File stems (`2016-general-boulder-county.csv`), the Datalab cache (`datalab/2016-general/`) and `--election` arguments use it. Raw folders under `data/original/` keep their published names (`2016G`) and are mapped in code — never renamed. |
 | `data/processed/` layout | one subfolder per dataset (`statements-of-votes/`, `vote-counting/`) |
 | Packaging | uv + `uv.lock` + hatchling; `[dependency-groups] dev` holds pytest + ruff, so `uv sync` installs them; `.python-version` = 3.11 |
 | Python | `requires-python >= 3.11`; CI tests 3.11 (the floor) and 3.13 |
@@ -136,11 +136,12 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at for ev
 | **RCV expansion (2023)** | Summing `votes` for RCV contests double-counts (Round 1 + Round 2 + Final). | Filter to `candidate_or_option.str.endswith("| Final")` before summing totals. Reconcile already handles this — see `reconcile.py:reconcile_source`. |
 | **2008-2012 Boulder panel format** | Header labels don't sit over their values (merged cells), so `boco_panel` maps each row's non-empty cells to the header's non-empty labels by position — never by spreadsheet column. Rows that don't fit go to the reject port. | Keep `reconcile.py`'s contest × candidate check at 0 mismatches: it compares against the file's own `Totals` row. |
 | **2005/2007/2009 PDF years** | Candidate columns change page to page within one contest, and the vote-method block is 4 columns (2007) or 6 (2005/2009). | `boco_pdf` re-reads the header on every page and splits rows at the `%` token. Rows still carry `extraction_quality = pdf_text_layer`; spot-check names against the source PDF. |
-| **2024 Boulder file** | The upstream "Amended SoV" file contains only 66 rows of local races (Town of Superior, etc.). Federal/state-level Boulder results may have a separate file or appear via SOS once published. | Verify the file's scope before drawing conclusions. |
+| **Recount / amended SoVs (Boulder 2023, 2024)** | The county's December recount (2023) and amended (2024) SoVs re-report **only** the recounted or amended contests (1 and 2 contests). Ingesting the partial file alone, as this repo did for 2024 until #43, keeps a sliver of the election; ingesting only the full file keeps pre-recount counts (#42). | Register the full SoV as the `Source` and the partial file in its `supplements` (`scripts/sources.py`). `clean_source` merges it over the full file **by contest** (`scripts/overlay.py`), and `reconcile` does the same on the raw side. A supplement contest whose title isn't in the full file fails the build. See `docs/data-dictionary.md` §4.7. |
+| **Errors in a published SoV** | Occasionally the county's own file is wrong: 2023 Louisville Ward 2 counts precinct 202 twice (#44). | Never edit the raw file or special-case the parser. Add a row with its evidence to `scripts/corrections/statements-of-votes.csv` (`scripts/sov_corrections.py`; the build fails if the published value stops matching). `reconcile` reports the key as `corrected`, not `mismatch`. |
 | **negative `votes` values** | Legitimately appear in RCV intermediate rounds (ballots transferring away from eliminated candidates). | `validate()` skips this check for `contest_type == "ranked_choice"` rows. Don't "fix" it by taking absolute values — you lose information. |
 | **Election-night snapshots** (`data/processed/vote-counting/`) | Rows are cumulative county-wide totals per snapshot; summing `votes` across snapshots multiplies them, and concatenating with precinct data double-counts. | Use `vote_change` or filter `is_final_snapshot`. Keep the dataset separate (own schema in `schema.py:VOTE_COUNTING_*`). |
 | **Vote-counting OCR fixes** | Editing a cached Datalab JSON hides the fix and is overwritten on re-OCR. | Add a row to `scripts/corrections/vote-counting.csv` (the build fails if its `ocr_value` stops matching). `data/audit/vote-counting.md` must show 0 open issues. |
-| **Combined CSV size** | `all-elections-tidy.csv` is <!-- generated:combined-size -->61 MB<!-- /generated:combined-size -->. Gitignored. | The pipeline regenerates it from per-year files; never check it in. |
+| **Combined CSV size** | `all-elections-tidy.csv` is <!-- generated:combined-size -->63 MB<!-- /generated:combined-size -->. Gitignored. | The pipeline regenerates it from per-year files; never check it in. |
 
 ### 3a. Long runs and the working tree
 
@@ -199,7 +200,7 @@ In rough order of value:
 
 ## 6. How to add a new election year
 
-1. Add the entry to `BOULDER_COUNTY` or `SECRETARY_OF_STATE` in [`scripts/sources.py`](scripts/sources.py).
+1. Add the entry to `BOULDER_COUNTY` or `SECRETARY_OF_STATE` in [`scripts/sources.py`](scripts/sources.py). If the county also posts a recount or amended SoV, add it to that entry's `supplements`; don't replace the full file with it.
 2. Add the election day to `ELECTION_DATES` in the same file (use the absolute date — `2026-11-03`, not "next November").
 3. Pick a parser route in [`scripts/clean.py`](scripts/clean.py). If the new year is a Boulder XLS/XLSX, it should "just work" via `boco_tidy`. If it's a new file format, add a parser under `scripts/parsers/`.
 4. Run `uv run python -m scripts.pipeline --skip-fetch --year <year>`.
@@ -237,7 +238,7 @@ In rough order of value:
 | End-to-end driver | [`scripts/pipeline.py`](scripts/pipeline.py) |
 | JSON lookup exporter | [`scripts/export_lookups.py`](scripts/export_lookups.py) |
 | Doc counts/sizes generator | [`scripts/doc_stats.py`](scripts/doc_stats.py) (rewrites the `<!-- generated:… -->` spans) |
-| Test suite | [`tests/`](tests/) (pytest, <!-- generated:test-count -->436 tests<!-- /generated:test-count -->; hermetic — never writes into `data/`) |
+| Test suite | [`tests/`](tests/) (pytest, <!-- generated:test-count -->469 tests<!-- /generated:test-count -->; hermetic — never writes into `data/`) |
 | Shared Excel reader | [`scripts/parsers/common.py`](scripts/parsers/common.py) (`read_excel`, `excel_file`) |
 | Data dictionary | [`docs/data-dictionary.md`](docs/data-dictionary.md) |
 | Changelog | [`docs/changelog.md`](docs/changelog.md) |
@@ -254,6 +255,8 @@ In rough order of value:
 | Reconciliation report | [`data/audit/reconciliation.md`](data/audit/reconciliation.md) (top-line rows in `reconciliation.csv`, contest × candidate rows in `reconciliation-candidates.csv`) |
 | Election-night vote counting | [`scripts/vote_counting.py`](scripts/vote_counting.py), parser [`scripts/parsers/boco_vote_counting.py`](scripts/parsers/boco_vote_counting.py), OCR client [`scripts/datalab.py`](scripts/datalab.py) |
 | Vote-counting OCR corrections | [`scripts/corrections/vote-counting.csv`](scripts/corrections/vote-counting.csv) |
+| Recount / amended SoV merge | [`scripts/overlay.py`](scripts/overlay.py); registered as `Source.supplements` in [`scripts/sources.py`](scripts/sources.py) |
+| SoV corrections (adjudicated) | [`scripts/corrections/statements-of-votes.csv`](scripts/corrections/statements-of-votes.csv), applied by [`scripts/sov_corrections.py`](scripts/sov_corrections.py) |
 | Vote-counting QA | [`data/audit/vote-counting.md`](data/audit/vote-counting.md) |
 | Per-file audits | [`data/audit/*.md`](data/audit/) |
 | Annual refresh workflow | [`.github/workflows/annual-sov-refresh.yml`](.github/workflows/annual-sov-refresh.yml) |

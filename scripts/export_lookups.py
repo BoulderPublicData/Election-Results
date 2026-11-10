@@ -97,9 +97,11 @@ def export_sources() -> None:
     payload = {
         "$schema_version": SCHEMA_VERSION,
         "$description": (
-            "Source URL registry. One entry per (year, data_source). "
+            "Source URL registry. One entry per (year, election_type, data_source). "
             "`local_filename` is the file under data/original/boulder-county/statement-of-votes/ "
-            "(Boulder County) or data/original/secretary-of-state/ (SOS)."
+            "(Boulder County) or data/original/secretary-of-state/ (SOS). `supplements` are "
+            "later recount or amended files that re-report some contests; each replaces "
+            "those contests in the source file (scripts/overlay.py)."
         ),
         "$generated_by": "scripts/export_lookups.py from scripts/sources.py:ALL_SOURCES",
         "$generated_at": _now(),
@@ -110,6 +112,10 @@ def export_sources() -> None:
                 "data_source": s.data_source,
                 "url": s.url,
                 "local_filename": s.local_filename,
+                "supplements": [
+                    {"kind": sup.kind, "url": sup.url, "local_filename": sup.local_filename}
+                    for sup in s.supplements
+                ],
             }
             for s in sorted(ALL_SOURCES, key=lambda s: (s.year, s.data_source))
         ],

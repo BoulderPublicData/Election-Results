@@ -17,17 +17,44 @@ from typing import Literal
 
 
 @dataclass(frozen=True)
-class Source:
-    year: int
-    election_type: Literal["general", "primary", "coordinated"]
-    data_source: Literal["boulder_county", "secretary_of_state"]
+class Supplement:
+    """A later file that re-reports some of a source's contests: a recount or
+    an amended Statement of Votes. It covers only the contests it re-reports,
+    so it is merged over the source **by contest** (scripts/overlay.py): every
+    contest it names replaces that contest in the source file, and every other
+    contest keeps the source file's rows. Both files stay in data/original/."""
+
+    kind: Literal["recount", "amended"]
     url: str
     local_filename: str  # file under config.ORIGINAL_SUBDIRS[data_source]
 
 
+@dataclass(frozen=True)
+class Source:
+    year: int
+    election_type: Literal["general", "primary", "coordinated", "presidential_primary"]
+    data_source: Literal["boulder_county", "secretary_of_state"]
+    url: str
+    local_filename: str  # file under config.ORIGINAL_SUBDIRS[data_source]
+    # Applied in order, each over the result of the previous one.
+    supplements: tuple[Supplement, ...] = ()
+
+    def file_records(self) -> list[Source]:
+        """This source and each supplement as a single-file Source (same year,
+        type and data source; the supplement's URL and filename), for code
+        that handles raw files one at a time: fetch, the manifest, rejects."""
+        return [self] + [
+            Source(self.year, self.election_type, self.data_source, sup.url, sup.local_filename)
+            for sup in self.supplements
+        ]
+
+
 # Boulder County Statement of Votes.
 # Note: 2005, 2007, 2009 are coordinated elections published only as PDFs.
-# 2024 is the AMENDED SoV (post-recount); supersedes the original.
+# 2023 and 2024: the county posted the full SoV in November, then a recount
+# (2023) or amended (2024) SoV in December that re-reports only the recounted
+# or amended contests. The full file is the source; the December file is a
+# Supplement merged over it by contest (#42, #43).
 BOULDER_COUNTY: list[Source] = [
     Source(
         2005,
@@ -152,15 +179,32 @@ BOULDER_COUNTY: list[Source] = [
         2023,
         "coordinated",
         "boulder_county",
-        "https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx",
+        "https://assets.bouldercounty.gov/wp-content/uploads/2023/11/2023C-Boulder-County-Official-Statement-of-Votes.xlsx",
         "2023-coordinated-sov.xlsx",
+        supplements=(
+            # City of Boulder Council Candidates only (December 2023 recount).
+            Supplement(
+                "recount",
+                "https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx",
+                "2023-coordinated-sov-recount.xlsx",
+            ),
+        ),
     ),
     Source(
         2024,
         "general",
         "boulder_county",
-        "https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx",
+        "https://assets.bouldercounty.gov/wp-content/uploads/2024/11/2024G-Boulder-County-Official-Statement-of-Votes.xlsx",
         "2024-general-sov.xlsx",
+        supplements=(
+            # Town of Superior - Trustee and Town of Erie - Council Member
+            # District 1 only (amended December 2024).
+            Supplement(
+                "amended",
+                "https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx",
+                "2024-general-sov-amended.xlsx",
+            ),
+        ),
     ),
     Source(
         2025,
@@ -286,41 +330,61 @@ PRIMARY_ELECTION_DATES: dict[int, str] = {
     2026: "2026-06-30",
 }
 
+# Colorado's March presidential primaries (Super Tuesday). No data is ingested
+# here; the type exists so this repo and Cast-Vote-Records (which holds the
+# 2024 presidential primary CVR) share one election-key vocabulary.
+PRESIDENTIAL_PRIMARY_ELECTION_DATES: dict[int, str] = {
+    2024: "2024-03-05",
+}
+
 
 def election_date_for(year: int, election_type: str) -> str:
     """Election day for (year, election_type); a placeholder when unknown."""
     if election_type == "primary":
         return PRIMARY_ELECTION_DATES.get(year, f"{year}-06-XX")
+    if election_type == "presidential_primary":
+        return PRESIDENTIAL_PRIMARY_ELECTION_DATES.get(year, f"{year}-03-XX")
     return ELECTION_DATES.get(year, f"{year}-11-XX")
 
 
 # The election key shared with BoulderPublicData/Cast-Vote-Records (#34):
-# lowercase "{year}-{type}", type one of ELECTION_TYPES. File stems, cache
-# folders and CLI --election arguments all use it.
-ELECTION_TYPES: tuple[str, ...] = ("general", "primary", "coordinated")
-_KEY_RE = re.compile(r"^(?P<year>\d{4})-(?P<type>general|primary|coordinated)$")
+# lowercase "{year}-{type}", type one of ELECTION_TYPES, with "_" written "-"
+# ("2024-presidential-primary"). File stems, cache folders and CLI --election
+# arguments all use it.
+ELECTION_TYPES: tuple[str, ...] = ("general", "primary", "coordinated", "presidential_primary")
+_KEY_RE = re.compile(
+    r"^(?P<year>\d{4})-(?P<type>general|primary|coordinated|presidential[-_]primary)$"
+)
 # Raw election-night folders under data/original/ (immutable) are named
-# "2016G" / "2015C"; this maps their letter to the type.
-_LEGACY_CODE_RE = re.compile(r"^(?P<year>\d{4})(?P<kind>[GCP])$")
-_LEGACY_KIND = {"G": "general", "C": "coordinated", "P": "primary"}
+# "2016G" / "2015C"; this maps their letter to the type. The county writes the
+# presidential primary "2024PP".
+_LEGACY_CODE_RE = re.compile(r"^(?P<year>\d{4})(?P<kind>PP|[GCP])$")
+_LEGACY_KIND = {
+    "G": "general",
+    "C": "coordinated",
+    "P": "primary",
+    "PP": "presidential_primary",
+}
 
 
 def election_key(year: int, election_type: str) -> str:
-    """(2016, "general") → "2016-general"."""
+    """(2016, "general") → "2016-general";
+    (2024, "presidential_primary") → "2024-presidential-primary"."""
     if election_type not in ELECTION_TYPES:
         raise ValueError(
             f"unknown election type {election_type!r}; expected one of {ELECTION_TYPES}"
         )
-    return f"{int(year)}-{election_type}"
+    return f"{int(year)}-{election_type.replace('_', '-')}"
 
 
 def parse_election_key(key: str) -> tuple[int, str]:
-    """ "2016-general" → (2016, "general"). Also accepts the legacy folder code
-    "2016G" so old commands keep working."""
+    """ "2016-general" → (2016, "general"); "2024-presidential-primary" →
+    (2024, "presidential_primary"). Also accepts the legacy folder code
+    "2016G" / "2024PP" so old commands keep working."""
     s = key.strip()
     m = _KEY_RE.match(s.lower())
     if m:
-        return int(m["year"]), m["type"]
+        return int(m["year"]), m["type"].replace("-", "_")
     m = _LEGACY_CODE_RE.match(s.upper())
     if m:
         return int(m["year"]), _LEGACY_KIND[m["kind"]]

@@ -317,8 +317,6 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181207202,202,Boulder County Ballot Issue 1B,measure,No,,172,676,460,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181207202,202,City of Louisville Ballot Issue 2C,measure,Yes,,296,676,457,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181207202,202,City of Louisville Ballot Issue 2C,measure,No,,156,676,457,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,"2181207202, 2181207500","202, 500",City of Louisville City Council Ward 2 (4-year term),candidate,Deborah Fahey,,183,1895,458,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,"2181207202, 2181207500","202, 500",City of Louisville City Council Ward 2 (4-year term),candidate,George Colbert,,234,1895,458,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181207203,203,City of Louisville Mayor At-Large (4 Year Term),candidate,Sherry Sommer,,134,923,565,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181207203,203,City of Louisville Mayor At-Large (4 Year Term),candidate,Chris Leh,,323,923,565,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181207203,203,City of Louisville Mayor At-Large (4 Year Term),candidate,Josh Cooperman,,70,923,565,False
@@ -2726,10 +2724,10 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007801,801,City of Boulder Council Candidates,candidate,Jacques Decalo,,26,479,199,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007801,801,City of Boulder Council Candidates,candidate,Silas Atkins,,53,479,199,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007801,801,City of Boulder Council Candidates,candidate,Waylon Lewis,,48,479,199,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007801,801,City of Boulder Council Candidates,candidate,Ryan Schuchard,,109,479,199,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007801,801,City of Boulder Council Candidates,candidate,Ryan Schuchard,,108,479,199,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007801,801,City of Boulder Council Candidates,candidate,Tara Winer,,102,479,199,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007801,801,City of Boulder Council Candidates,candidate,Tina Marquis,,46,479,199,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007801,801,City of Boulder Council Candidates,candidate,Taishya Adams,,112,479,199,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007801,801,City of Boulder Council Candidates,candidate,Taishya Adams,,111,479,199,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007801,801,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Jason Unger,,75,479,199,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007801,801,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Neil Fishman,,88,479,199,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007801,801,Boulder Valley School District RE-2 Director District C (4 Years),candidate,Andrew Steffl,,18,479,199,False
@@ -2928,7 +2926,7 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007807,807,City of Boulder Council Candidates,candidate,Jenny Robins,,241,1091,604,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007807,807,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,47,1091,604,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007807,807,City of Boulder Council Candidates,candidate,Jacques Decalo,,49,1091,604,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007807,807,City of Boulder Council Candidates,candidate,Silas Atkins,,80,1091,604,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007807,807,City of Boulder Council Candidates,candidate,Silas Atkins,,79,1091,604,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007807,807,City of Boulder Council Candidates,candidate,Waylon Lewis,,134,1091,604,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007807,807,City of Boulder Council Candidates,candidate,Ryan Schuchard,,234,1091,604,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007807,807,City of Boulder Council Candidates,candidate,Tara Winer,,417,1091,604,False
@@ -3162,16 +3160,16 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007813,813,City of Boulder Ballot Question 2B,measure,No,,86,1029,660,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007813,813,City of Boulder Ballot Question 302,measure,Yes,,383,1029,660,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007813,813,City of Boulder Ballot Question 302,measure,No,,260,1029,660,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Terri Brncic,,302,844,562,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Jenny Robins,,253,844,562,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,29,844,562,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Jacques Decalo,,29,844,562,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Silas Atkins,,77,844,562,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Waylon Lewis,,140,844,562,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Ryan Schuchard,,180,844,562,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Tara Winer,,399,844,562,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Tina Marquis,,357,844,562,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Taishya Adams,,159,844,562,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Terri Brncic,,303,844,563,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Jenny Robins,,254,844,563,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,29,844,563,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Jacques Decalo,,29,844,563,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Silas Atkins,,77,844,563,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Waylon Lewis,,140,844,563,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Ryan Schuchard,,180,844,563,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Tara Winer,,400,844,563,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Tina Marquis,,358,844,563,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,City of Boulder Council Candidates,candidate,Taishya Adams,,159,844,563,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Jason Unger,,283,844,562,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Neil Fishman,,136,844,562,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907814,814,Boulder Valley School District RE-2 Director District C (4 Years),candidate,Andrew Steffl,,31,844,562,False
@@ -3200,7 +3198,7 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907815,815,City of Boulder Council Candidates,candidate,Jenny Robins,,571,1788,1155,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907815,815,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,40,1788,1155,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907815,815,City of Boulder Council Candidates,candidate,Jacques Decalo,,60,1788,1155,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907815,815,City of Boulder Council Candidates,candidate,Silas Atkins,,121,1788,1155,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907815,815,City of Boulder Council Candidates,candidate,Silas Atkins,,120,1788,1155,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907815,815,City of Boulder Council Candidates,candidate,Waylon Lewis,,214,1788,1155,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907815,815,City of Boulder Council Candidates,candidate,Ryan Schuchard,,341,1788,1155,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907815,815,City of Boulder Council Candidates,candidate,Tara Winer,,848,1788,1155,False
@@ -3232,7 +3230,7 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907815,815,City of Boulder Ballot Question 302,measure,No,,315,1788,1155,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007816,816,City of Boulder Council Candidates,candidate,Terri Brncic,,407,1301,817,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007816,816,City of Boulder Council Candidates,candidate,Jenny Robins,,317,1301,817,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007816,816,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,60,1301,817,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007816,816,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,59,1301,817,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007816,816,City of Boulder Council Candidates,candidate,Jacques Decalo,,62,1301,817,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007816,816,City of Boulder Council Candidates,candidate,Silas Atkins,,138,1301,817,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007816,816,City of Boulder Council Candidates,candidate,Waylon Lewis,,229,1301,817,False
@@ -3332,16 +3330,16 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007818,818,City of Boulder Ballot Question 2B,measure,No,,80,1719,637,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007818,818,City of Boulder Ballot Question 302,measure,Yes,,328,1719,637,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007818,818,City of Boulder Ballot Question 302,measure,No,,284,1719,637,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Terri Brncic,,259,1602,794,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Jenny Robins,,205,1602,794,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,105,1602,794,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Jacques Decalo,,89,1602,794,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Silas Atkins,,175,1602,794,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Waylon Lewis,,243,1602,794,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Ryan Schuchard,,366,1602,794,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Tara Winer,,453,1602,794,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Tina Marquis,,267,1602,794,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Taishya Adams,,397,1602,794,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Terri Brncic,,259,1602,793,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Jenny Robins,,205,1602,793,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,105,1602,793,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Jacques Decalo,,89,1602,793,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Silas Atkins,,175,1602,793,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Waylon Lewis,,243,1602,793,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Ryan Schuchard,,365,1602,793,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Tara Winer,,452,1602,793,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Tina Marquis,,266,1602,793,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,City of Boulder Council Candidates,candidate,Taishya Adams,,396,1602,793,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Jason Unger,,287,1602,794,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Neil Fishman,,299,1602,794,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007819,819,Boulder Valley School District RE-2 Director District C (4 Years),candidate,Andrew Steffl,,56,1602,794,False
@@ -3434,16 +3432,16 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007821,821,City of Boulder Ballot Question 2B,measure,No,,71,1104,561,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007821,821,City of Boulder Ballot Question 302,measure,Yes,,346,1104,561,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007821,821,City of Boulder Ballot Question 302,measure,No,,200,1104,561,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Terri Brncic,,337,1470,736,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Jenny Robins,,231,1470,736,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,76,1470,736,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Jacques Decalo,,81,1470,736,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Silas Atkins,,163,1470,736,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Waylon Lewis,,235,1470,736,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Ryan Schuchard,,313,1470,736,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Tara Winer,,454,1470,736,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Tina Marquis,,274,1470,736,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Taishya Adams,,319,1470,736,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Terri Brncic,,336,1470,735,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Jenny Robins,,230,1470,735,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,76,1470,735,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Jacques Decalo,,81,1470,735,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Silas Atkins,,163,1470,735,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Waylon Lewis,,234,1470,735,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Ryan Schuchard,,313,1470,735,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Tara Winer,,454,1470,735,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Tina Marquis,,273,1470,735,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,City of Boulder Council Candidates,candidate,Taishya Adams,,319,1470,735,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Jason Unger,,307,1470,736,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Neil Fishman,,244,1470,736,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007822,822,Boulder Valley School District RE-2 Director District C (4 Years),candidate,Andrew Steffl,,46,1470,736,False
@@ -3612,7 +3610,7 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907827,827,City of Boulder Council Candidates,candidate,Waylon Lewis,,265,1624,943,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907827,827,City of Boulder Council Candidates,candidate,Ryan Schuchard,,323,1624,943,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907827,827,City of Boulder Council Candidates,candidate,Tara Winer,,629,1624,943,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907827,827,City of Boulder Council Candidates,candidate,Tina Marquis,,482,1624,943,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907827,827,City of Boulder Council Candidates,candidate,Tina Marquis,,481,1624,943,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907827,827,City of Boulder Council Candidates,candidate,Taishya Adams,,330,1624,943,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907827,827,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Jason Unger,,425,1624,946,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907827,827,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Neil Fishman,,261,1624,946,False
@@ -3679,7 +3677,7 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007829,829,City of Boulder Council Candidates,candidate,Silas Atkins,,83,1445,465,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007829,829,City of Boulder Council Candidates,candidate,Waylon Lewis,,158,1445,465,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007829,829,City of Boulder Council Candidates,candidate,Ryan Schuchard,,165,1445,465,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007829,829,City of Boulder Council Candidates,candidate,Tara Winer,,270,1445,465,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007829,829,City of Boulder Council Candidates,candidate,Tara Winer,,269,1445,465,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007829,829,City of Boulder Council Candidates,candidate,Tina Marquis,,226,1445,465,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007829,829,City of Boulder Council Candidates,candidate,Taishya Adams,,163,1445,465,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007829,829,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Jason Unger,,202,1445,465,False
@@ -4046,16 +4044,16 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007839,839,City of Boulder Ballot Question 2B,measure,No,,99,1316,797,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007839,839,City of Boulder Ballot Question 302,measure,Yes,,463,1316,797,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007839,839,City of Boulder Ballot Question 302,measure,No,,304,1316,797,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Terri Brncic,,382,1794,1037,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Jenny Robins,,324,1794,1037,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,113,1794,1037,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Jacques Decalo,,112,1794,1037,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Silas Atkins,,205,1794,1037,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Waylon Lewis,,270,1794,1037,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Ryan Schuchard,,452,1794,1037,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Tara Winer,,623,1794,1037,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Tina Marquis,,452,1794,1037,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Taishya Adams,,489,1794,1037,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Terri Brncic,,381,1794,1038,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Jenny Robins,,325,1794,1038,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,113,1794,1038,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Jacques Decalo,,112,1794,1038,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Silas Atkins,,205,1794,1038,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Waylon Lewis,,270,1794,1038,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Ryan Schuchard,,452,1794,1038,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Tara Winer,,623,1794,1038,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Tina Marquis,,453,1794,1038,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,City of Boulder Council Candidates,candidate,Taishya Adams,,489,1794,1038,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Jason Unger,,383,1794,1037,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Neil Fishman,,421,1794,1037,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007840,840,Boulder Valley School District RE-2 Director District C (4 Years),candidate,Andrew Steffl,,67,1794,1037,False
@@ -4322,12 +4320,12 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Jenny Robins,,85,789,320,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,40,789,320,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Jacques Decalo,,48,789,320,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Silas Atkins,,70,789,320,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Silas Atkins,,71,789,320,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Waylon Lewis,,76,789,320,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Ryan Schuchard,,130,789,320,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Tara Winer,,172,789,320,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Ryan Schuchard,,131,789,320,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Tara Winer,,173,789,320,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Tina Marquis,,114,789,320,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Taishya Adams,,145,789,320,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,City of Boulder Council Candidates,candidate,Taishya Adams,,146,789,320,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Jason Unger,,131,789,320,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,Boulder Valley School District RE-2 Director District A (4 Years),candidate,Neil Fishman,,102,789,320,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007848,848,Boulder Valley School District RE-2 Director District C (4 Years),candidate,Andrew Steffl,,24,789,320,False
@@ -4386,8 +4384,8 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007849,849,City of Boulder Ballot Question 2B,measure,No,,59,1030,503,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007849,849,City of Boulder Ballot Question 302,measure,Yes,,259,1030,503,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007849,849,City of Boulder Ballot Question 302,measure,No,,228,1030,503,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007850,850,City of Boulder Council Candidates,candidate,Terri Brncic,,210,1324,709,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007850,850,City of Boulder Council Candidates,candidate,Jenny Robins,,158,1324,709,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007850,850,City of Boulder Council Candidates,candidate,Terri Brncic,,211,1324,709,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007850,850,City of Boulder Council Candidates,candidate,Jenny Robins,,159,1324,709,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007850,850,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,95,1324,709,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007850,850,City of Boulder Council Candidates,candidate,Jacques Decalo,,94,1324,709,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2181007850,850,City of Boulder Council Candidates,candidate,Silas Atkins,,205,1324,709,False
@@ -4526,7 +4524,7 @@ election_year,election_date,election_type,data_source,jurisdiction_level,jurisdi
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907854,854,City of Boulder Council Candidates,candidate,Jenny Robins,,228,860,579,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907854,854,City of Boulder Council Candidates,candidate,Aaron Gabriel Neyer,,34,860,579,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907854,854,City of Boulder Council Candidates,candidate,Jacques Decalo,,42,860,579,False
-2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907854,854,City of Boulder Council Candidates,candidate,Silas Atkins,,82,860,579,False
+2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907854,854,City of Boulder Council Candidates,candidate,Silas Atkins,,81,860,579,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907854,854,City of Boulder Council Candidates,candidate,Waylon Lewis,,139,860,579,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907854,854,City of Boulder Council Candidates,candidate,Ryan Schuchard,,214,860,579,False
 2023,2023-11-07,coordinated,boulder_county,county,Boulder County,2184907854,854,City of Boulder Council Candidates,candidate,Tara Winer,,411,860,579,False

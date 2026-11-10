@@ -77,3 +77,26 @@ def test_force_redownloads_and_rerecords(env):
 def test_committed_manifest_covers_and_matches_every_original():
     """Every registry file on disk has an entry whose sha256 matches."""
     assert fetch.verify_manifest() == []
+
+
+def test_supplements_are_fetched_and_recorded(tmp_path, monkeypatch):
+    """#42/#43: a recount or amended file is downloaded and recorded like
+    its source, and its record says what it supplements."""
+    from scripts.sources import find
+
+    s = find(2024, "boulder_county")
+    manifest = tmp_path / "manifest.json"
+    monkeypatch.setattr(fetch, "MANIFEST_PATH", manifest)
+    monkeypatch.setattr(fetch, "local_path", lambda r: tmp_path / r.local_filename)
+    monkeypatch.setattr(fetch.http, "get_bytes", lambda url, **kw: url.encode())
+    assert [r.local_filename for r in fetch.files([s])] == [
+        "2024-general-sov.xlsx",
+        "2024-general-sov-amended.xlsx",
+    ]
+    assert fetch.fetch_many([s]) == 0
+    recs = json.loads(manifest.read_text())["files"]
+    amended = recs["boulder_county/2024-general-sov-amended.xlsx"]
+    assert amended["kind"] == "amended"
+    assert amended["supplement_of"] == "2024-general-sov.xlsx"
+    assert amended["url"] == s.supplements[0].url
+    assert "kind" not in recs["boulder_county/2024-general-sov.xlsx"]
