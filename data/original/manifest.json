@@ -224,6 +224,16 @@
       "url": "https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx",
       "year": 2025
     },
+    "boulder_county/2026-general-sov.xlsx": {
+      "bytes": 915179,
+      "data_source": "boulder_county",
+      "election_type": "general",
+      "filename": "2026-general-sov.xlsx",
+      "retrieved_at": "2026-11-26T01:46:44+00:00",
+      "sha256": "2cf8fd32734956235509dba68e6cacad6a07099d0a6e1864d36afe31fd50f5b3",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2026/11/2026G-Boulder-County-Official-Statement-of-Votes.xlsx",
+      "year": 2026
+    },
     "secretary_of_state/2004-general-precinct-results.xlsx": {
       "bytes": 7013174,
       "data_source": "secretary_of_state",

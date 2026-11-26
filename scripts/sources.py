@@ -213,6 +213,13 @@ BOULDER_COUNTY: list[Source] = [
         "https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx",
         "2025-coordinated-sov.xlsx",
     ),
+    Source(
+        2026,
+        "general",
+        "boulder_county",
+        "https://assets.bouldercounty.gov/wp-content/uploads/2026/11/2026G-Boulder-County-Official-Statement-of-Votes.xlsx",
+        "2026-general-sov.xlsx",
+    ),
 ]
 
 # Colorado Secretary of State precinct-level results.

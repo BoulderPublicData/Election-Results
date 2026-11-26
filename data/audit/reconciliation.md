@@ -16,14 +16,14 @@ county's own `Totals` row per candidate (Boulder panel XLS, 2008-2012), or the
 - `not_in_file` — the canonical contest pattern matched nothing in either file.
 - `corrected` — the difference is exactly an adjudicated correction in [`scripts/corrections/statements-of-votes.csv`](../../scripts/corrections/statements-of-votes.csv) (the published file is wrong; see its evidence column).
 
-**Contest × candidate:** 3,325 keys compared, 3,323 match, 0 near_match, 2 corrected, **0 mismatch**; structural issues (duplicate keys + mixed contests): **0**.
+**Contest × candidate:** 3,553 keys compared, 3,551 match, 0 near_match, 2 corrected, **0 mismatch**; structural issues (duplicate keys + mixed contests): **0**.
 
-**Top-line summary across all 182 contest-source rows:**
+**Top-line summary across all 193 contest-source rows:**
 
 | status | rows |
 |---|---|
 | corrected | 1 |
-| match | 181 |
+| match | 192 |
 
 ## Contest × candidate reconciliation
 
@@ -61,6 +61,7 @@ Every (contest, candidate_or_option) key in each file, original vs. processed (R
 | 2024 general boulder_county | 152 | 152 | 0 | 0 | 0 | 0 | 0 |
 | 2024 general secretary_of_state | — | — | — | — | — | 0 | 0 |
 | 2025 coordinated boulder_county | 80 | 80 | 0 | 0 | 0 | 0 | 0 |
+| 2026 general boulder_county | 228 | 228 | 0 | 0 | 0 | 0 | 0 |
 
 ### Keys that differ (2)
 
@@ -397,6 +398,22 @@ Every (contest, candidate_or_option) key in each file, original vs. processed (R
 | City of Boulder Council | 113,888 | 113,888 | +0 | `match` |
 | City of Longmont Mayor | 31,844 | 31,844 | +0 | `match` |
 | City of Louisville Council | 7,383 | 7,383 | +0 | `match` |
+
+### 2026 general — boulder_county
+
+| canonical contest | original | processed | delta | status |
+|---|---|---|---|---|
+| Attorney General | 169,555 | 169,555 | +0 | `match` |
+| City of Boulder Council | 179,680 | 179,680 | +0 | `match` |
+| City of Boulder Mayor | 41,401 | 41,401 | +0 | `match` |
+| County Commissioner | 117,805 | 117,805 | +0 | `match` |
+| Governor | 173,265 | 173,265 | +0 | `match` |
+| Regent University of Colorado | 164,459 | 164,459 | +0 | `match` |
+| Secretary of State | 171,042 | 171,042 | +0 | `match` |
+| State Representative | 151,116 | 151,116 | +0 | `match` |
+| State Treasurer | 170,019 | 170,019 | +0 | `match` |
+| United States Representative | 172,742 | 172,742 | +0 | `match` |
+| United States Senator | 173,565 | 173,565 | +0 | `match` |
 
 ## Boulder County SoV vs. SOS file, same election (report only)
 

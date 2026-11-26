@@ -50,3 +50,49 @@ def test_property_owner_rows_are_kept(tmp_path):
     po = out[out["precinct_name"] == "Property Owner"]
     assert (po["precinct_id"] == "Property Owner").all()
     assert "Property Owner" in out["extraction_notes"].iloc[0]
+
+
+def test_rcv_statement_sheet_is_ranked_choice(tmp_path):
+    """2026 names its sheets "Plurality Statement" / "RCV Statement" (2023 used
+    "Plurality" / "RCV"). The RCV sheet must still be melted into rounds: before
+    this fix the 2026 mayoral race was read as a plurality contest holding only
+    the final-round totals (Adams 0 instead of 8,630 first choices)."""
+    mayor = "City of Boulder Mayoral Candidates"
+    plurality = pd.DataFrame(
+        {
+            "Precinct Code": ["503", "503"],
+            "Precinct Number": [2181207503, 2181207503],
+            "Contest Title": ["United States Senator"] * 2,
+            "Choice Name": ["A", "B"],
+            "Total Ballots": [10, 10],
+            "Total Votes": [6, 4],
+        }
+    )
+    rcv = pd.DataFrame(
+        {
+            "Precinct Code": ["503", "503", "503"],
+            "Precinct Number": [2181207503] * 3,
+            "Contest Title": [mayor] * 3,
+            "Candidate Name": ["Adams", "Brockett", "La Grave"],
+            "Total Ballots": [10, 10, 10],
+            "Round 1 Votes": [3, 4, 3],
+            "Round 2 Votes": [-3, 2, 1],
+            "Total Votes": [0, 6, 4],
+        }
+    )
+    path = tmp_path / "2026-general-sov.xlsx"
+    with pd.ExcelWriter(path) as xw:
+        plurality.to_excel(xw, sheet_name="Plurality Statement", index=False)
+        rcv.to_excel(xw, sheet_name="RCV Statement", index=False)
+
+    out = boco_tidy.parse(path, _meta(path.name))
+
+    m = out[out["contest"] == mayor]
+    assert (m["contest_type"] == "ranked_choice").all()
+    votes = m.set_index("candidate_or_option")["votes"].to_dict()
+    assert votes["Adams | Round 1"] == 3
+    assert votes["Brockett | Round 2"] == 2
+    assert votes["Brockett | Final"] == 6
+    assert len(m) == 9  # 3 candidates x (Round 1, Round 2, Final)
+    senate = out[out["contest"] == "United States Senator"]
+    assert (senate["contest_type"] != "ranked_choice").all()

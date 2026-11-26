@@ -141,7 +141,7 @@ Raw downloads are committed alongside the manifest (sha256 + retrieved_at for ev
 | **negative `votes` values** | Legitimately appear in RCV intermediate rounds (ballots transferring away from eliminated candidates). | `validate()` skips this check for `contest_type == "ranked_choice"` rows. Don't "fix" it by taking absolute values — you lose information. |
 | **Election-night snapshots** (`data/processed/vote-counting/`) | Rows are cumulative county-wide totals per snapshot; summing `votes` across snapshots multiplies them, and concatenating with precinct data double-counts. | Use `vote_change` or filter `is_final_snapshot`. Keep the dataset separate (own schema in `schema.py:VOTE_COUNTING_*`). |
 | **Vote-counting OCR fixes** | Editing a cached Datalab JSON hides the fix and is overwritten on re-OCR. | Add a row to `scripts/corrections/vote-counting.csv` (the build fails if its `ocr_value` stops matching). `data/audit/vote-counting.md` must show 0 open issues. |
-| **Combined CSV size** | `all-elections-tidy.csv` is <!-- generated:combined-size -->63 MB<!-- /generated:combined-size -->. Gitignored. | The pipeline regenerates it from per-year files; never check it in. |
+| **Combined CSV size** | `all-elections-tidy.csv` is <!-- generated:combined-size -->67 MB<!-- /generated:combined-size -->. Gitignored. | The pipeline regenerates it from per-year files; never check it in. |
 
 ### 3a. Long runs and the working tree
 
@@ -245,7 +245,7 @@ In rough order of value:
 | End-to-end driver | [`scripts/pipeline.py`](scripts/pipeline.py) |
 | JSON lookup exporter | [`scripts/export_lookups.py`](scripts/export_lookups.py) |
 | Doc counts/sizes generator | [`scripts/doc_stats.py`](scripts/doc_stats.py) (rewrites the `<!-- generated:… -->` spans) |
-| Test suite | [`tests/`](tests/) (pytest, <!-- generated:test-count -->469 tests<!-- /generated:test-count -->; hermetic — never writes into `data/`) |
+| Test suite | [`tests/`](tests/) (pytest, <!-- generated:test-count -->476 tests<!-- /generated:test-count -->; hermetic — never writes into `data/`) |
 | Shared Excel reader | [`scripts/parsers/common.py`](scripts/parsers/common.py) (`read_excel`, `excel_file`) |
 | Data dictionary | [`docs/data-dictionary.md`](docs/data-dictionary.md) |
 | Changelog | [`docs/changelog.md`](docs/changelog.md) |

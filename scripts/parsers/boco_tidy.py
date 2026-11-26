@@ -6,7 +6,8 @@ The only work is column normalization to the harmonized schema and contest-type
 classification. Composite precinct IDs (2015, 2022) are preserved as-is and flagged
 in extraction_notes.
 
-2023 has two sheets: 'Plurality' (standard) and 'RCV' (ranked choice). The RCV sheet
+2023 and 2026 have two sheets: 'Plurality' / 'Plurality Statement' (standard) and 'RCV' /
+'RCV Statement' (ranked choice). The RCV sheet
 gets contest_type='ranked_choice'; each row corresponds to one round's tally for one
 candidate.
 
@@ -82,7 +83,9 @@ def parse(path: Path, meta: SourceMeta) -> pd.DataFrame:
         if raw.empty:
             continue
         df = clean_cols(raw)
-        is_rcv = sheet.upper() == "RCV"
+        # 2023 names the sheets "Plurality" / "RCV"; 2026 "Plurality Statement" /
+        # "RCV Statement". Any sheet with the word RCV holds the ranked-choice rounds.
+        is_rcv = "RCV" in sheet.upper().split()
 
         p_long = _pick(df, _PRECINCT_LONG_ALIASES)
         p_short = _pick(df, _PRECINCT_SHORT_ALIASES)

@@ -1,7 +1,7 @@
 # Election Results
 
 Boulder County and Colorado Secretary of State precinct-level election results,
-harmonized into a single tidy long-form dataset spanning **2004-2025**.
+harmonized into a single tidy long-form dataset spanning **2004-2026**.
 
 > **🦆 Datasette Lite (one click, no install):**
 > [**Open the full dataset in your browser →**](https://lite.datasette.io/?url=https://github.com/BoulderPublicData/Election-Results/releases/download/latest/elections.db#/elections)
@@ -131,6 +131,7 @@ Are the results of individual contests available at the level of precincts in an
 
 | Year | Boulder | State | Notes |
 |---|---|---|---|
+| 2026 | ✅ [2026 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2026/11/2026G-Boulder-County-Official-Statement-of-Votes.xlsx) | ⏳ not yet published | General election. Includes the ranked-choice City of Boulder mayor's race (`RCV Statement` sheet). Election-night snapshots not ingested yet (the OCR step is paid). |
 | 2025 | ✅ [2025 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx) | ❌ not published | Coordinated election (odd-year). |
 | 2024 | ✅ [2024 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2024/11/2024G-Boulder-County-Official-Statement-of-Votes.xlsx) + [amended SoV](https://assets.bouldercounty.gov/wp-content/uploads/2024/12/2024G-Boulder-County-Amended-Statement-of-Votes.xlsx) | ⚠️ [2024 SOS turnout-only](https://www.coloradosos.gov/pubs/elections/Results/2024/2024GeneralPrecinctVoterTurnout.xlsx) | All 65 contests; the amended SoV's 2 contests merged over the full one. SOS file is turnout-only (no candidate detail). |
 | 2023 | ✅ [2023 SoV xlsx](https://assets.bouldercounty.gov/wp-content/uploads/2023/11/2023C-Boulder-County-Official-Statement-of-Votes.xlsx) + [recount SoV](https://assets.bouldercounty.gov/wp-content/uploads/2023/12/2023C-Boulder-County-Official-Statement-of-Votes-Recount.xlsx) | ❌ not published | First Boulder mayoral RCV. City of Boulder Council from the December recount; Louisville Ward 2 corrected (data dictionary §4.7–4.8). |
@@ -225,7 +226,7 @@ uv run python -m scripts.pipeline --discover            # full end-to-end with d
 The pytest suite and [ruff](https://docs.astral.sh/ruff/) lint run on every push and PR via [`.github/workflows/tests.yml`](.github/workflows/tests.yml). The tests cover schema contracts, per-parser helpers, the discovery classifier (with cached HTML fixtures so it works offline), source-registry shape, the election-night parser and QA, fixture or golden-page tests for the SOS, panel and PDF parsers, and every committed processed CSV. They never touch the network or rewrite committed files.
 
 ```bash
-uv run pytest                  # run everything (<!-- generated:test-count -->469 tests<!-- /generated:test-count -->)
+uv run pytest                  # run everything (<!-- generated:test-count -->476 tests<!-- /generated:test-count -->)
 uv run pytest tests/test_discover.py -v
 uv run ruff check .            # lint (rules in pyproject.toml)
 ```
