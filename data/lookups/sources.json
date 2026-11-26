@@ -2,7 +2,7 @@
   "$schema_version": "1.2.0",
   "$description": "Source URL registry. One entry per (year, election_type, data_source). `local_filename` is the file under data/original/boulder-county/statement-of-votes/ (Boulder County) or data/original/secretary-of-state/ (SOS). `supplements` are later recount or amended files that re-report some contests; each replaces those contests in the source file (scripts/overlay.py).",
   "$generated_by": "scripts/export_lookups.py from scripts/sources.py:ALL_SOURCES",
-  "$generated_at": "2026-11-10T03:58:54+00:00",
+  "$generated_at": "2026-11-26T01:54:00+00:00",
   "sources": [
     {
       "year": 2004,
@@ -254,6 +254,14 @@
       "data_source": "boulder_county",
       "url": "https://assets.bouldercounty.gov/wp-content/uploads/2025/11/2025C-Boulder-County-Official-Statement-of-Votes.xlsx",
       "local_filename": "2025-coordinated-sov.xlsx",
+      "supplements": []
+    },
+    {
+      "year": 2026,
+      "election_type": "general",
+      "data_source": "boulder_county",
+      "url": "https://assets.bouldercounty.gov/wp-content/uploads/2026/11/2026G-Boulder-County-Official-Statement-of-Votes.xlsx",
+      "local_filename": "2026-general-sov.xlsx",
       "supplements": []
     }
   ]
